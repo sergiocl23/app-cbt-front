@@ -1,0 +1,4 @@
+.selected {
+  background-color: rgba(0, 0, 0, 0.1); /* Cambia el color según tu diseño */
+  color: #1976d2; /* Color del texto, si lo deseas */
+}

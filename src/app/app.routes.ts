@@ -1,27 +1,39 @@
 import { Routes } from '@angular/router';
 import { NotFoundComponent } from './shared/pages/not-found/not-found.component';
+import { MainLayoutPageComponent } from './core/main-layout-page/main-layout-page.component';
+
 
 export const routes: Routes = [
   {
-    path: 'home',
-    loadChildren: () => import('./home/home.routes').then( r => r.routes)
+    path: '',
+    component: MainLayoutPageComponent,
+    children: [
+      {
+        path: 'home',
+        loadChildren: () => import('./features/home/home.routes').then( r => r.routes)
+      },
+      {
+        path: 'news',
+        loadChildren: () => import('./features/news/news.routes').then( r => r.routes)
+      },
+      {
+        path: 'simulation',
+        loadChildren: () => import('./features/simulation/simulation.routes').then( r => r.routes)
+      },
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      },
+    ]
   },
   {
     path: 'auth',
-    loadChildren: () => import('./auth/auth.routes').then( r => r.routes)
-  },
-  {
-    path: 'news',
-    loadChildren: () => import('./news/news.routes').then( r => r.routes)
+    loadChildren: () => import('./features/auth/auth.routes').then( r => r.routes)
   },
   {
     path: 'not-found',
     component: NotFoundComponent
-  },
-  {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
   },
   {
     path: '**',
