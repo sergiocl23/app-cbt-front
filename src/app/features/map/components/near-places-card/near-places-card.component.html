@@ -1,0 +1,35 @@
+<mat-card>
+  <mat-card-header>
+    <div class="card-title flex align-items-center justify-content-between w-full">
+      <span>Lugares Cercanos</span>
+      <button mat-stroked-button color="primary" >
+        Ver más
+      </button>
+    </div>
+  </mat-card-header>
+  <div class="mat-card-content p-4">
+    <div class="grid">
+      <div class="col-6 col-mapa">
+        <div id="map"></div>
+      </div>
+      <div class="col-6">
+        <table class="lugares-table">
+          <tbody>
+            <tr *ngFor="let lugar of nearPlaces">
+              <!-- Círculo de color -->
+              <td>
+                <span class="color-circle">{{ lugar.order }}</span>
+              </td>
+              <td>{{ lugar.name }}</td>
+              <td>
+                <span [ngClass]=" getDistanceColor(lugar.distance) " class="distance-circle">
+                  {{ lugar.distance }} km
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</mat-card>

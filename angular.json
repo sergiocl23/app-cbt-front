@@ -21,13 +21,12 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              "src/assets",
+              "src/favicon.ico"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "@angular/material/prebuilt-themes/deeppurple-amber.css"
             ],
             "scripts": [],
             "server": "src/main.server.ts",
@@ -38,6 +37,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environments.ts",
+                  "with": "src/environments/environments.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
@@ -84,13 +89,12 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
+              "src/assets",
+              "src/favicon.ico"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "@angular/material/prebuilt-themes/deeppurple-amber.css"
             ],
             "scripts": []
           }

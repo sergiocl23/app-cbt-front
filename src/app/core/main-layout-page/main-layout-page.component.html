@@ -1,0 +1,46 @@
+<mat-sidenav-container fullscreen>
+  <mat-sidenav #sidenav mode="push">
+    <mat-toolbar>
+      <!-- <img mat-card-image src="/src/assets/logo/logo.png" alt="logo"> -->
+       <div class="logo-container">
+         <img class="logo" src="assets/images/logo/logo.png" alt="Logo" class="logo">
+         <img class="titulo" src="assets/images/logo/titulo.png" alt="Logo" class="titulo">
+       </div>
+      <span class="spacer"></span>
+
+      <button mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+    </mat-toolbar>
+
+    <mat-nav-list>
+      <mat-list-item *ngFor="let item of sidebarItems"
+        [routerLink]="item.url"
+        routerLinkActive="selected"
+        (click) = "sidenav.toggle()"
+      >
+      <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+      {{ item.label }}
+      </mat-list-item>
+    </mat-nav-list>
+
+  </mat-sidenav>
+
+  <mat-toolbar color="primary">
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <span class="spacer"></span>
+    <button mat-button>
+      Logout
+    </button>
+  </mat-toolbar>
+
+  <div class="container">
+    <router-outlet />
+  </div>
+
+
+</mat-sidenav-container>

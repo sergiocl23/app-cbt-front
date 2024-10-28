@@ -1,0 +1,83 @@
+<mat-card>
+  <mat-card-header>
+    <div class="card-title flex align-items-center justify-content-between w-full">
+      <span>Próximas Reuniones</span>
+      <button mat-stroked-button color="primary" >
+        Ver más
+      </button>
+    </div>
+  </mat-card-header>
+  <div class="mat-card-content p-4">
+    <div class="grid">
+      <div class="col-12">
+
+<!--
+        <table class="meetings-table">
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>País</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let meet of meetings">
+              <td>
+                <span>{{ meet.company }}</span>
+              </td>
+              <td>
+                <span>{{ meet.country }}</span>
+              </td>
+              <td>
+                <span>{{ meet.date }} - {{ meet.time }}</span>
+              </td>
+              <td>
+                <span>{{ meet.status }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+ -->
+
+        <table class="meetings-table">
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>País</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let reunion of meetings">
+              <!-- Empresa -->
+              <td class="empresa-cell">
+                <span class="logo-circle">
+                  <img [src]="reunion.company.logo" alt="{{ reunion.company.name }}" class="company-logo" />
+                </span>
+                <span>{{ reunion.company.name }}</span>
+              </td>
+
+              <!-- País -->
+              <td>{{ reunion.country }}</td>
+
+              <!-- Fecha -->
+              <td>{{ reunion.date }} - {{ reunion.time }}</td>
+
+              <!-- Estado -->
+              <td>
+                <span class="estado-badge">
+                  <span [ngClass]="getStatusClass(reunion.status)" class="estado-circle"></span>
+                  {{ reunion.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+
+      </div>
+    </div>
+  </div>
+</mat-card>

@@ -1,0 +1,28 @@
+<mat-card>
+  <mat-card-header>
+    <div class="card-title flex align-items-center justify-content-between w-full">
+      <span>Empresas Guardadas</span>
+      <button mat-stroked-button color="primary" >
+        Ver más
+      </button>
+    </div>
+  </mat-card-header>
+  <div class="mat-card-content p-4">
+    <div class="empresas-guardadas grid grid-nogutter">
+      <div *ngFor="let empresa of companies" class="col-12 md:col-3">
+        <div class="empresa-card">
+          <div class="empresa-content">
+            <img [src]="empresa.logo" alt="{{ empresa.name }}" class="empresa-logo" />
+            <h3 class="empresa-name">{{ empresa.name }}</h3>
+            <p class="empresa-location">{{ empresa.city }} - {{ empresa.country }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+  </div>
+</mat-card>
