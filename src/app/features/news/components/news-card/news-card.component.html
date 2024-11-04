@@ -1,38 +1,27 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-subtitle>{{ newsItem.fecha }}</mat-card-subtitle>
-    <mat-card-title>{{ newsItem.titulo }}</mat-card-title>
-  </mat-card-header>
+<p-card [header]="newsItem.titulo" [subheader]="newsItem.fecha.toString()">
+  <ng-template pTemplate="header">
+      <img mat-card-image [src]="newsItem | newsItemImage " [alt]="newsItem.id">
+  </ng-template>
+  <p>
+    {{ newsItem.descripcion[0].children[0].text }}
+  </p>
+  <p-divider></p-divider>
+  <ng-template pTemplate="footer">
 
-  <img mat-card-image [src]="newsItem | newsItemImage " [alt]="newsItem.id">
-
-  <mat-card-content class="mt-2">
-    <p>
-      {{ newsItem.descripcion[0].children[0].text }}
-    </p>
-  </mat-card-content>
-
-  <mat-divider></mat-divider>
-  <mat-card-actions>
-
-    <button mat-button
-      mat-raised
-      color="primary"
-      [routerLink]="['/news/edit', newsItem.id]"
-      >
-      <mat-icon>edit</mat-icon>
-      Editar
-    </button>
-
-    <span class="spacer"></span>
-
-    <button mat-button
-      mat-raised
-      [routerLink]="['/news', newsItem.id]">
-      <mat-icon>more_horiz</mat-icon>
-      Más
-    </button>
-
-  </mat-card-actions>
-
-</mat-card>
+      <div class="flex gap-3 mt-1">
+        <button pButton type="button" [routerLink]="['/news/edit', newsItem.id]" size="small">
+          <div class="flex align-items-center justify-content-center w-full">
+            <span class="material-icons mr-2">edit</span>
+            <strong>Editar</strong>
+          </div>
+        </button>
+        <!-- <span class="spacer"></span> -->
+        <button pButton type="button" severity="secondary" [routerLink]="['/news', newsItem.id]" size="small">
+          <div class="flex align-items-center justify-content-center w-full">
+            <span class="material-icons mr-2">more_horiz</span>
+            <strong>Más</strong>
+          </div>
+        </button>
+      </div>
+  </ng-template>
+</p-card>

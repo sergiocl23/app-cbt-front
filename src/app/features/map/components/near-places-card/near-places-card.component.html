@@ -1,13 +1,11 @@
-<mat-card>
-  <mat-card-header>
-    <div class="card-title flex align-items-center justify-content-between w-full">
+<p-card>
+  <ng-template pTemplate="header">
+    <div class="card-title flex align-items-center justify-content-between px-3 pt-3 pb-0">
       <span>Lugares Cercanos</span>
-      <button mat-stroked-button color="primary" >
-        Ver más
-      </button>
+      <p-button label="Ver más" [outlined]="true" severity="secondary" />
     </div>
-  </mat-card-header>
-  <div class="mat-card-content p-4">
+  </ng-template>
+  <ng-template pTemplate="content">
     <div class="grid">
       <div class="col-6 col-mapa">
         <div id="map"></div>
@@ -17,11 +15,11 @@
           <tbody>
             <tr *ngFor="let lugar of nearPlaces">
               <!-- Círculo de color -->
-              <td>
+              <td style="width: 10%;">
                 <span class="color-circle">{{ lugar.order }}</span>
               </td>
-              <td>{{ lugar.name }}</td>
-              <td>
+              <td style="width: 60%;">{{ lugar.name }}</td>
+              <td style="width: 30%;">
                 <span [ngClass]=" getDistanceColor(lugar.distance) " class="distance-circle">
                   {{ lugar.distance }} km
                 </span>
@@ -31,5 +29,5 @@
         </table>
       </div>
     </div>
-  </div>
-</mat-card>
+  </ng-template>
+</p-card>

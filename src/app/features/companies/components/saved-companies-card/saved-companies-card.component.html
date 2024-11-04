@@ -1,13 +1,11 @@
-<mat-card>
-  <mat-card-header>
-    <div class="card-title flex align-items-center justify-content-between w-full">
+<p-card>
+  <ng-template pTemplate="header">
+    <div class="card-title flex align-items-center justify-content-between px-3 pt-3 pb-0">
       <span>Empresas Guardadas</span>
-      <button mat-stroked-button color="primary" >
-        Ver más
-      </button>
+      <p-button label="Ver más" [outlined]="true" severity="secondary" />
     </div>
-  </mat-card-header>
-  <div class="mat-card-content p-4">
+  </ng-template>
+  <ng-template pTemplate="content">
     <div class="empresas-guardadas grid grid-nogutter">
       <div *ngFor="let empresa of companies" class="col-12 md:col-3">
         <div class="empresa-card">
@@ -19,10 +17,5 @@
         </div>
       </div>
     </div>
-
-
-
-
-
-  </div>
-</mat-card>
+  </ng-template>
+</p-card>

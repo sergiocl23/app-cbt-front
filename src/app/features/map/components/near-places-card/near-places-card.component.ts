@@ -1,8 +1,8 @@
 import { Component, Inject, PLATFORM_ID, AfterViewInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
 
 import mapboxgl, { Map, NavigationControl, LngLat, Marker, Popup, LngLatBounds } from 'mapbox-gl';
 import { environments } from '../../../../../environments/environments';
@@ -12,7 +12,11 @@ mapboxgl.accessToken = environments.mapBoxKey;
 @Component({
   selector: 'near-places-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    CardModule,
+    ButtonModule
+  ],
   templateUrl: './near-places-card.component.html',
   styleUrl: './near-places-card.component.css'
 })

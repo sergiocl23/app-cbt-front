@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
 
 interface Meeting {
   company: {
@@ -19,8 +20,8 @@ interface Meeting {
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
-    MatButtonModule
+    CardModule,
+    ButtonModule
   ],
   templateUrl: './upcoming-meetings-card.component.html',
   styleUrl: './upcoming-meetings-card.component.css'

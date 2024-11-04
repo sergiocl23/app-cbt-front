@@ -1,17 +1,29 @@
-<mat-card>
-  <mat-card-header>
-    <div class="card-title flex align-items-center justify-content-between w-full">
+<p-card>
+  <ng-template pTemplate="header">
+    <div class="card-title flex align-items-center justify-content-between px-3 pt-3 pb-0">
       <span>Ultima Simulacion</span>
-      <button mat-stroked-button color="primary" >
-        Ver más
-      </button>
+      <p-button label="Ver más" [outlined]="true" severity="secondary" />
     </div>
-  </mat-card-header>
-  <div class="mat-card-content p-4">
+  </ng-template>
+  <ng-template pTemplate="content">
     <div class="grid">
-      <div class="col-12">
-        <p>Simulacion</p>
+      <div class="sm:col-12 md:col-6">
+        <table class="cities-table">
+          <tbody>
+            <tr *ngFor="let city of cities">
+              <td>{{ city.name }}</td>
+              <td>
+                <span [ngClass]=" getTimeColor(city.time) " class="time-circle">
+                  {{ city.time }} h
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sm:col-12 md:col-6 p-0">
+        <div id="chart" style="width: 100%; height: 100%; min-height: 200px;"></div>
       </div>
     </div>
-  </div>
-</mat-card>
+  </ng-template>
+</p-card>

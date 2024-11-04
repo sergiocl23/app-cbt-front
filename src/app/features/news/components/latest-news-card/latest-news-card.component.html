@@ -1,13 +1,11 @@
-<mat-card>
-  <mat-card-header>
-    <div class="card-title flex align-items-center justify-content-between w-full">
+<p-card>
+  <ng-template pTemplate="header">
+    <div class="card-title flex align-items-center justify-content-between px-3 pt-3 pb-0">
       <span>Noticias Destacadas</span>
-      <button mat-stroked-button color="primary">
-        Ver más
-      </button>
+      <p-button label="Ver más" [outlined]="true" severity="secondary" />
     </div>
-  </mat-card-header>
-  <div class="mat-card-content p-4">
+  </ng-template>
+  <ng-template pTemplate="content">
     <div class="grid">
       <div class="col-12">
 
@@ -17,16 +15,19 @@
             *ngFor="let news of newsList; let i = index"
             [ngStyle]="{ 'transform': 'translateX(-' + currentIndex * 100 + '%)', 'background-image': 'url(' + news.image + ')' }"
           >
-            <div class="overlay">
-              <h3>{{ news.title }}</h3>
-              <p>{{ news.summary }}</p>
+            <div class="overlay text-justify">
+              <h3 class="m-0" style="font-weight: 500; font-size: 20px;">{{ news.title }}</h3>
+              <p class="m-0">{{ news.summary }}</p>
             </div>
           </div>
 
-          <!-- <button class="arrow-button left-arrow" (click)="prevSlide()">&#8592;</button> -->
-          <!-- <button class="arrow-button right-arrow" (click)="nextSlide()">&#8594;</button> -->
-          <button class="arrow-button left-arrow" mat-fab color="primary" (click)="prevSlide()"><mat-icon>arrow_back_ios_new</mat-icon></button>
-          <button class="arrow-button right-arrow" mat-fab color="primary" (click)="nextSlide()"><mat-icon>arrow_forward_ios</mat-icon></button>
+          <button class="arrow-button left-arrow" pButton type="button" [rounded]="true" [text]="true" (click)="prevSlide()">
+              <span class="material-icons mr-2">arrow_back_ios_new</span>
+          </button>
+
+          <button class="arrow-button right-arrow" pButton type="button" [rounded]="true" [text]="true" (click)="nextSlide()">
+            <span class="material-icons mr-2">arrow_forward_ios</span>
+          </button>
         </div>
 
         <!-- Indicadores de página -->
@@ -41,5 +42,5 @@
 
       </div>
     </div>
-  </div>
-</mat-card>
+  </ng-template>
+</p-card>

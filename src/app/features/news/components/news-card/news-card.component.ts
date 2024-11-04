@@ -1,22 +1,22 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NewsItem } from '../../interfaces/news.interface';
-import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
+
+import { DividerModule } from 'primeng/divider';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
+
 import { NewsItemImagePipe } from '../../pipes/news-item-image.pipe';
+import { NewsItem } from '../../interfaces/news.interface';
 
 @Component({
   selector: 'news-card',
   standalone: true,
   imports: [
     // Modules
-    MatButtonModule,
-    MatCardModule,
-    MatDividerModule,
-    MatIconModule,
     RouterModule,
+    DividerModule,
+    CardModule,
+    ButtonModule,
 
     // Pipes
     NewsItemImagePipe

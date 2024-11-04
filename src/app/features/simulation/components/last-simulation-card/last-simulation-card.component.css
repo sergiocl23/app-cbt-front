@@ -2,3 +2,35 @@
   font-weight: bold;
   font-size: 20px;
 }
+
+/* Estilos de la tabla */
+.cities-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cities-table th, .cities-table td {
+  padding: 8px;
+}
+
+/* Estilos para el círculo de distancia */
+.time-circle {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+.green-circle{
+  background-color: #54C45E;
+  border: 2px solid #008A0E;
+}
+
+.yellow-circle{
+  background-color: #FFE342;
+  border: 2px solid #FCCE14;
+}
+
+.gray-circle{
+  background-color: #CED4DB;
+  border: 2px solid #6F7681;
+}

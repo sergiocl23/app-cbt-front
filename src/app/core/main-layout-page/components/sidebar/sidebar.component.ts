@@ -42,8 +42,8 @@ export class SidebarComponent {
     ]},
     { label: 'Foro', show: true, sections: [
       { label: 'Ver Publicaciones', icon: 'forum', url: 'a'},
-      { label: 'Mis Publicaciones', icon: 'route', url: 'a'},
-      { label: 'Realizar Publicación', icon: 'folder_open', url: 'a'},
+      { label: 'Mis Publicaciones', icon: 'folder_open', url: 'a'},
+      { label: 'Realizar Publicación', icon: 'post_add', url: 'a'},
     ]},
     { label: 'Aprende', show: true, sections: [
       { label: 'Plataforma Digital', icon: 'devices', url: 'a'},
