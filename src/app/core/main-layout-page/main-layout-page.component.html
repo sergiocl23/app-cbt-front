@@ -18,9 +18,7 @@
         [(ngModel)]="selectedLanguage"
         (onChange)="changeLanguage()"
         optionLabel="name"
-        [showClear]="false"
         [style]="{width: '48px'}"
-        [loading]="true"
 
         >
         <ng-template *ngIf="isBrowser" pTemplate="dropdownicon">

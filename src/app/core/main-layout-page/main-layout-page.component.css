@@ -58,28 +58,7 @@ sidebar {
   gap: 0.5rem;
 }
 
-/* Opción 1: Más específico */
-.p-dropdown .p-dropdown-trigger {
-  display: none !important;
-  width: 0 !important;
-}
-
-/* Opción 2: Aún más específico */
-div.p-dropdown .p-dropdown-trigger,
-span.p-dropdown .p-dropdown-trigger {
-  display: none !important;
-  width: 0 !important;
-}
-
-/* Opción 3: Si las anteriores no funcionan */
 :host ::ng-deep .p-dropdown .p-dropdown-trigger {
-  display: none !important;
-  width: 0 !important;
-}
-
-/* Opción 4: La más específica */
-:host ::ng-deep .p-dropdown .p-dropdown-trigger,
-:host ::ng-deep .p-dropdown-trigger-icon {
   display: none !important;
   width: 0 !important;
 }
