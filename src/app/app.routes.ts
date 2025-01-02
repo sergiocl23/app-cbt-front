@@ -33,8 +33,13 @@ export const routes: Routes = [
         loadChildren: () => import('./features/meetings/meetings.routes').then( r => r.routes)
       },
       {
+        path: 'forum',
+        loadChildren: () => import('./features/forum/forum.routes').then( r => r.routes)
+      },
+      {
         path: '',
-        redirectTo: 'home',
+        // redirectTo: 'home',
+        redirectTo: 'map',
         pathMatch: 'full'
       },
     ]

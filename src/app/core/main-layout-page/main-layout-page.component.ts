@@ -1,11 +1,14 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatListModule } from '@angular/material/list';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
+
+import { ButtonModule } from 'primeng/button';
+import { ToolbarModule } from 'primeng/toolbar';
+import { DropdownModule } from 'primeng/dropdown';
+
+import { FormsModule } from '@angular/forms';
+
+import { SidebarComponent } from './components/sidebar/sidebar.component';
 
 @Component({
   selector: 'app-main-layout-page',
@@ -13,30 +16,53 @@ import { RouterModule } from '@angular/router';
   imports: [
     CommonModule,
     RouterModule,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatIconModule,
-    MatButtonModule,
-    MatListModule
+
+    ButtonModule,
+    ToolbarModule,
+    DropdownModule,
+
+    FormsModule,
+
+    SidebarComponent,
+
   ],
   templateUrl: './main-layout-page.component.html',
   styleUrl: './main-layout-page.component.css'
 })
 export class MainLayoutPageComponent{
+  isSidebarOpen: boolean = true;
+  isBrowser!: boolean;
 
-  public sidebarItems = [
-    { label: 'Inicio', icon: 'home', url: 'home'},
-    { label: 'Portal de noticias', icon: 'newspaper', url: 'news'},
-    { label: 'Simulación', icon: 'route', url: 'simulation'},
-    { label: 'Mapa Interactivo', icon: 'map_search', url: 'map'},
-    { label: 'Catálogo de Empresas', icon: 'menu_book', url: 'companies'}
-  ]
-  /*
-  isCollapsed = false;  // El sidenav comienza expandido
+  languages = [
+      { name: 'Español', code: 'es', flag:'assets/images/flags/espana.png' },
+      { name: 'Inglés', code: 'en', flag:'assets/images/flags/estados-unidos.png' },
+      { name: 'Portugués', code: 'pt', flag:'assets/images/flags/brasil.png' },
+      { name: 'Guaraní', code: 'gn', flag:'assets/images/flags/paraguay.png' },
+  ];
 
-  toggleSidenav() {
-    this.isCollapsed = !this.isCollapsed;  // Alterna entre expandido y colapsado
+  selectedLanguage = this.languages[0];
+
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+}
+
+  changeLanguage() {
+    console.log(`Idioma cambiado a: ${this.selectedLanguage.name}`);
+    // Aquí puedes añadir la lógica para cambiar el idioma
   }
-  */
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+  }
+
+  get mainContentClass() {
+    // return '';
+    return this.isSidebarOpen ? 'sidebar-open' : '';
+  }
+
 
 }

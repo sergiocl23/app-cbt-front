@@ -1,15 +1,17 @@
 import { Component } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'saved-companies-card',
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
-    MatButtonModule
+
+    CardModule,
+    ButtonModule
   ],
   templateUrl: './saved-companies-card.component.html',
   styleUrl: './saved-companies-card.component.css'

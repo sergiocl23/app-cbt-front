@@ -1,8 +1,28 @@
+@import "primeng/resources/themes/aura-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+@import 'primeicons/primeicons.css';
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html {
+  height: 100%;
+  background-color: #ecf0f1;
+}
+body {
+  margin: 0;
+  font-family: Roboto,
+  "Helvetica Neue", sans-serif;
+  height: 100vh; /* Ocupa toda la altura de la ventana */
+}
 
 .spacer{
   flex: 1 1 auto;
+}
+
+.p-card{
+  box-shadow: 0px 1px 3px #888888 !important;
+}
+
+
+.p-card-body{
+  padding: 10px 14px 13px 14px !important;
 }

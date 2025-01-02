@@ -1,8 +1,8 @@
-import { Component, Inject, PLATFORM_ID, AfterViewInit } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
+import { CardModule } from 'primeng/card';
+import { ButtonModule } from 'primeng/button';
 
 import mapboxgl, { Map, NavigationControl, LngLat, Marker, Popup, LngLatBounds } from 'mapbox-gl';
 import { environments } from '../../../../../environments/environments';
@@ -12,15 +12,17 @@ mapboxgl.accessToken = environments.mapBoxKey;
 @Component({
   selector: 'near-places-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    CardModule,
+    ButtonModule
+  ],
   templateUrl: './near-places-card.component.html',
   styleUrl: './near-places-card.component.css'
 })
-export class NearPlacesCardComponent implements AfterViewInit{
-
+export class NearPlacesCardComponent implements AfterViewInit, OnDestroy{
   private map!: Map;
   private currentLngLat: LngLat = new LngLat(-70.14056585946109, -20.24473796434132);
-
   public nearPlaces = [
     { order: 1 ,name: 'Alto Hospicio, Chile', distance: '16.4', coords: [-70.09697379013878, -20.293861412727768], color: 'orange' },
     { order: 2 ,name: 'Pozo Almonte, Chile', distance: '60.8', coords: [-69.78570822059187, -20.257099018382934], color: 'orange' },
@@ -29,16 +31,12 @@ export class NearPlacesCardComponent implements AfterViewInit{
     { order: 5 ,name: 'Calama, Chile', distance: '379', coords: [-68.92879299594195, -22.454528879239856], color: 'orange' },
     { order: 6 ,name: 'San Pedro de Atacama, Chile', distance: '493', coords: [-68.1990509416736, -22.90927031661637], color: 'orange' },
   ]
-
   displayedColumns: string[] = ['numero', 'nombre', 'distancia'];
-
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
-
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-
       this.map = new Map({
-        container: 'map',
+        container: 'map-near-places',
         style: 'mapbox://styles/mapbox/streets-v12',
         center: this.currentLngLat,
         zoom: 8,
@@ -85,6 +83,13 @@ export class NearPlacesCardComponent implements AfterViewInit{
       });
 
       this.map.fitBounds(bounds, { padding: 50 });
+
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove(); // Elimina el mapa al destruir el componente
     }
   }
 
