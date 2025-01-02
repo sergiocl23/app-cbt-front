@@ -1,12 +1,13 @@
 .card-title span{
   font-weight: bold;
-  font-size: 20px;
+  font-size: 18px;
 }
 
-#map{
+#map-near-places{
   width: 100%;
   height: 100%;
-  min-height: 200px;
+  min-height: 290px;
+  border-radius: 12px;
   /* background-color: red; */
 }
 /* Estilos de la tabla */
@@ -25,7 +26,7 @@
   height: 25px;
   border-radius: 50%;
   background: rgb(193 193, 193);
-  font-size: 15px;
+  font-size: 14px;
   align-items: center;
   justify-content: center;
   font-weight: bold;
@@ -34,9 +35,10 @@
 /* Estilos para el círculo de distancia */
 .distance-circle {
   display: inline-block;
-  padding: 4px 8px;
+  padding: 2px 8px;
   border-radius: 15px;
   font-weight: bold;
+  font-size: 14px;
 }
 .green-circle{
   background-color: #54C45E;
@@ -51,4 +53,12 @@
 .gray-circle{
   background-color: #CED4DB;
   border: 2px solid #6F7681;
+}
+
+:host ::ng-deep .p-button{
+  font-size:14px;
+}
+
+.place-name{
+  font-size: 14px;
 }

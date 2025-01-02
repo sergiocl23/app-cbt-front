@@ -1,18 +1,22 @@
 <!-- sidebar.component.html -->
 <div class="custom-sidebar" [class.open]="isOpen">
-  <div class="sidebar-container h-full" >
+  <div class="sidebar-container h-full" [class.open]="isOpen">
     <div class="flex flex-column h-full">
-      <div class="flex align-items-center justify-content-between px-3 pt-3 flex-shrink-0">
-        <span class="inline-flex align-items-center gap-2">
-          <span class="font-semibold text-2xl">Menú</span>
-        </span>
-        <span>
-          <p-button type="button" (onClick)="onClose()" icon="pi pi-times" rounded="true" outlined="true"
-            styleClass="h-2rem w-2rem"></p-button>
-        </span>
+      <div class="user-info-container flex align-items-center justify-content-between py-3 flex-shrink-0 px-2">
+        <div class="user-info flex align-items-center">
+          <div class="initials-username flex align-items-center justify-content-center">
+            SC
+          </div>
+          <div class="username-container ml-2" [ngClass]="{ 'hidden': !isOpen }">
+            <div class="username">Sergio Cerda Lozano</div>
+            <div class="user-type">Administrador</div>
+          </div>
+        </div>
+        <span [ngClass]="{ 'hidden': !isOpen }" class="pi pi-sign-out logout"></span>
       </div>
-      <div class="overflow-y-auto mt-2">
-        <ul class="list-none p-3 py-0 m-0">
+      <!-- <p-divider type="solid"></p-divider> -->
+      <div class="overflow-y-auto pt-2">
+        <ul class="menu-options-list list-none m-0 py-0 px-1">
           <li *ngFor="let item of sidebarItems">
             <div pRipple class="pt-1 pb-1 flex align-items-center justify-content-between text-600 cursor-pointer sidebar-separator"
               *ngIf="item.show">
@@ -22,11 +26,14 @@
             </div>
             <ul *ngIf="item.sections.length > 0" class="list-none p-0 m-0" [ngClass]="item.show ? 'pl-2':''">
               <li *ngFor="let sectionItem of item.sections"
-                [routerLink]="sectionItem.url" routerLinkActive="selected" class="border-round py-1 px-1">
+                [routerLink]="sectionItem.url" routerLinkActive="selected" class="border-round py-2">
                 <a pRipple
-                  class="flex align-items-center cursor-pointer py-1 px-2 border-round text-700 hover:surface-300 transition-duration-150 transition-colors p-ripple">
-                  <span class="material-icons mr-2">{{ sectionItem.icon }}</span>
-                  <span class="font-medium">{{ sectionItem.label }}</span>
+                  class="menu-option flex align-items-center cursor-pointer px-2 py-2 border-round text-700 transition-duration-150 transition-colors p-ripple"
+                  >
+                  <div class="option-icon flex align-items-center justify-content-center">
+                    <span class="material-icons">{{ sectionItem.icon }}</span>
+                  </div>
+                  <span class="ml-2 font-medium option-description" [ngClass]="{ 'hidden': !isOpen }">{{ sectionItem.label }}</span>
                 </a>
               </li>
             </ul>

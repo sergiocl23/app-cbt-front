@@ -1,10 +1,24 @@
 .main-content {
-  transition: margin-left 0.15s ease;
+  padding-left: 53px;
+  transition: all 0.15s ease;
+  position: relative;
 }
 
 /* Ajustar el margen cuando el sidebar está visible */
 .main-content.sidebar-open {
-  margin-left: 300px;
+  padding-left: 268px;
+}
+
+.header {
+  width: calc( 100% - 53px);
+  transition: all 0.15s ease;
+  position: fixed;
+  background-color: #ecf0f1;
+  z-index: 10;
+}
+
+.header.sidebar-open {
+  width: calc( 100% - 268px);
 }
 
 .logo-container {
@@ -28,9 +42,9 @@
 
 
 
-sidebar {
+/* sidebar {
   height: 100vh;
-}
+} */
 
 .navbar{
   height: 64px; box-shadow: 0px 1px 3px #888888; padding: 10px;

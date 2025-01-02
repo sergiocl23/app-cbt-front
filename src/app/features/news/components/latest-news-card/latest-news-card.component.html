@@ -2,12 +2,12 @@
   <ng-template pTemplate="header">
     <div class="card-title flex align-items-center justify-content-between px-3 pt-3 pb-0">
       <span>Noticias Destacadas</span>
-      <p-button label="Ver más" [outlined]="true" severity="secondary" />
+      <p-button label="Ver más" [rounded]="true" [outlined]="true" severity="primary" size="small"/>
     </div>
   </ng-template>
   <ng-template pTemplate="content">
     <div class="grid">
-      <div class="col-12">
+      <div class="col-12 pb-0">
 
         <div class="carousel-container">
           <div
@@ -16,9 +16,18 @@
             [ngStyle]="{ 'transform': 'translateX(-' + currentIndex * 100 + '%)', 'background-image': 'url(' + news.image + ')' }"
           >
             <div class="overlay text-justify">
-              <h3 class="m-0" style="font-weight: 500; font-size: 20px;">{{ news.title }}</h3>
-              <p class="m-0">{{ news.summary }}</p>
+              <p class="mb-2 news-title">{{ news.title }}</p>
+              <p class="mb-0 news-summary">{{ news.summary }}</p>
             </div>
+          </div>
+          <!-- Indicadores de página -->
+          <div class="indicators">
+            <span
+              *ngFor="let news of newsList; let i = index"
+              (click)="currentIndex = i"
+              [class.active]="i === currentIndex"
+              class="indicator"
+            ></span>
           </div>
 
           <button class="arrow-button left-arrow" pButton type="button" [rounded]="true" [text]="true" (click)="prevSlide()">
@@ -30,15 +39,7 @@
           </button>
         </div>
 
-        <!-- Indicadores de página -->
-        <div class="indicators">
-          <span
-            *ngFor="let news of newsList; let i = index"
-            (click)="currentIndex = i"
-            [class.active]="i === currentIndex"
-            class="indicator"
-          ></span>
-        </div>
+
 
       </div>
     </div>

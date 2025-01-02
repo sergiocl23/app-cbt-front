@@ -1,4 +1,4 @@
-import { Component, Inject, PLATFORM_ID, AfterViewInit } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 import { CardModule } from 'primeng/card';
@@ -20,7 +20,7 @@ mapboxgl.accessToken = environments.mapBoxKey;
   templateUrl: './near-places-card.component.html',
   styleUrl: './near-places-card.component.css'
 })
-export class NearPlacesCardComponent implements AfterViewInit{
+export class NearPlacesCardComponent implements AfterViewInit, OnDestroy{
 
   private map!: Map;
   private currentLngLat: LngLat = new LngLat(-70.14056585946109, -20.24473796434132);
@@ -42,7 +42,7 @@ export class NearPlacesCardComponent implements AfterViewInit{
     if (isPlatformBrowser(this.platformId)) {
 
       this.map = new Map({
-        container: 'map',
+        container: 'map-near-places',
         style: 'mapbox://styles/mapbox/streets-v12',
         center: this.currentLngLat,
         zoom: 8,
@@ -89,6 +89,13 @@ export class NearPlacesCardComponent implements AfterViewInit{
       });
 
       this.map.fitBounds(bounds, { padding: 50 });
+
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.remove(); // Elimina el mapa al destruir el componente
     }
   }
 

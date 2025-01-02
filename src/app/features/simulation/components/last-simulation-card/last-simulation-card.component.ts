@@ -1,10 +1,13 @@
-import { Component, ElementRef, HostListener, Inject, OnInit, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, Inject, PLATFORM_ID, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
+import { ChartModule } from 'primeng/chart';
 
-import * as echarts from 'echarts';
+import { Chart } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 @Component({
   selector: 'last-simulation-card',
   standalone: true,
@@ -12,12 +15,16 @@ import * as echarts from 'echarts';
     CommonModule,
 
     CardModule,
-    ButtonModule
+    ButtonModule,
+    ChartModule
   ],
   templateUrl: './last-simulation-card.component.html',
   styleUrl: './last-simulation-card.component.css'
 })
-export class LastSimulationCardComponent implements OnInit{
+export class LastSimulationCardComponent implements OnInit {
+
+  data: any;
+  options: any;
 
   public cities = [
     { name: 'Alto Hospicio, Chile', time: 1 },
@@ -26,84 +33,100 @@ export class LastSimulationCardComponent implements OnInit{
     { name: 'Calama, Chile', time: 8 },
   ]
 
-
-  private chartInstance: any;
-
-  categories = [
-    { name: 'Categoría 1', value: 70 },
-    { name: 'Categoría 2', value: 50 },
-    { name: 'Categoría 3', value: 30 },
-  ];
-
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    Chart.register(ChartDataLabels);
+  }
 
   ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.initChart();
-    }
-  }
-
-  initChart(): void {
-    this.chartInstance = echarts.init(document.getElementById('chart') as HTMLElement);
-    this.chartInstance.setOption(this.getChartOptions());
-  }
-
-  getChartOptions() {
-    const chartData = [
-      { value: 34, name: 'Carne' },
-      { value: 27, name: 'Tecnología' },
-      { value: 17, name: 'Soya' },
-      { value: 22, name: 'Otros' },
-    ];
-
-    return {
-      title: {
-        text: 'Porcentajes de Cargas Trasladadas',  // Aquí defines el título
-        left: 'center',                // Posiciona el título en el centro
-        top: 'top'                     // Posiciona el título en la parte superior
-      },
-      tooltip: {
-        trigger: 'item',
-        formatter: (params: any) => {
-        const total = chartData.reduce((sum, cat) => sum + cat.value, 0);
-        const percent = ((params.data.value / total) * 100).toFixed(2);
-        const color = params.color; // Color de la serie
-        return `
-          <span style="display:inline-block;width:10px;height:10px;background-color:${color};border-radius:50%;margin-right:5px;"></span>
-          ${params.data.name}: <strong>${percent}%</strong>
-        `;
-        },
-      },
-      legend: {
-        show: false
-      },
-      series: [
+    this.data = {
+      labels: ['Carne', 'Tecnología', 'Soya', 'Otros'],
+      datasets: [
         {
-          type: 'pie',
-          radius: ['40%', '70%'],
-          center: ['50%', '90%'],
-          // adjust the start and end angle
-          startAngle: 180,
-          endAngle: 360,
-          data: chartData,
-          emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
-              },
-          },
-          label: {
-              show: true,
-              formatter: (params: any) => {
-                const total = chartData.reduce((sum, data) => sum + data.value, 0);
-                const percent = ((params.data.value / total) * 100).toFixed(2);
-                return `${params.data.name} \n ${percent}%`; // Muestra solo el porcentaje en la etiqueta
-              },
-          },
-
+          data: [68, 54, 34, 44],
         }
       ]
+    };
+
+
+    this.options = {
+      responsive: true,  // Hace que el gráfico sea responsivo
+      maintainAspectRatio: false,  // Permite que se ajusten las proporciones
+      aspectRatio: 1,            // Proporción opcional si deseas controlar el comportamiento
+      cutoutPercentage: 60,      // Ajusta el "hueco" central del doughnut (ajusta según sea necesario)
+      rotation: -90,
+      circumference: 180,
+      // cutout: 100,
+      plugins: {
+        legend: {
+          display: false
+        },
+        title: {
+          display: false,
+          text: 'Porcentaje de cargas trasladadas',
+          font: {
+            size: 20,
+          }
+        },
+        tooltip: {
+          titleFont: {
+            size: 0
+          },
+          bodyFont: {
+            size: 15,
+            weight: 'bold',
+          },
+          usePointStyle: true, // Usa un punto en lugar de un rectángulo de color
+          padding: 10, // Agrega espacio interno en el tooltip
+          callbacks: {
+            labelPointStyle: () => ({
+              pointStyle: 'rectRounded', // Hace que el punto sea un cuadro redondeado
+              rotation: 0
+            }),
+            label: (context: any) => {
+              // Configura el formato de la etiqueta en el tooltip
+              const label = context.label || '';
+              const value = context.raw;
+              return ` ${label}: ${value} `;
+            }
+          },
+
+        },
+        datalabels: {
+          backgroundColor: function(context: any) {
+            return context.dataset.backgroundColor;
+          },
+          borderColor: 'white',
+          borderRadius: 25,
+          borderWidth: 2,
+          color: 'white',
+          display: function(context: any) {
+            var dataset = context.dataset;
+            var count = dataset.data.length;
+            var value = dataset.data[context.dataIndex];
+            return value > count * 1.5;
+          },
+          font: {
+            weight: 'bold'
+          },
+          padding: 6,
+          formatter: (value: number, context: any) => {
+            const label = context.chart.data.labels[context.dataIndex]; // Obtiene la etiqueta
+            const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0); // Calcula el total
+            const percentage = ((value / total) * 100).toFixed(0); // Calcula el porcentaje
+            return `${label}: ${percentage}%`; // Devuelve el texto "etiqueta: porcentaje%"
+          },
+          anchor: 'end',
+        }
+      },
+      layout: {
+        padding: {
+          top: 0, // Reduce el espacio superior
+          bottom: 0, // Reduce el espacio inferior
+          right: 40,
+          left: 40
+
+      },
+      },
     };
   }
 
@@ -118,10 +141,4 @@ export class LastSimulationCardComponent implements OnInit{
     }
   }
 
-  @HostListener('window:resize', ['$event'])
-    onResize() {
-        if (this.chartInstance) {
-            this.chartInstance.resize();
-        }
-    }
 }

@@ -2,13 +2,13 @@
   <ng-template pTemplate="header">
     <div class="card-title flex align-items-center justify-content-between px-3 pt-3 pb-0">
       <span>Lugares Cercanos</span>
-      <p-button label="Ver más" [outlined]="true" severity="secondary" />
+      <p-button label="Ver más" [rounded]="true" [outlined]="true" severity="primary" size="small"/>
     </div>
   </ng-template>
   <ng-template pTemplate="content">
     <div class="grid">
-      <div class="col-6 col-mapa">
-        <div id="map"></div>
+      <div class="col-6">
+        <div id="map-near-places"></div>
       </div>
       <div class="col-6">
         <table class="lugares-table">
@@ -18,7 +18,7 @@
               <td style="width: 10%;">
                 <span class="color-circle">{{ lugar.order }}</span>
               </td>
-              <td style="width: 60%;">{{ lugar.name }}</td>
+              <td class="place-name" style="width: 60%;">{{ lugar.name }}</td>
               <td style="width: 30%;">
                 <span [ngClass]=" getDistanceColor(lugar.distance) " class="distance-circle">
                   {{ lugar.distance }} km

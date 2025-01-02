@@ -3,29 +3,98 @@
   top: 0;
   left: 0;
   height: 100%;
-  width: 300px;
-  background-color: #fff;
+
+  background-color: #242527;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  transform: translateX(-100%);
-  transition: transform 0.15s ease-in-out; /* Animación suave */
+  /* transform: translateX(-100%); */
+  transition: 0.15s ease-in-out; /* Animación suave */
   z-index: 1000;
+  font-size: 14px;
+  width: 53px;
+}
+
+.menu-options-list{
+  transition: 0.15s ease-in-out; /* Animación suave */
+}
+
+.menu-option{
+  transition: 0.15s ease-in-out;
+  color: white !important;
+}
+
+.menu-option:hover{
+  background-color: #3A3B3D;
 }
 
 .custom-sidebar.open {
-  transform: translateX(0); /* Muestra el sidebar */
+  /* transform: translateX(0); */
+  width: 268px;
 }
 
-.sidebar-container {
-  width: 300px;
-  background-color: #f4f4f4;
+.sidebar-container.open {
+  width: 70px;
+}
+.sidebar-container.open {
+  width: 268px;
 }
 
 .selected a{
-  background-color: var(--surface-300); /* Cambia el color según tu diseño */
+  background-color: #3A3B3D; /* Cambia el color según tu diseño */
 }
 
 .sidebar-separator{
   font-size: 13px;
-  color: rgba(0, 0, 0, 0.5) !important;
+  /* color: rgba(0, 0, 0, 0.5) !important; */
+  color: rgba(255, 0, 0, 0.5) !important;
+}
+
+.material-icons{
+  font-size: 22px !important;
+}
+
+
+.initials-username{
+  background-color: #BE1622;
+  color: white;
+  padding: 9px 7px;
+  border-radius: 50%;
+  font-weight: 500;
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+}
+
+.username-container{
+  color: white;
+}
+
+.username{
+  font-weight: 500;
+}
+
+.user-type{
+  font-size: 12px;
+}
+
+.option-description{
+  transition: 0.15s ease-in-out;
+  font-weight: normal !important;
+}
+
+.user-info-container{
+  background-color: #3b4151;
+  min-height: 72px;
+}
+
+.logout{
+  font-size: 17px !important;
+  color: #15a5d1;
+  cursor: pointer;
+}
+
+.option-icon{
+  width: 100%;
+  max-width: 29px;
+  min-width: 29px;
 }

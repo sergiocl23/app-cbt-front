@@ -60,6 +60,7 @@ export class MainLayoutPageComponent{
   }
 
   get mainContentClass() {
+    // return '';
     return this.isSidebarOpen ? 'sidebar-open' : '';
   }
 

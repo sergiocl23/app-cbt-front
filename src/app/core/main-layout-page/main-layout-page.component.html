@@ -1,6 +1,6 @@
 <sidebar [isOpen]="isSidebarOpen" (close)="closeSidebar()"></sidebar>
-<div class="main-content container" [ngClass]="mainContentClass">
-  <div class="mx-5 my-3">
+<div class="main-content" [ngClass]="mainContentClass">
+  <div [ngClass]="mainContentClass" class="header px-3 pt-3 pb-0">
     <p-toolbar [style]="{'height': '64px', 'box-shadow': '0px 1px 3px #888888', 'padding': '10px'}">
       <button pButton class="no-background-button" type="button" icon="pi pi-bars" (click)="toggleSidebar()"></button>
 
@@ -45,5 +45,7 @@
 
     </p-toolbar>
   </div>
-  <router-outlet />
+  <div class="container" style="padding-top: 90px;">
+    <router-outlet />
+  </div>
 </div>

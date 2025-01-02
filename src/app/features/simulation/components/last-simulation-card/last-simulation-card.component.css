@@ -1,6 +1,6 @@
 .card-title span{
   font-weight: bold;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* Estilos de la tabla */
@@ -16,7 +16,7 @@
 /* Estilos para el círculo de distancia */
 .time-circle {
   display: inline-block;
-  padding: 4px 8px;
+  padding: 0px 8px;
   border-radius: 15px;
   font-weight: bold;
 }
@@ -33,4 +33,12 @@
 .gray-circle{
   background-color: #CED4DB;
   border: 2px solid #6F7681;
+}
+
+:host ::ng-deep .p-button{
+  font-size:14px;
+}
+
+.cities-table tbody {
+  font-size: 14px;
 }
