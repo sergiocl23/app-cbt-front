@@ -21,10 +21,8 @@ mapboxgl.accessToken = environments.mapBoxKey;
   styleUrl: './near-places-card.component.css'
 })
 export class NearPlacesCardComponent implements AfterViewInit, OnDestroy{
-
   private map!: Map;
   private currentLngLat: LngLat = new LngLat(-70.14056585946109, -20.24473796434132);
-
   public nearPlaces = [
     { order: 1 ,name: 'Alto Hospicio, Chile', distance: '16.4', coords: [-70.09697379013878, -20.293861412727768], color: 'orange' },
     { order: 2 ,name: 'Pozo Almonte, Chile', distance: '60.8', coords: [-69.78570822059187, -20.257099018382934], color: 'orange' },
@@ -33,14 +31,10 @@ export class NearPlacesCardComponent implements AfterViewInit, OnDestroy{
     { order: 5 ,name: 'Calama, Chile', distance: '379', coords: [-68.92879299594195, -22.454528879239856], color: 'orange' },
     { order: 6 ,name: 'San Pedro de Atacama, Chile', distance: '493', coords: [-68.1990509416736, -22.90927031661637], color: 'orange' },
   ]
-
   displayedColumns: string[] = ['numero', 'nombre', 'distancia'];
-
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
-
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-
       this.map = new Map({
         container: 'map-near-places',
         style: 'mapbox://styles/mapbox/streets-v12',
