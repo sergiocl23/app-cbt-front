@@ -4,6 +4,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import mapboxgl, { Map, NavigationControl, LngLat, Marker, Popup, LngLatBounds } from 'mapbox-gl';
 import { Feature, LineString } from 'geojson';
 import { environments } from '../../../../../environments/environments';
+import { HttpClient } from '@angular/common/http';
 
 mapboxgl.accessToken = environments.mapBoxKey;
 
@@ -18,7 +19,7 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy{
   private map!: Map;
   private currentLngLat: LngLat = new LngLat(-70.14056585946109, -20.24473796434132);
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient) {}
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -34,54 +35,13 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy{
       this.map.addControl(new NavigationControl());
 
       // Marker ubicacion
-      this.createCurrentLocationMarker(this.map, this.currentLngLat)
+      // this.createCurrentLocationMarker(this.map, this.currentLngLat)
 
-      const route: Feature<LineString> = {
-        type: 'Feature',
-        geometry: {
-          type: 'LineString',
-          coordinates: [
-            [-70.13662363926578, -20.23110856880029], // Iquique, Chile
-            [-70.10197033524106, -20.2687742004362], // Alto Hospicio, Chile
-            [-69.78974880198224, -20.25737089086163], // Pozo Almonte, Chile
-            [-69.4536033094392, -21.64879980592402], // Quillagua, Chile
-            [-69.63246599865376, -22.355385948328205], // Maria Elena, Chile
-            [-68.92965130273234, -22.455163463844116], // Calama, Chile
-            [-68.1728409202262, -22.912595149768027], // San Pedro de Atacama, Chile
-            [-67.01902297614322, -23.242704878207608], // Jama, Argentina
-            [-65.29765971340198, -24.18576145173499], // San Salvador de Jujuy, Argentina
-            [-63.805664469718685, -22.51730196140737], // Tartagal, Argentina
-            [-62.51579045636932, -22.370594917414362], // Pozo Hondo, Paraguay
-            [-60.353472958813654, -22.066341292528996], // Mariscal Estigarribia, Paraguay
-            [-57.88345909398014, -21.697567863951402], // Porto Mortinho, Brasil
+      this.getRoute([-70.13662363926578, -20.23110856880029], [-57.88345909398014, -21.697567863951402]);
+      this.addMarker(this.map, [-70.13662363926578, -20.23110856880029]);
+      this.addMarker(this.map, [-57.88345909398014, -21.697567863951402]);
 
-          ],
-        },
-        properties: {},
-      };
 
-      this.map.on('load', () => {
-        // Agregar la fuente GeoJSON
-        this.map.addSource('route', {
-          type: 'geojson',
-          data: route,
-        });
-
-        // Agregar una capa para la ruta
-        this.map.addLayer({
-          id: 'route',
-          type: 'line',
-          source: 'route',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
-          },
-          paint: {
-            'line-color': '#FF5733', // Color de la línea (naranja en este caso)
-            'line-width': 5, // Grosor de la línea
-          },
-        });
-      });
     }
   }
 
@@ -123,6 +83,49 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy{
       iconElement.style.width = '30px';  // Ajusta el ancho del icono
       iconElement.style.height = '30px'; // Ajusta la altura del icono
     }
+  }
+
+   // Obtener y graficar la ruta
+  getRoute(start: [number, number], end: [number, number]) {
+    const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${start.join(',')};${end.join(',')}?geometries=geojson&overview=full&access_token=${environments.mapBoxKey}`;
+
+    this.http.get(url).subscribe((response: any) => {
+      const data = response.routes[0].geometry;
+
+      // Crear fuente para la ruta
+      this.map.on('load', () => {
+        this.map.addSource('route', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: data
+          }
+        });
+
+        // Agregar la línea al mapa
+        this.map.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#FF5733', // Color de la línea (naranja en este caso)
+            'line-width': 5, // Grosor de la línea
+          }
+        });
+      });
+    });
+  }
+
+  // Agregar marcador en un punto
+  addMarker(map: Map, coordinates: [number, number]) {
+    new mapboxgl.Marker(({
+      color: 'red'
+    })).setLngLat(coordinates).addTo(map);
   }
 
 }
