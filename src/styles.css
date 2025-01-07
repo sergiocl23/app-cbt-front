@@ -9,8 +9,7 @@ html {
 }
 body {
   margin: 0;
-  font-family: Roboto,
-  "Helvetica Neue", sans-serif;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   height: 100vh; /* Ocupa toda la altura de la ventana */
 }
 
