@@ -6,9 +6,12 @@ import { environments } from '../../../../environments/environments';
 import { resolve } from 'node:path';
 import { rejects } from 'node:assert';
 import { isPlatformBrowser } from '@angular/common';
+import { LngLatLike, Map } from 'mapbox-gl';
 
 @Injectable({providedIn: 'root'})
 export class MapService {
+
+  private map?: Map;
 
   private baseUrlStrapi: string = environments.baseUrlStrapi;
   private token: string = environments.strapiToken;
@@ -17,6 +20,23 @@ export class MapService {
 
   get isUserLocationReady(): boolean {
     return !!this.userLocation;
+  }
+
+  get isMapReady(): boolean {
+    return !!this.map;
+  }
+
+  setMap( map: Map ) {
+    this.map = map;
+  }
+
+  flyTo( coords: LngLatLike ){
+    if( !this.isMapReady) throw new Error('El mapa no esta inicializado');
+
+    this.map?.flyTo({
+      zoom: 14,
+      center: coords
+    })
   }
 
   constructor(

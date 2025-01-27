@@ -7,13 +7,16 @@ import { environments } from '../../../../../environments/environments';
 import { HttpClient } from '@angular/common/http';
 import { MapService } from '../../services/map.service';
 import { Point } from '../../interfaces/point.interface';
+import { LoadingComponent } from '../../components/loading/loading.component';
+import { BtnMyLocationComponent } from '../../components/btn-my-location/btn-my-location.component';
+import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
 
 mapboxgl.accessToken = environments.mapBoxKey;
 
 @Component({
   selector: 'app-map-layout-page',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, LoadingComponent, BtnMyLocationComponent, SearchBarComponent],
   templateUrl: './map-layout-page.component.html',
   styleUrl: './map-layout-page.component.css'
 })
@@ -31,6 +34,14 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
     private mapService: MapService
   ) {}
 
+  get isUserLocationReady() {
+    return this.mapService.isUserLocationReady;
+  }
+
+  get isRoutePointsReady() {
+    return !!this.routePoints.length;
+  }
+
   ngOnInit(): void {
 
 
@@ -46,19 +57,26 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
           return [point.longitude, point.latitude, point.description];
         });
 
-        this.map = new Map({
-          container: 'map',
-          style: 'mapbox://styles/mapbox/streets-v12',
-          center: [-57.59705313935333, -22.520013511251367],
-          zoom: 5.5,
-          pitch: 55
-        })
+        // Corregir
+        setTimeout(() => {
+          this.map = new Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [-57.59705313935333, -22.520013511251367],
+            zoom: 5.5,
+            pitch: 55
+          })
 
-        this.map.addControl(new NavigationControl());
+          this.map.addControl(new NavigationControl());
 
-        this.setRoute(this.routePoints);
+          this.setRoute(this.routePoints);
+
+          new mapboxgl.Marker().setLngLat(this.mapService.userLocation!).addTo(this.map);
+          this.mapService.setMap(this.map);
+        }, 0);
+        // Fin corregir
+        console.log(this.mapService.userLocation!)
       });
-
     }
   }
 
@@ -104,7 +122,7 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
 
     const coordinates =  routePoints.map(point => point.slice(0, 2)).map(point => point.join(',')).join(';');
 
-    console.log(coordinates)
+    // console.log(coordinates)
 
     const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?geometries=geojson&overview=full&access_token=${environments.mapBoxKey}`;
 
