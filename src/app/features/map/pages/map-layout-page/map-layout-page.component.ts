@@ -71,11 +71,9 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
 
           this.setRoute(this.routePoints);
 
-          new mapboxgl.Marker().setLngLat(this.mapService.userLocation!).addTo(this.map);
           this.mapService.setMap(this.map);
-        }, 0);
+        }, 100);
         // Fin corregir
-        console.log(this.mapService.userLocation!)
       });
     }
   }

@@ -25,3 +25,12 @@ body {
 .p-card-body{
   padding: 10px 14px 13px 14px !important;
 }
+
+.p-message{
+  margin: 5px 0px 0px 0px !important;
+}
+
+
+.place-active .p-message {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+}

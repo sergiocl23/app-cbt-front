@@ -1,4 +1,12 @@
 <div class="search-container">
-  <input pInputText id="search_bar" autocomplete="off" placeholder="Buscar lugar..."/>
+  <input
+    pInputText
+    type="text"
+    class="w-full"
+    placeholder="Buscar lugar..."
+    autocomplete="off"
+    #txtQuery
+    (keyup)="onQueryChanged(txtQuery.value)"
+  />
   <search-results></search-results>
 </div>
