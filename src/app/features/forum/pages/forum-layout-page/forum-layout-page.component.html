@@ -1,1 +1,117 @@
-<!-- <p>forum-layout-page works!</p> -->
+<div class="forum-container">
+  <!-- Sidebar -->
+  <div class="forum-sidebar">
+    <div class="sidebar-header">
+      <h3>Categorías</h3>
+      <button class="add-category-btn" (click)="onCreateSubcategory()">
+        <span class="fas fa-plus"></span>
+      </button>
+    </div>
+    <ul class="subcategories-list">
+      <li class="subcategory-item" 
+          [class.active]="!selectedSubcategory"
+          (click)="selectSubcategory(null)">
+        <span>Mostrar Todos</span>
+      </li>
+
+      <li *ngIf="subcategories.length === 0" class="loading-message">
+        Cargando categorías...
+      </li>
+      <li *ngFor="let subcategory of subcategories" 
+          class="subcategory-item"
+          [class.active]="selectedSubcategory?.id === subcategory.id">
+        <div class="subcategory-content" (click)="selectSubcategory(subcategory)">
+          <span>{{ subcategory.name }}</span>
+        </div>
+        <div class="subcategory-actions">
+          <button class="edit-btn" 
+                  (click)="onEditSubcategory($event, subcategory)"
+                  title="Editar categoría">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="delete-btn" 
+                  (click)="onDeleteSubcategory($event, subcategory)"
+                  title="Eliminar categoría">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main content -->
+  <div class="forum-content">
+    <div class="topics-header">
+      <h2>{{ selectedSubcategory?.name || 'Todos los tópicos' }}</h2>
+      <button class="new-topic-btn" (click)="onNewTopic()">
+        <i class="fas fa-plus"></i> Nuevo tópico
+      </button>
+    </div>
+    
+    <div class="topics-list">
+      <div *ngIf="topics.length === 0" class="loading-message">
+        {{ selectedSubcategory ? 'No hay tópicos en esta categoría' : 'Cargando tópicos...' }}
+      </div>
+      
+      <div *ngFor="let topic of topics" 
+           class="topic-item"
+           [class.pinned-topic]="topic.pinned"
+           [class.closed-topic]="topic.closed">
+        <div class="topic-status">
+          <!-- Show both icons when topic is pinned and closed -->
+          <ng-container *ngIf="topic.pinned && topic.closed">
+            <i class="fas fa-thumbtack pin-icon"></i>
+            <i class="fas fa-lock lock-icon"></i>
+          </ng-container>
+          
+          <!-- Show only pin when just pinned -->
+          <ng-container *ngIf="topic.pinned && !topic.closed">
+            <i class="fas fa-thumbtack pin-icon"></i>
+          </ng-container>
+          
+          <!-- Show only lock when just closed -->
+          <ng-container *ngIf="!topic.pinned && topic.closed">
+            <i class="fas fa-lock lock-icon"></i>
+          </ng-container>
+          
+          <!-- Show default icon when neither pinned nor closed -->
+          <ng-container *ngIf="!topic.pinned && !topic.closed">
+            <i class="fas fa-comment"></i>
+          </ng-container>
+        </div>
+        
+        <div class="topic-content" [routerLink]="['/forum/topic', topic.id]">
+          <h3 class="topic-title">{{ topic.name }}</h3>
+          <p class="topic-preview">{{ getPreviewText(topic.body) }}</p>
+          <div class="topic-meta">
+            <span class="topic-author">
+              <i class="fas fa-user"></i> 
+              {{ topic.users_permissions_user?.username || 'Anónimo' }}
+            </span>
+            <span class="topic-category">
+              <i class="fas fa-folder"></i>
+              {{ topic.subcategory?.name || 'Sin categoría' }}
+            </span>
+            <span class="topic-date">
+              <i class="fas fa-calendar"></i> 
+              {{ topic.createdAt | date:'medium' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="topic-actions">
+          <button class="action-btn edit-btn" 
+                  (click)="onEditTopic($event, topic)"
+                  title="Editar tópico">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="action-btn delete-btn" 
+                  (click)="onDeleteTopic($event, topic)"
+                  title="Eliminar tópico">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

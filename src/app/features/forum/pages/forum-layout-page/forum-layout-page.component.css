@@ -1,0 +1,361 @@
+.forum-container {
+    display: flex;
+    min-height: calc(100vh - 64px);
+    padding-top: 20px;
+    background-color: #ecf0f1;
+    padding-left: 16px; /* Default sidebar width */
+    transition: padding-left 0.15s ease-in-out;
+  }
+  
+  .forum-container.sidebar-open {
+    padding-left: 268px; /* Expanded sidebar width */
+  }
+  
+  .forum-sidebar {
+    width: 270px;
+    padding: 20px;
+    background-color: white;
+    border-right: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    margin-right: 15px;
+  }
+  
+  .forum-content {
+    flex: 1;
+    padding: 20px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-right: 15px;
+  }
+  
+  /* Rest of your existing CSS remains the same */
+  
+  .subcategories-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .subcategory-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    margin: 5px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .subcategory-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .subcategory-content {
+    flex: 1;
+    cursor: pointer;
+  }
+  
+  .subcategory-item .delete-btn {
+    visibility: hidden;
+    background: transparent;
+    border: none;
+    color: #dc3545;
+    padding: 4px 8px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  
+  .subcategory-item .delete-btn:hover {
+    color: #c82333;
+  }
+  
+  .subcategory-item:hover .delete-btn {
+    visibility: visible;
+  }
+  
+  .topics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .new-topic-btn {
+    padding: 8px 16px;
+    background-color: #36A9E1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .new-topic-btn:hover {
+    background-color: #2196D3;
+  }
+  
+  .topic-item {
+    display: flex;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+  }
+  
+  .topic-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    margin-right: 1rem;
+    min-width: 24px;
+  }
+  
+  /* Pinned topic styles */
+  .pinned-topic {
+    background-color: #f8f9fa;
+    border-left: 3px solid #36A9E1;
+  }
+  
+  /* Closed topic styles */
+  .closed-topic {
+    background-color: #f8f9fa;
+    border-left: 3px solid #dc3545;
+  }
+  
+  /* Combined state - pinned and closed */
+  .pinned-topic.closed-topic {
+    background-color: #f8f9fa;
+    border-left: 3px solid #6c757d;
+  }
+  
+  /* Icon styles */
+  .pin-icon {
+    color: #36A9E1;
+    transform: rotate(45deg);
+  }
+  
+  .lock-icon {
+    color: #dc3545;
+  }
+  
+  /* When both icons are present */
+  .topic-status:has(.pin-icon, .lock-icon) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .topic-content {
+    flex: 1;
+  }
+  
+  .topic-title {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #2c3e50;
+  }
+  
+  .topic-preview {
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  /* Hover effects */
+  .topic-item:hover {
+    background-color: #f1f3f5;
+    cursor: pointer;
+    transform: translateX(2px);
+  }
+  
+  .subcategory-item.active {
+    background-color: #ebf7fc; /* Lighter shade of #36A9E1 */
+    color: #36A9E1;
+  }
+
+  /* Topic metadata container */
+  .topic-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85em;
+    color: #666;
+  }
+
+  .topic-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #36A9E1; /* Or any color you prefer for categories */
+  }
+
+  .topic-category i {
+    color: inherit;
+  }
+
+  /* Loading message */
+  .loading-message {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+  }
+
+  /* Make topic items clickable */
+  .topic-item {
+    cursor: pointer;
+  }
+
+  /* Topic author */
+  .topic-author {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Icon spacing */
+  .fas {
+    margin-right: 5px;
+  }
+
+  .topic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .topic-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding-left: 1rem;
+    border-left: 1px solid #e9ecef;
+  }
+
+  .action-btn {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .edit-btn {
+    color: #6c757d;
+  }
+
+  .delete-btn {
+    color: #6c757d;
+  }
+
+  .edit-btn:hover {
+    color: #36A9E1;
+    background: none;
+  }
+
+  .delete-btn:hover {
+    color: #dc3545;
+    background: none;
+  }
+
+  .action-btn:hover {
+    background: none;
+  }
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-right: 10px;
+
+    h3 {
+      margin: 0;
+      color: #333;
+    }
+
+    .add-category-btn {
+      background: none;
+      border: none;
+      color: #36A9E1;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.2s;
+      font-size: 20px;
+
+      &:hover {
+        color: #2196D3;
+      }
+    }
+  }
+
+  .subcategory-actions {
+    display: flex;
+    gap: 8px;
+    visibility: hidden;
+  }
+
+  .subcategory-item:hover .subcategory-actions {
+    visibility: visible;
+  }
+
+  .subcategory-actions .edit-btn {
+    background: transparent;
+    border: none;
+    color: #36A9E1;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+
+  .subcategory-actions .edit-btn:hover {
+    color: #1976D2;
+  }
+
+  .subcategory-actions .delete-btn {
+    background: transparent;
+    border: none;
+    color: #dc3545;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+
+  .subcategory-actions .delete-btn:hover {
+    color: #c82333;
+  }
+
+  /* Place these styles at the end of the file to ensure they take precedence */
+  .topic-item .topic-actions .action-btn.edit-btn {
+    color: #36A9E1 !important;  /* Blue */
+  }
+
+  .topic-item .topic-actions .action-btn.delete-btn {
+    color: #dc3545 !important;  /* Red */
+  }
+
+  .topic-item .topic-actions .action-btn.edit-btn:hover {
+    color: #2196D3 !important;  /* Darker blue */
+  }
+
+  .topic-item .topic-actions .action-btn.delete-btn:hover {
+    color: #c82333 !important;  /* Darker red */
+  }
+
+  /* Base action button styles */
+  .topic-item .topic-actions .action-btn {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  /* Remove any background effects */
+  .topic-item .topic-actions .action-btn:hover {
+    background: none;
+  }

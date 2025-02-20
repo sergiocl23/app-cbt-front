@@ -26,7 +26,7 @@ export class SidebarComponent {
       { label: 'Portal de Noticias', icon: 'newspaper', url: 'news'},
       // { label: 'Catálogo de Empresas', icon: 'store', url: 'a'},
       { label: 'Mapa Interactivo', icon: 'map', url: 'map'},
-      // { label: 'Foro', icon: 'forum', url: 'forum'},
+      { label: 'Foro', icon: 'forum', url: 'forum'},
       { label: 'Simulación', icon: 'route', url: 'simulation'},
       // { label: 'Contactos', icon: 'perm_contact_calendar', url: 'a'},
       // { label: 'Aprende', icon: 'menu_book', url: 'a'},

@@ -1,0 +1,42 @@
+<div class="edit-post-container">
+  <h2>Editar Respuesta</h2>
+  
+  <div class="form-group">
+    <div class="editor-header">
+      <label for="body">Contenido</label>
+      <button class="btn-preview" (click)="togglePreview()">
+        {{ showPreview ? 'Editar' : 'Vista previa' }}
+      </button>
+    </div>
+
+    <div class="editor-container">
+      <textarea *ngIf="!showPreview"
+                id="body" 
+                [(ngModel)]="editedPost.body" 
+                (ngModelChange)="updatePreview()"
+                class="form-control"
+                rows="10"
+                placeholder="Escriba aquí usando Markdown para dar formato al texto..."></textarea>
+      
+      <div *ngIf="showPreview" class="markdown-preview markdown-body" [innerHTML]="previewContent"></div>
+    </div>
+
+    <div class="markdown-help">
+      <small>
+        Formato soportado: 
+        <code># Título</code>,
+        <code>**negrita**</code>,
+        <code>*cursiva*</code>,
+        <code>- lista</code>,
+        <code>[enlace](url)</code>
+      </small>
+    </div>
+  </div>
+  
+  <div class="dialog-actions">
+    <button class="cancel-btn" (click)="onCancel()">Cancelar</button>
+    <button class="save-btn" (click)="onSave()" [disabled]="!editedPost.body.trim()">
+      Guardar
+    </button>
+  </div>
+</div>
