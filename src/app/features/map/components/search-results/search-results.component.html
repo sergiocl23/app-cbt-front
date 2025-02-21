@@ -1,0 +1,37 @@
+<p-messages severity="info" *ngIf="isLoadingPlaces">
+  <ng-template pTemplate>
+      <div class="text-center w-full">
+        <p class="loader-title mt-2">Cargando</p>
+        <p>Espere por favor...</p>
+      </div>
+  </ng-template>
+</p-messages>
+
+
+<div class="places-container" *ngIf="places.length > 0 && !isLoadingPlaces">
+  <!-- <p-messages class="pointer" [severity]="place.id === selectedId ? 'warning' : 'secondary'" *ngFor="let place of places" (click)="flyTo(place)"> -->
+  <p-messages class="pointer" severity="secondary" [class.place-active]="place.place_id=== selectedId" *ngFor="let place of places" (click)="flyTo(place)">
+    <ng-template pTemplate>
+      <div class="grid h-full">
+        <div class="col-12 pt-2 pb-1">
+          <p class="m-0 place-name">{{ place.name }}</p>
+        </div>
+        <div class="col-12 pt-1 pb-1">
+          <p class="m-0 place-detail">{{ place.display_name }}</p>
+        </div>
+        <div class="col-12">
+          <!-- <p-button type="button" label="Direcciones" size="small" [outlined]="true" severity="info"></p-button> -->
+          <p-button
+            type="button"
+            label="¿Cómo llegar?"
+            size="small"
+            [outlined]="place.place_id === selectedId ? false : true"
+            severity="info"
+            (onClick)="getDirections( place )"
+            ></p-button>
+        </div>
+      </div>
+    </ng-template>
+  </p-messages>
+</div>
+

@@ -9,8 +9,7 @@ html {
 }
 body {
   margin: 0;
-  font-family: Roboto,
-  "Helvetica Neue", sans-serif;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   height: 100vh; /* Ocupa toda la altura de la ventana */
 }
 
@@ -25,4 +24,13 @@ body {
 
 .p-card-body{
   padding: 10px 14px 13px 14px !important;
+}
+
+.p-message{
+  margin: 5px 0px 0px 0px !important;
+}
+
+
+.place-active .p-message {
+  background-color: rgba(0, 0, 0, 0.15) !important;
 }

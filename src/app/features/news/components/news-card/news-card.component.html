@@ -1,9 +1,9 @@
-<p-card [header]="newsItem.titulo" [subheader]="newsItem.fecha.toString()">
+<p-card [header]="newsItem.title!" [subheader]="newsItem.fecha.toString()">
   <ng-template pTemplate="header">
       <img mat-card-image [src]="newsItem | newsItemImage " [alt]="newsItem.id">
   </ng-template>
   <p>
-    {{ newsItem.descripcion[0].children[0].text }}
+    {{ newsItem.content[0].children[0].text }}
   </p>
   <p-divider></p-divider>
   <ng-template pTemplate="footer">

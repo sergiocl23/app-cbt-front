@@ -1,0 +1,19 @@
+.loader-title {
+  font-weight: 600;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+/* p {
+  font-size: 12px;
+} */
+
+.place-name {
+  font-weight: bold;
+}
+
+.place-detail {
+  font-size: 12px;
+}

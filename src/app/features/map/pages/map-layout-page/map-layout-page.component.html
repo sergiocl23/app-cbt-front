@@ -2,7 +2,16 @@
 <div class="container mx-3 container-map">
   <div class="grid h-full">
     <div class="col-12 h-full">
-      <!-- <div id="map"></div> -->
+      <app-loading *ngIf="!isUserLocationReady && !isRoutePointsReady; else mapReady"></app-loading>
+      <ng-template #mapReady>
+        <div id="map"></div>
+
+        <div class="flex flex-col gap-2">
+          <btn-my-location></btn-my-location>
+          <search-bar></search-bar>
+        </div>
+
+      </ng-template>
     </div>
   </div>
 </div>
