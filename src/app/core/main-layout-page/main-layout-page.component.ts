@@ -30,7 +30,9 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
   styleUrl: './main-layout-page.component.css'
 })
 export class MainLayoutPageComponent{
-  isSidebarOpen: boolean = true;
+  public isSidebarOpen = true;
+  static sidebarState: boolean = true;
+
   isBrowser!: boolean;
 
   languages = [

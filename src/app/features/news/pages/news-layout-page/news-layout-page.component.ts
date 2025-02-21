@@ -1,14 +1,12 @@
-import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
 import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-layout-page',
+  selector: 'app-news-layout-page',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [CommonModule, RouterOutlet],
   templateUrl: './news-layout-page.component.html',
-  styleUrl: './news-layout-page.component.css'
+  styleUrls: ['./news-layout-page.component.css']
 })
-export class NewsLayoutPageComponent {
-
-}
+export class NewsLayoutPageComponent {}

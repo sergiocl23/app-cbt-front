@@ -1,50 +1,54 @@
 export interface News {
   data: NewsItem[];
-  meta: Meta;
+  meta?: any;
 }
 
 export interface NewsItem {
-  id:            number;
-  documentId:    string;
-  fecha:         Date;
-  createdAt:     Date;
-  updatedAt:     Date;
-  publishedAt:   Date;
-  locale:        null;
-  title:         null | string;
-  content:       Content[];
-  summary:       null;
-  imagen:        Imagen | null;
-  autor:         Autor;
-  tags:          Tag[];
-  localizations: any[];
+  id: number;
+  title: string;
+  summary: string;
+  content: Content[];
+  images: string[];
+  sourceUrl?: string;
+  sourceName?: string;
+  articleType: 'regular' | 'topicFeatured' | 'topicSmall';
+  createdAt: string;
+  mainImage?: string;
+  publishedAt?: string;
+  articleDate?: string;
+  author?: {
+    username: string;
+  };
+  tags?: Tag[];
+  pais?: string;
 }
 
-export interface Autor {
-  id:          number;
-  documentId:  string;
-  username:    string;
-  email:       string;
-  provider:    string;
-  confirmed:   boolean;
-  blocked:     boolean;
-  createdAt:   Date;
-  updatedAt:   Date;
-  publishedAt: Date;
-  locale:      null;
+export interface MediaItem {
+  url: string;
+  alternativeText?: string;
+  formats?: {
+    thumbnail?: ImageFormat;
+    small?: ImageFormat;
+    medium?: ImageFormat;
+    large?: ImageFormat;
+  };
+}
+
+export interface ImageFormat {
+  url: string;
+  width: number;
+  height: number;
 }
 
 export interface Content {
-  type:     string;
-  children: Child[];
-}
-
-export interface Child {
-  text: string;
   type: string;
+  children: {
+    text: string;
+    type?: string;
+  }[];
 }
 
-export interface Imagen {
+export interface ImageData {
   id:                number;
   documentId:        string;
   name:              string;
@@ -61,9 +65,9 @@ export interface Imagen {
   previewUrl:        null;
   provider:          string;
   provider_metadata: null;
-  createdAt:         Date;
-  updatedAt:         Date;
-  publishedAt:       Date;
+  createdAt:         string;
+  updatedAt:         string;
+  publishedAt:       string;
   locale:            null;
 }
 
@@ -86,15 +90,30 @@ export interface Medium {
   sizeInBytes: number;
 }
 
+export interface Author {
+  id:          number;
+  documentId:  string;
+  username:    string;
+  email:       string;
+  provider:    string;
+  confirmed:   boolean;
+  blocked:     boolean;
+  createdAt:   string;
+  updatedAt:   string;
+  publishedAt: string;
+  locale:      null;
+}
+
 export interface Tag {
   id:          number;
   documentId:  string;
   name:        string;
-  createdAt:   Date;
-  updatedAt:   Date;
-  publishedAt: Date;
+  nombre?:     string;
+  createdAt:   string;
+  updatedAt:   string;
+  publishedAt: string;
   locale:      null;
-  id_tag:      string;
+  id_tag?:     string;
 }
 
 export interface Meta {
