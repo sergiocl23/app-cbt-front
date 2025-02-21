@@ -1,0 +1,29 @@
+.news-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.news-header {
+  background-color: #f8f9fa;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.news-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.news-content {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.news-footer {
+  background-color: #f8f9fa;
+  padding: 1rem 0;
+  border-top: 1px solid #e9ecef;
+}

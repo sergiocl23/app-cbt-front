@@ -1,47 +1,25 @@
-<p-card>
-  <ng-template pTemplate="header">
-    <div class="card-title flex align-items-center justify-content-between px-3 pt-3 pb-0">
-      <span>Noticias Destacadas</span>
-      <p-button label="Ver más" [rounded]="true" [outlined]="true" severity="primary" size="small"/>
+<div class="latest-news-card" *ngIf="latestNews">
+  <div class="card-content">
+    <div class="image-container">
+      <img [src]="getImageUrl(latestNews)" [alt]="latestNews.title">
     </div>
-  </ng-template>
-  <ng-template pTemplate="content">
-    <div class="grid">
-      <div class="col-12 pb-0">
-
-        <div class="carousel-container">
-          <div
-            class="carousel-slide"
-            *ngFor="let news of newsList; let i = index"
-            [ngStyle]="{ 'transform': 'translateX(-' + currentIndex * 100 + '%)', 'background-image': 'url(' + news.image + ')' }"
-          >
-            <div class="overlay text-justify">
-              <p class="mb-2 news-title">{{ news.title }}</p>
-              <p class="mb-0 news-summary">{{ news.summary }}</p>
-            </div>
-          </div>
-          <!-- Indicadores de página -->
-          <div class="indicators">
-            <span
-              *ngFor="let news of newsList; let i = index"
-              (click)="currentIndex = i"
-              [class.active]="i === currentIndex"
-              class="indicator"
-            ></span>
-          </div>
-
-          <button class="arrow-button left-arrow" pButton type="button" [rounded]="true" [text]="true" (click)="prevSlide()">
-              <span class="material-icons mr-2">arrow_back_ios_new</span>
-          </button>
-
-          <button class="arrow-button right-arrow" pButton type="button" [rounded]="true" [text]="true" (click)="nextSlide()">
-            <span class="material-icons mr-2">arrow_forward_ios</span>
-          </button>
-        </div>
-
-
-
+    <div class="text-content">
+      <h2>{{ latestNews.title }}</h2>
+      <div class="meta-info">
+        <span class="date">
+          <i class="pi pi-calendar"></i>
+          {{ latestNews.createdAt | date:'longDate':'GMT-3' }}
+        </span>
+        <span class="author" *ngIf="latestNews.author">
+          <i class="pi pi-user"></i>
+          {{ latestNews.author.username }}
+        </span>
       </div>
+      <p class="summary">{{ latestNews.summary }}</p>
+      <div class="tags" *ngIf="latestNews.tags?.length">
+        <span class="tag" *ngFor="let tag of latestNews.tags">{{ tag.name }}</span>
+      </div>
+      <button pButton label="Leer más" (click)="navigateToNews()"></button>
     </div>
-  </ng-template>
-</p-card>
+  </div>
+</div>
