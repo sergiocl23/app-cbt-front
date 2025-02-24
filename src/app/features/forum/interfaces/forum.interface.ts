@@ -40,9 +40,11 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  body: string;                    // Changed from 'content' to 'body'
-  topic?: Topic;                   // Relation with Topic
-  users_permissions_user?: User;   // Relation with User from users-permissions
+  body: string;                    
+  topic?: Topic;                   
+  users_permissions_user?: User;   
+  post?: Post;     // The post this is replying to (previously reply_to)
+  posts?: Post[];  // Posts that reply to this post (previously replies)
 }
 
 // Add User interface for the users-permissions relation

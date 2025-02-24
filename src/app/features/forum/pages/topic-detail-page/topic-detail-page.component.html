@@ -24,7 +24,24 @@
       <div class="post-header">
         <span class="author">{{ post.users_permissions_user?.username || 'Anónimo' }}</span>
         <span class="date">Respondió {{ post.createdAt | date:'MMM d, y, h:mm:ss a' }}</span>
+        
+        <!-- Changed reply_to to post -->
+        <span *ngIf="post.post" class="reply-reference">
+          en respuesta a 
+          <a href="#post-{{post.post.id}}" 
+             (click)="scrollToPost($event, post.post.id)">
+            {{ post.post.users_permissions_user?.username || 'Anónimo' }}
+          </a>
+        </span>
+        
         <div class="post-actions">
+          <!-- Add reply button -->
+          <button class="reply-btn" 
+                  (click)="onReplyToPost(post)"
+                  title="Responder a este mensaje">
+            <i class="fas fa-reply"></i>
+          </button>
+          <!-- Existing edit/delete buttons -->
           <button class="edit-btn" 
                   (click)="onEditPost(post)"
                   title="Editar respuesta">
@@ -38,14 +55,27 @@
           </button>
         </div>
       </div>
-      <div class="markdown-body" [innerHTML]="getFormattedContent(post.id)"></div>
+      
+      <!-- Add post ID for scroll targeting -->
+      <div [id]="'post-' + post.id" class="markdown-body" [innerHTML]="getFormattedContent(post.id)"></div>
     </div>
   </div>
 
   <!-- Reply form -->
   <div class="reply-form" *ngIf="!topic.closed">
     <div class="editor-header">
-      <h3>Tu respuesta</h3>
+      <h3>
+        Tu respuesta 
+        <!-- Changed replyingTo to match post property -->
+        <span *ngIf="replyingTo" class="replying-to">
+          en respuesta a 
+          <a href="#post-{{replyingTo.id}}" 
+             (click)="scrollToPost($event, replyingTo.id)">
+            {{ replyingTo.users_permissions_user?.username || 'Anónimo' }}
+          </a>
+          <button class="clear-reply" (click)="clearReplyTo()">&times;</button>
+        </span>
+      </h3>
       <button class="btn-preview" (click)="toggleReplyPreview()">
         {{ showReplyPreview ? 'Editar' : 'Vista previa' }}
       </button>

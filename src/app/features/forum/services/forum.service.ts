@@ -85,32 +85,43 @@ export class ForumService {
         headers: this.getHeaders(),
         params: {
           'filters[id][$eq]': id.toString(),
-          'populate': '*'
+          'populate[posts][populate]': ['users_permissions_user', 'post', 'posts'],
+          'populate[users_permissions_user]': '*'
         }
       }
     ).pipe(
       map(normalizeResponse),
       map(topics => {
         if (!topics.length) throw new Error(`Topic with id ${id} not found`);
-        
-        console.log(`Retrieved topic ID from API: ${topics[0].id}`); // Log the real ID
-  
         return topics;
       })
     );
   }
   
 
-  createPost(topicId: number, content: string): Observable<StrapiResponse<Post>> {
+  createPost(topicId: number, content: string, replyToId?: number): Observable<StrapiResponse<Post>> {
+    const data = {
+      body: content,
+      topic: topicId,
+      post: replyToId
+    };
+    
+    console.log('Creating post with data:', data);
+    
     return this.http.post<StrapiResponse<Post>>(
       `${this.baseUrl}/api/posts`,
-      {
-        data: {
-          body: content,
-          topic: topicId
-        }
-      },
+      { data },
       { headers: this.getHeaders() }
+    ).pipe(
+      tap({
+        error: (error) => {
+          console.error('Error response:', error);
+          console.error('Error details:', error.error);
+          if (error.error?.error?.details) {
+            console.error('Validation errors:', error.error.error.details);
+          }
+        }
+      })
     );
   }
 

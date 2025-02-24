@@ -259,4 +259,46 @@
 .topic-status i {
   font-size: 1.2em;
 }
+
+.reply-reference {
+  color: #666;
+  font-size: 0.9em;
+  margin-left: 10px;
+}
+
+.reply-reference a {
+  color: #36A9E1;
+  text-decoration: none;
+}
+
+.reply-reference a:hover {
+  text-decoration: underline;
+}
+
+.reply-btn {
+  color: #36A9E1;
+  
+  &:hover {
+    background-color: rgba(54, 169, 225, 0.1);
+  }
+}
+
+.replying-to {
+  font-size: 0.9em;
+  color: #666;
+  margin-left: 10px;
+}
+
+.clear-reply {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  padding: 0 5px;
+  margin-left: 5px;
+  
+  &:hover {
+    color: #BE1622;
+  }
+}
   

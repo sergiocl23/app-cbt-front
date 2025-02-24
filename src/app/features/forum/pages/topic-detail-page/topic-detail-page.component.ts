@@ -35,6 +35,7 @@ export class TopicDetailComponent implements OnInit {
   newPostContent: string = '';
   showReplyPreview = false;
   replyPreview!: SafeHtml;
+  replyingTo: Post | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -83,14 +84,31 @@ export class TopicDetailComponent implements OnInit {
 
     if (!this.topic || !this.newPostContent.trim()) return;
 
-    this.forumService.createPost(this.topic.id, this.newPostContent)
-      .subscribe({
-        next: () => {
-          this.loadTopic(this.topic.id);
-          this.newPostContent = '';
-        },
-        error: (error) => console.error('Error:', error)
-      });
+    console.log('Submitting post with data:', {
+      topicId: this.topic.id,
+      content: this.newPostContent,
+      replyToId: this.replyingTo?.id,
+      replyingTo: this.replyingTo
+    });
+
+    this.forumService.createPost(
+      this.topic.id, 
+      this.newPostContent,
+      this.replyingTo?.id
+    ).subscribe({
+      next: (response) => {
+        console.log('Post created successfully:', response);
+        this.loadTopic(this.topic.id);
+        this.newPostContent = '';
+        this.replyingTo = null;
+      },
+      error: (error) => {
+        console.error('Error creating post:', error);
+        if (error.error?.error?.message) {
+          console.error('Error message:', error.error.error.message);
+        }
+      }
+    });
   }
 
   onDeletePost(post: Post) {
@@ -149,6 +167,24 @@ export class TopicDetailComponent implements OnInit {
           }
         });
       }
+    });
+  }
+
+  onReplyToPost(post: Post) {
+    console.log('Replying to post:', post);
+    this.replyingTo = post;
+    document.querySelector('.reply-form')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  clearReplyTo() {
+    this.replyingTo = null;
+  }
+
+  scrollToPost(event: Event, postId: number) {
+    event.preventDefault();
+    document.getElementById(`post-${postId}`)?.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'center'
     });
   }
 }
