@@ -4,6 +4,13 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 /* You can add global styles to this file, and also import other style files */
 
+/* Variables globales */
+:root {
+  --bg-dark: #121212;
+  --bg-dark-lighter: #1e1e1e;
+  --text-dark: #e1e1e1;
+}
+
 html {
   height: 100%;
   background-color: #ecf0f1;
@@ -27,11 +34,50 @@ body {
   padding: 10px 14px 13px 14px !important;
 }
 
-.p-message{
-  margin: 5px 0px 0px 0px !important;
+/* Modo lectura global */
+body.reading-mode {
+  background-color: var(--bg-dark) !important; /* Forzar el color de fondo */
+  color: var(--text-dark);
+  min-height: 100vh;
 }
 
-
-.place-active .p-message {
-  background-color: rgba(0, 0, 0, 0.15) !important;
+/* Asegurar que el fondo del html también cambie */
+body.reading-mode ~ html {
+  background-color: var(--bg-dark) !important;
 }
+
+/* Contenedor principal */
+body.reading-mode .main-content {
+  background-color: var(--bg-dark) !important;
+}
+
+/* Header y toolbar */
+body.reading-mode .header,
+body.reading-mode p-toolbar {
+  background-color: var(--bg-dark-lighter) !important;
+}
+
+/* Sidebar en modo lectura */
+body.reading-mode .custom-sidebar {
+  background-color: var(--bg-dark-lighter) !important;
+}
+
+/* Ajustar el color del texto en elementos del header */
+body.reading-mode .header *,
+body.reading-mode p-toolbar * {
+  color: var(--text-dark);
+}
+
+body.reading-mode app-root {
+  background-color: var(--bg-dark);
+  min-height: 100vh;
+  display: block;
+}
+
+body.reading-mode .navbar {
+  background-color: var(--bg-dark-lighter);
+  color: var(--text-dark);
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

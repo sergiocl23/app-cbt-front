@@ -1,1 +1,106 @@
-<p>news-page works!</p>
+<div class="container" [class.reading-mode]="isReadingMode">
+  <!-- Botón de retroceso -->
+  <!--<button 
+    class="back-button"
+    (click)="goBack()"
+    title="Volver atrás">
+    <i class="pi pi-arrow-left"></i>
+    <span class="back-text">Regresar</span>
+  </button>-->
+
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+  </div>
+
+  <!-- Contenido de la noticia -->
+  <div *ngIf="!isLoading && newsItem" class="news-detail">
+    <div class="news-header">
+      <h1>{{ newsItem.title }}</h1>
+      <div class="news-meta">
+        <span class="date">
+          <i class="pi pi-calendar"></i>
+          {{ getFormattedDate(newsItem.articleDate || newsItem.publishedAt) | date:'longDate':'GMT-3' }}
+        </span>
+        <span *ngIf="newsItem.sourceUrl" class="source">
+          <i class="pi pi-globe"></i>
+          <a [href]="newsItem.sourceUrl" target="_blank">
+            {{ getFormattedSourceUrl(newsItem.sourceUrl) }}
+          </a>
+        </span>
+        <span *ngIf="newsItem.pais" class="country">
+          <i class="pi pi-flag"></i>
+          {{ newsItem.pais ? newsItem.pais.toUpperCase() : '' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="news-image-container">
+      <div class="news-image">
+        <img [src]="getImageUrl()" [alt]="newsItem.title"
+             loading="lazy"
+             [class.default-image]="!newsItem.mainImage">
+      </div>
+    </div>
+
+    <div class="news-content-wrapper">
+      <!-- Tags con tooltip para extras -->
+      <ng-container *ngIf="(newsItem.tags?.length || 0) <= 3; else extraTags">
+        <div class="news-tags">
+          <span class="tag" *ngFor="let tag of (newsItem.tags || []).slice(0, 3)">
+            {{ tag.name || tag.nombre }}
+          </span>
+        </div>
+      </ng-container>
+      <ng-template #extraTags>
+        <div class="news-tags">
+          <!-- Mostrar siempre las primeras 3 etiquetas -->
+          <span class="tag" *ngFor="let tag of (newsItem.tags || []).slice(0, 3)">
+            {{ tag.name || tag.nombre }}
+          </span>
+
+          <!-- Mostrar el +N solo si hay más de 3 etiquetas -->
+          <span class="tag extra-tag" *ngIf="(newsItem.tags?.length || 0) > 3">
+            +{{ (newsItem.tags?.length || 0) - 3 }}
+            <div class="extra-tags-tooltip">
+              <span class="tag" *ngFor="let tag of (newsItem.tags || []).slice(3)">
+                {{ tag.name || tag.nombre }}
+              </span>
+            </div>
+          </span>
+        </div>
+      </ng-template>
+
+      <div class="news-content">
+        <div *ngIf="newsItem.summary" class="summary">
+          <div class="ai-badge">
+            <i class="pi pi-bolt"></i>IA
+          </div>
+          <p>{{ newsItem.summary }}</p>
+        </div>
+
+        <div class="content" style="white-space: pre-line;">
+          {{ cleanHtmlTags(getContent()) }}
+        </div>
+
+        <a *ngIf="newsItem.sourceUrl" 
+           [href]="newsItem.sourceUrl" 
+           target="_blank"
+           class="source-link">
+          <i class="pi pi-external-link"></i>
+          Ver fuente original
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="!isLoading && !newsItem" class="error-message">
+    <p>No se encontró la noticia solicitada</p>
+  </div>
+</div>
+
+<!-- Botón modo lectura -->
+<button class="reading-mode-toggle" (click)="toggleReadingMode()" [title]="isReadingMode ? 'Modo normal' : 'Modo lectura'">
+  <i class="pi" [class.pi-eye]="!isReadingMode" [class.pi-eye-slash]="isReadingMode"></i>
+</button>
