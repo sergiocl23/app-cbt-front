@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+.mat-dialog-container {
+  padding: 24px;
+  border-radius: 4px;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.dialog-content {
+  margin-bottom: 24px;
+  color: rgba(0, 0, 0, 0.67);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+button {
+  min-width: 80px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cancel-btn {
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* Add focus styles for accessibility */
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
