@@ -284,21 +284,45 @@
 }
 
 .replying-to {
-  font-size: 0.9em;
+  font-size: 0.9rem;
   color: #666;
   margin-left: 10px;
+  padding: 4px 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  a {
+    color: #36A9E1;
+    text-decoration: none;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 .clear-reply {
-  background: none;
+  background-color: #e9ecef;
   border: none;
-  color: #666;
+  color: #495057;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  padding: 0 5px;
-  margin-left: 5px;
-  
+  font-size: 16px;
+  padding: 0;
+  transition: all 0.2s ease;
+  margin-left: 4px;
+
   &:hover {
-    color: #BE1622;
+    background-color: #dc3545;
+    color: white;
   }
 }
   
