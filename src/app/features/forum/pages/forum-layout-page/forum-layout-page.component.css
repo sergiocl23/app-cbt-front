@@ -2,8 +2,9 @@
     display: flex;
     min-height: calc(100vh - 64px);
     padding: 30px;
-    background-color: #f8f9fa;
+    background-color: #ecf0f1;
     gap: 20px;
+    position: relative;
   }
   
   .forum-container.sidebar-open {
@@ -17,6 +18,10 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-right: 20px;
+    position: sticky;
+    top: 30px;
+    height: calc(100vh - 94px);
+    overflow-y: auto;
   }
   
   .forum-content {
@@ -33,7 +38,7 @@
   .subcategories-list {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0 0 15px 0;
   }
   
   .subcategory-item {
@@ -362,4 +367,114 @@
 
   .subcategory-content .fas {
     margin-right: 0;
+  }
+
+  /* Add these new styles */
+  .sidebar-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    
+    &:first-child {
+      margin-bottom: 0;
+    }
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  .section-title {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px 0;
+  }
+
+  .social-links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+
+    i {
+      width: 20px;
+      margin-right: 10px;
+      text-align: center;
+    }
+
+    &:hover {
+      background-color: #f8f9fa;
+      color: #36A9E1;
+      transform: translateX(2px);
+    }
+
+    /* Social media specific colors on hover */
+    &:hover i.fa-instagram {
+      color: #E1306C;
+    }
+
+    &:hover i.fa-x-twitter {
+      color: #000000;
+    }
+
+    &:hover i.fa-linkedin {
+      color: #0077B5;
+    }
+
+    &:hover i.fa-facebook {
+      color: #1877F2;
+    }
+  }
+
+  /* Add smooth scrollbar for the sidebar */
+  .forum-sidebar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .forum-sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .forum-sidebar::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+
+  .forum-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
+  }
+
+  /* Style the subcategories scrollbar */
+  .subcategories-list::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .subcategories-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .subcategories-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+
+  .subcategories-list::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
   }
