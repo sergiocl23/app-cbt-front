@@ -1,19 +1,19 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, PLATFORM_ID, Inject, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ForumService } from '../../services/forum.service';
-import { Topic, Post } from '../../interfaces/forum.interface';
+import { Topic, Post, Media } from '../../interfaces/forum.interface';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { marked } from 'marked';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { EditPostComponent } from '../../components/edit-post/edit-post.component';
 import { Marked } from 'marked';
-import { isPlatformBrowser } from '@angular/common';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MarkdownEditorComponent } from '../../components/markdown-editor/markdown-editor.component';
 
 @Component({
   selector: 'app-topic-detail',
@@ -25,15 +25,15 @@ import { isPlatformBrowser } from '@angular/common';
     MatIconModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatSnackBarModule, 
+    MarkdownEditorComponent,
   ],
   templateUrl: './topic-detail-page.component.html',
   styleUrls: ['./topic-detail-page.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class TopicDetailComponent implements OnInit, OnDestroy {
-  @ViewChild('editor') editorElement!: ElementRef;
-  
+export class TopicDetailComponent implements OnInit {
   topic!: Topic;
   formattedTopicContent!: SafeHtml;
   formattedPosts: { id: number; formattedContent: SafeHtml }[] = [];
@@ -42,17 +42,14 @@ export class TopicDetailComponent implements OnInit, OnDestroy {
   replyPreview!: SafeHtml;
   replyingTo: Post | null = null;
   
-  private editor: any = null;
   private marked = new Marked();
 
   constructor(
     private route: ActivatedRoute,
     private forumService: ForumService,
     private sanitizer: DomSanitizer,
-    private dialog: MatDialog,
-    @Inject(PLATFORM_ID) private platformId: Object
+    private dialog: MatDialog
   ) {
-    // Just use basic marked configuration
     this.marked.setOptions({
       breaks: true,
       gfm: true
@@ -64,141 +61,6 @@ export class TopicDetailComponent implements OnInit, OnDestroy {
       const id = params['id'];
       this.loadTopic(id);
     });
-  }
-
-  ngAfterViewInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      setTimeout(() => {
-        this.initializeEditor();
-      }, 100);
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.editor) {
-      this.editor.toTextArea();
-      this.editor = null;
-    }
-  }
-
-  private async initializeEditor() {
-    if (isPlatformBrowser(this.platformId)) {
-      const EasyMDE = (await import('easymde')).default;
-      
-      if (this.editorElement) {
-        this.editorElement.nativeElement.style.display = '';
-        
-        try {
-          this.editor = new EasyMDE({
-            element: this.editorElement.nativeElement,
-            spellChecker: false,
-            initialValue: '',
-            forceSync: true,
-            placeholder: 'Escriba su respuesta aquí...',
-            toolbar: [
-              {
-                name: "bold",
-                action: EasyMDE.toggleBold,
-                className: "fa fa-bold",
-                title: "Negrita"
-              },
-              {
-                name: "italic",
-                action: EasyMDE.toggleItalic,
-                className: "fa fa-italic",
-                title: "Cursiva"
-              },
-              "|",
-              {
-                name: "heading",
-                action: EasyMDE.toggleHeadingSmaller,
-                className: "fa fa-header",
-                title: "Encabezado"
-              },
-              "|",
-              {
-                name: "quote",
-                action: EasyMDE.toggleBlockquote,
-                className: "fa fa-quote-left",
-                title: "Cita"
-              },
-              {
-                name: "unordered-list",
-                action: EasyMDE.toggleUnorderedList,
-                className: "fa fa-list-ul",
-                title: "Lista con viñetas"
-              },
-              {
-                name: "ordered-list",
-                action: EasyMDE.toggleOrderedList,
-                className: "fa fa-list-ol",
-                title: "Lista numerada"
-              },
-              "|",
-              {
-                name: "link",
-                action: EasyMDE.drawLink,
-                className: "fa fa-link",
-                title: "Crear enlace"
-              },
-              {
-                name: "image",
-                action: EasyMDE.drawImage,
-                className: "fa fa-image",
-                title: "Insertar imagen",
-              },
-              "|",
-              {
-                name: "preview",
-                action: EasyMDE.togglePreview,
-                className: "fa fa-eye no-disable",
-                title: "Vista previa"
-              }
-            ],
-            renderingConfig: {
-              singleLineBreaks: true,
-              codeSyntaxHighlighting: false,
-            },
-            status: false,
-            previewRender: (plainText: string, previewElement: HTMLElement) => {
-              this.marked.setOptions({
-                breaks: true,
-                gfm: true
-              });
-              const rendered = this.marked.parse(plainText) as string;
-              return rendered;
-            },
-            uploadImage: true,
-            imageUploadFunction: (file: File, onSuccess: Function, onError: Function) => {
-              const formData = new FormData();
-              formData.append('files', file);
-
-              this.forumService.uploadImage(formData).subscribe({
-                next: (response: { url: string }) => {
-                  onSuccess(response.url);
-                },
-                error: (error: Error) => {
-                  console.error('Error uploading image:', error);
-                  onError('Error al subir la imagen');
-                }
-              });
-            }
-          });
-
-          setTimeout(() => {
-            if (this.editor && this.editor.codemirror) {
-              this.editor.codemirror.refresh();
-            }
-          }, 100);
-
-          this.editor.codemirror.on('change', () => {
-            this.newPostContent = this.editor?.value() || '';
-          });
-        } catch (error) {
-          console.error('Error creating editor:', error);
-        }
-      }
-    }
   }
 
   async formatContent(content: string): Promise<SafeHtml> {
@@ -248,9 +110,6 @@ export class TopicDetailComponent implements OnInit, OnDestroy {
         this.loadTopic(this.topic.id);
         this.newPostContent = '';
         this.replyingTo = null;
-        if (this.editor) {
-          this.editor.value('');
-        }
       },
       error: (error) => {
         console.error('Error creating post:', error);
@@ -278,20 +137,6 @@ export class TopicDetailComponent implements OnInit, OnDestroy {
 
   getFormattedContent(postId: number): SafeHtml | undefined {
     return this.formattedPosts.find(p => p.id === postId)?.formattedContent;
-  }
-
-  async updateReplyPreview() {
-    if (this.newPostContent) {
-      const htmlContent = await marked(this.newPostContent);
-      this.replyPreview = this.sanitizer.bypassSecurityTrustHtml(htmlContent);
-    }
-  }
-
-  async toggleReplyPreview() {
-    this.showReplyPreview = !this.showReplyPreview;
-    if (this.showReplyPreview) {
-      await this.updateReplyPreview();
-    }
   }
 
   onEditPost(post: Post): void {
@@ -342,5 +187,9 @@ export class TopicDetailComponent implements OnInit, OnDestroy {
         element.classList.remove('highlight-animation');
       }, 2000); // Match animation duration
     }
+  }
+
+  onImageUploaded(media: Media) {
+    console.log('Image uploaded:', media);
   }
 }

@@ -12,6 +12,7 @@ import { EditTopicComponent } from '../../../features/forum/components/edit-topi
 import { EditPostComponent } from '../../../features/forum/components/edit-post/edit-post.component';
 import { CreateSubcategoryComponent } from '../../../features/forum/components/create-subcategory/create-subcategory.component';
 import { EditSubcategoryComponent } from '../../../features/forum/components/edit-subcategory/edit-subcategory.component';
+import { Media } from '../interfaces/forum.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -480,20 +481,7 @@ export class ForumService {
     );
   }
 
-  uploadImage(formData: FormData): Observable<{ url: string }> {
-    return this.http.post<{ url: string }>(
-      `${this.baseUrl}/upload`,  // Strapi's default upload endpoint
-      formData
-    ).pipe(
-      map(response => {
-        // Strapi returns an array of uploaded files
-        const uploadedFile = Array.isArray(response) ? response[0] : response;
-        return { url: uploadedFile.url };
-      }),
-      catchError(error => {
-        console.error('Error uploading image:', error);
-        throw error;
-      })
-    );
+  uploadImage(formData: FormData): Observable<Media> {
+    return this.http.post<Media>(`${this.baseUrl}/upload`, formData);
   }
 }

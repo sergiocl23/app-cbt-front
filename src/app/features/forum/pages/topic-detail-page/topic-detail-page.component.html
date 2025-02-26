@@ -79,7 +79,11 @@
     </div>
 
     <div class="editor-container">
-      <textarea #editor></textarea>
+      <app-markdown-editor
+        [(ngModel)]="newPostContent"
+        [placeholder]="'Escriba su respuesta aquí...'"
+        (imageUploaded)="onImageUploaded($event)">
+      </app-markdown-editor>
     </div>
 
     <button mat-raised-button 
