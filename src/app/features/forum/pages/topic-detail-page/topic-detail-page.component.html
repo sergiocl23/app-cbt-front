@@ -20,7 +20,9 @@
 
   <!-- Posts/Replies -->
   <div class="replies-section" *ngIf="topic.posts && topic.posts.length > 0">
-    <div class="content-card reply" *ngFor="let post of topic.posts">
+    <div class="content-card reply" 
+         *ngFor="let post of topic.posts"
+         [id]="'post-' + post.id">
       <div class="post-header">
         <span class="author">{{ post.users_permissions_user?.username || 'Anónimo' }}</span>
         <span class="date">Respondió {{ post.createdAt | date:'MMM d, y, h:mm:ss a' }}</span>
@@ -56,8 +58,7 @@
         </div>
       </div>
       
-      <!-- Add post ID for scroll targeting -->
-      <div [id]="'post-' + post.id" class="markdown-body" [innerHTML]="getFormattedContent(post.id)"></div>
+      <div class="markdown-body" [innerHTML]="getFormattedContent(post.id)"></div>
     </div>
   </div>
 
@@ -65,8 +66,7 @@
   <div class="reply-form" *ngIf="!topic.closed">
     <div class="editor-header">
       <h3>
-        Tu respuesta 
-        <!-- Changed replyingTo to match post property -->
+        Tu respuesta
         <span *ngIf="replyingTo" class="replying-to">
           en respuesta a 
           <a href="#post-{{replyingTo.id}}" 
@@ -76,34 +76,10 @@
           <button class="clear-reply" (click)="clearReplyTo()">&times;</button>
         </span>
       </h3>
-      <button class="btn-preview" (click)="toggleReplyPreview()">
-        {{ showReplyPreview ? 'Editar' : 'Vista previa' }}
-      </button>
     </div>
 
     <div class="editor-container">
-      <mat-form-field *ngIf="!showReplyPreview" appearance="fill">
-        <mat-label>Escriba su respuesta...</mat-label>
-        <textarea 
-          matInput 
-          [(ngModel)]="newPostContent" 
-          (ngModelChange)="updateReplyPreview()"
-          rows="4">
-        </textarea>
-      </mat-form-field>
-
-      <div *ngIf="showReplyPreview" class="markdown-preview markdown-body" [innerHTML]="replyPreview"></div>
-    </div>
-
-    <div class="markdown-help">
-      <small>
-        Formato soportado: 
-        <code># Título</code>,
-        <code>**negrita**</code>,
-        <code>*cursiva*</code>,
-        <code>- lista</code>,
-        <code>[enlace](url)</code>
-      </small>
+      <textarea #editor></textarea>
     </div>
 
     <button mat-raised-button 

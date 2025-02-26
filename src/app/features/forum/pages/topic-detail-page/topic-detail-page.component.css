@@ -55,6 +55,8 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   padding: 25px;
   margin-bottom: 20px;
+  transition: all 0.3s ease;
+  will-change: transform, box-shadow, background-color;
 }
 
 .topic-content {
@@ -151,11 +153,7 @@
   }
 
   .editor-container {
-    margin-bottom: 15px;
-
-    mat-form-field {
-      width: 100%;
-    }
+    margin-bottom: 20px;
   }
 
   .btn-preview {
@@ -195,86 +193,40 @@
   }
 }
 
+/* Restore default markdown heading styles */
 .markdown-body {
-  color: #333;
-  line-height: 1.6;
-  
   h1, h2, h3, h4, h5, h6 {
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
-    color: #2c3e50;
+    all: revert; /* This resets all properties to their default values */
   }
 
-  p {
-    margin-bottom: 1rem;
+  h1 {
+    font-size: 2em !important;
+    font-weight: bold !important;
   }
 
-  ul, ol {
-    margin-bottom: 1rem;
-    padding-left: 2rem;
+  h2 {
+    font-size: 1.5em !important;
+    font-weight: bold !important;
   }
 
-  code {
-    background: #f8f9fa;
-    padding: 0.2rem 0.4rem;
-    border-radius: 3px;
-    font-family: monospace;
+  h3 {
+    font-size: 1.17em !important;
+    font-weight: bold !important;
   }
 
-  blockquote {
-    border-left: 4px solid #e9ecef;
-    padding-left: 1rem;
-    margin: 1rem 0;
-    color: #6c757d;
+  h4 {
+    font-size: 1em !important;
+    font-weight: bold !important;
   }
 
-  img {
-    max-width: 100%;
-    height: auto;
-    margin: 1rem 0;
+  h5 {
+    font-size: 0.83em !important;
+    font-weight: bold !important;
   }
 
-  a {
-    color: #36A9E1;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1rem 0;
-
-    th, td {
-      border: 1px solid #dee2e6;
-      padding: 8px;
-    }
-
-    th {
-      background-color: #f8f9fa;
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .topic-container {
-    padding: 10px;
-  }
-
-  .content-card {
-    padding: 15px;
-  }
-
-  .post-header {
-    flex-direction: column;
-    align-items: flex-start;
-
-    .author {
-      margin-bottom: 5px;
-    }
+  h6 {
+    font-size: 0.67em !important;
+    font-weight: bold !important;
   }
 }
 
@@ -365,20 +317,28 @@
       text-decoration: underline;
     }
   }
+
+  &::before {
+    content: '\f3e5';  /* Font Awesome reply icon */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 12px;
+    color: #36A9E1;
+  }
 }
 
 .clear-reply {
   background-color: #e9ecef;
   border: none;
   color: #495057;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   padding: 0;
   transition: all 0.2s ease;
   margin-left: 4px;
@@ -388,4 +348,28 @@
     color: white;
   }
 }
-  
+
+@keyframes highlight-post {
+  0% {
+    background-color: rgba(54, 169, 225, 0.1);
+    box-shadow: 0 0 0 2px rgba(54, 169, 225, 0.5);
+    transform: translateY(-2px);
+  }
+  70% {
+    background-color: rgba(54, 169, 225, 0.1);
+    box-shadow: 0 0 0 2px rgba(54, 169, 225, 0.5);
+    transform: translateY(-2px);
+  }
+  100% {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transform: translateY(0);
+  }
+}
+
+.content-card.highlight-animation {
+  animation: highlight-post 2s ease-out;
+}
+
+
+

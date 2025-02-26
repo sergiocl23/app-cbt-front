@@ -479,4 +479,21 @@ export class ForumService {
       })
     );
   }
+
+  uploadImage(formData: FormData): Observable<{ url: string }> {
+    return this.http.post<{ url: string }>(
+      `${this.baseUrl}/upload`,  // Strapi's default upload endpoint
+      formData
+    ).pipe(
+      map(response => {
+        // Strapi returns an array of uploaded files
+        const uploadedFile = Array.isArray(response) ? response[0] : response;
+        return { url: uploadedFile.url };
+      }),
+      catchError(error => {
+        console.error('Error uploading image:', error);
+        throw error;
+      })
+    );
+  }
 }

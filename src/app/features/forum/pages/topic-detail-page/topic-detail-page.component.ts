@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, PLATFORM_ID, Inject, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ForumService } from '../../services/forum.service';
@@ -12,6 +12,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { EditPostComponent } from '../../components/edit-post/edit-post.component';
+import { Marked } from 'marked';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-topic-detail',
@@ -26,9 +28,12 @@ import { EditPostComponent } from '../../components/edit-post/edit-post.componen
     MatInputModule
   ],
   templateUrl: './topic-detail-page.component.html',
-  styleUrls: ['./topic-detail-page.component.scss']
+  styleUrls: ['./topic-detail-page.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
-export class TopicDetailComponent implements OnInit {
+export class TopicDetailComponent implements OnInit, OnDestroy {
+  @ViewChild('editor') editorElement!: ElementRef;
+  
   topic!: Topic;
   formattedTopicContent!: SafeHtml;
   formattedPosts: { id: number; formattedContent: SafeHtml }[] = [];
@@ -36,13 +41,23 @@ export class TopicDetailComponent implements OnInit {
   showReplyPreview = false;
   replyPreview!: SafeHtml;
   replyingTo: Post | null = null;
+  
+  private editor: any = null;
+  private marked = new Marked();
 
   constructor(
     private route: ActivatedRoute,
     private forumService: ForumService,
     private sanitizer: DomSanitizer,
     private dialog: MatDialog,
-  ) {}
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    // Just use basic marked configuration
+    this.marked.setOptions({
+      breaks: true,
+      gfm: true
+    });
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -51,8 +66,147 @@ export class TopicDetailComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => {
+        this.initializeEditor();
+      }, 100);
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.editor) {
+      this.editor.toTextArea();
+      this.editor = null;
+    }
+  }
+
+  private async initializeEditor() {
+    if (isPlatformBrowser(this.platformId)) {
+      const EasyMDE = (await import('easymde')).default;
+      
+      if (this.editorElement) {
+        this.editorElement.nativeElement.style.display = '';
+        
+        try {
+          this.editor = new EasyMDE({
+            element: this.editorElement.nativeElement,
+            spellChecker: false,
+            initialValue: '',
+            forceSync: true,
+            placeholder: 'Escriba su respuesta aquí...',
+            toolbar: [
+              {
+                name: "bold",
+                action: EasyMDE.toggleBold,
+                className: "fa fa-bold",
+                title: "Negrita"
+              },
+              {
+                name: "italic",
+                action: EasyMDE.toggleItalic,
+                className: "fa fa-italic",
+                title: "Cursiva"
+              },
+              "|",
+              {
+                name: "heading",
+                action: EasyMDE.toggleHeadingSmaller,
+                className: "fa fa-header",
+                title: "Encabezado"
+              },
+              "|",
+              {
+                name: "quote",
+                action: EasyMDE.toggleBlockquote,
+                className: "fa fa-quote-left",
+                title: "Cita"
+              },
+              {
+                name: "unordered-list",
+                action: EasyMDE.toggleUnorderedList,
+                className: "fa fa-list-ul",
+                title: "Lista con viñetas"
+              },
+              {
+                name: "ordered-list",
+                action: EasyMDE.toggleOrderedList,
+                className: "fa fa-list-ol",
+                title: "Lista numerada"
+              },
+              "|",
+              {
+                name: "link",
+                action: EasyMDE.drawLink,
+                className: "fa fa-link",
+                title: "Crear enlace"
+              },
+              {
+                name: "image",
+                action: EasyMDE.drawImage,
+                className: "fa fa-image",
+                title: "Insertar imagen",
+              },
+              "|",
+              {
+                name: "preview",
+                action: EasyMDE.togglePreview,
+                className: "fa fa-eye no-disable",
+                title: "Vista previa"
+              }
+            ],
+            renderingConfig: {
+              singleLineBreaks: true,
+              codeSyntaxHighlighting: false,
+            },
+            status: false,
+            previewRender: (plainText: string, previewElement: HTMLElement) => {
+              this.marked.setOptions({
+                breaks: true,
+                gfm: true
+              });
+              const rendered = this.marked.parse(plainText) as string;
+              return rendered;
+            },
+            uploadImage: true,
+            imageUploadFunction: (file: File, onSuccess: Function, onError: Function) => {
+              const formData = new FormData();
+              formData.append('files', file);
+
+              this.forumService.uploadImage(formData).subscribe({
+                next: (response: { url: string }) => {
+                  onSuccess(response.url);
+                },
+                error: (error: Error) => {
+                  console.error('Error uploading image:', error);
+                  onError('Error al subir la imagen');
+                }
+              });
+            }
+          });
+
+          setTimeout(() => {
+            if (this.editor && this.editor.codemirror) {
+              this.editor.codemirror.refresh();
+            }
+          }, 100);
+
+          this.editor.codemirror.on('change', () => {
+            this.newPostContent = this.editor?.value() || '';
+          });
+        } catch (error) {
+          console.error('Error creating editor:', error);
+        }
+      }
+    }
+  }
+
   async formatContent(content: string): Promise<SafeHtml> {
-    const htmlContent = await marked(content);
+    this.marked.setOptions({
+      breaks: true,
+      gfm: true
+    });
+    const htmlContent = this.marked.parse(content) as string;
     return this.sanitizer.bypassSecurityTrustHtml(htmlContent);
   }
 
@@ -84,13 +238,6 @@ export class TopicDetailComponent implements OnInit {
 
     if (!this.topic || !this.newPostContent.trim()) return;
 
-    console.log('Submitting post with data:', {
-      topicId: this.topic.id,
-      content: this.newPostContent,
-      replyToId: this.replyingTo?.id,
-      replyingTo: this.replyingTo
-    });
-
     this.forumService.createPost(
       this.topic.id, 
       this.newPostContent,
@@ -101,12 +248,12 @@ export class TopicDetailComponent implements OnInit {
         this.loadTopic(this.topic.id);
         this.newPostContent = '';
         this.replyingTo = null;
+        if (this.editor) {
+          this.editor.value('');
+        }
       },
       error: (error) => {
         console.error('Error creating post:', error);
-        if (error.error?.error?.message) {
-          console.error('Error message:', error.error.error.message);
-        }
       }
     });
   }
@@ -182,9 +329,18 @@ export class TopicDetailComponent implements OnInit {
 
   scrollToPost(event: Event, postId: number) {
     event.preventDefault();
-    document.getElementById(`post-${postId}`)?.scrollIntoView({ 
-      behavior: 'smooth',
-      block: 'center'
-    });
+    const element = document.getElementById(`post-${postId}`);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'center'
+      });
+      
+      // Add and remove highlight class
+      element.classList.add('highlight-animation');
+      setTimeout(() => {
+        element.classList.remove('highlight-animation');
+      }, 2000); // Match animation duration
+    }
   }
 }
