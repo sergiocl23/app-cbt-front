@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { StrapiResponse, Subcategory, Topic, Post, Category } from '../interfaces/forum.interface';
+import { Observable, throwError } from 'rxjs';
+import { tap, catchError, switchMap, map } from 'rxjs/operators';
+import { StrapiResponse, Subcategory, Topic, Post, Category, Media } from '../interfaces/forum.interface';
 import { environments } from '../../../../environments/environments';
-import { tap, map, switchMap, catchError } from 'rxjs/operators';
 import { normalizeResponse } from '../utils/strapi.utils';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
@@ -12,7 +12,7 @@ import { EditTopicComponent } from '../../../features/forum/components/edit-topi
 import { EditPostComponent } from '../../../features/forum/components/edit-post/edit-post.component';
 import { CreateSubcategoryComponent } from '../../../features/forum/components/create-subcategory/create-subcategory.component';
 import { EditSubcategoryComponent } from '../../../features/forum/components/edit-subcategory/edit-subcategory.component';
-import { Media } from '../interfaces/forum.interface';
+
 
 @Injectable({
   providedIn: 'root'
@@ -86,8 +86,12 @@ export class ForumService {
         headers: this.getHeaders(),
         params: {
           'filters[id][$eq]': id.toString(),
-          'populate[posts][populate]': ['users_permissions_user', 'post', 'posts'],
-          'populate[users_permissions_user]': '*'
+          'populate[posts][populate][users_permissions_user]': '*',
+          'populate[posts][populate][post]': '*',
+          'populate[posts][populate][posts]': '*',
+          'populate[posts][populate][images]': '*',
+          'populate[users_permissions_user]': '*',
+          'populate[images]': '*'
         }
       }
     ).pipe(
@@ -100,28 +104,27 @@ export class ForumService {
   }
   
 
-  createPost(topicId: number, content: string, replyToId?: number): Observable<StrapiResponse<Post>> {
+  createPost(topic: Topic, body: string, replyTo?: Post | null, images: Media[] = []): Observable<Post> {
     const data = {
-      body: content,
-      topic: topicId,
-      post: replyToId
+      data: {
+        body,
+        topic: topic.id,
+        post: replyTo?.id,
+        images: images.map(img => img.id)
+      }
     };
-    
+
     console.log('Creating post with data:', data);
-    
     return this.http.post<StrapiResponse<Post>>(
-      `${this.baseUrl}/api/posts`,
-      { data },
+      `${this.baseUrl}/api/posts`, 
+      data,
       { headers: this.getHeaders() }
     ).pipe(
-      tap({
-        error: (error) => {
-          console.error('Error response:', error);
-          console.error('Error details:', error.error);
-          if (error.error?.error?.details) {
-            console.error('Validation errors:', error.error.error.details);
-          }
-        }
+      map(response => normalizeResponse(response)[0]),
+      tap(response => console.log('Post created:', response)),
+      catchError(error => {
+        console.error('Error response:', error);
+        return throwError(() => error);
       })
     );
   }
@@ -199,16 +202,29 @@ export class ForumService {
   }
 
   deletePost(postId: number): Observable<any> {
-    return this.http.delete(
+    // First get the post to check its images
+    return this.http.get<Post>(
       `${this.baseUrl}/api/posts/${postId}`,
       { headers: this.getHeaders() }
     ).pipe(
-      tap({
-        next: () => console.log('Post eliminado correctamente'),
-        error: (error) => {
-          console.error('Error al eliminar el post:', error);
-          throw error;
-        }
+      switchMap(post => {
+        // Delete the post
+        return this.http.delete(
+          `${this.baseUrl}/api/posts/${postId}`,
+          { headers: this.getHeaders() }
+        ).pipe(
+          // After deleting post, delete associated images
+          tap(() => {
+            if (post.images?.length) {
+              post.images.forEach(image => {
+                this.http.delete(
+                  `${this.baseUrl}/api/upload/files/${image.id}`,
+                  { headers: this.getHeaders() }
+                ).subscribe();
+              });
+            }
+          })
+        );
       })
     );
   }
@@ -482,6 +498,36 @@ export class ForumService {
   }
 
   uploadImage(formData: FormData): Observable<Media> {
-    return this.http.post<Media>(`${this.baseUrl}/upload`, formData);
+    return this.http.post<Media>(
+      `${this.baseUrl}/api/upload`,
+      formData,
+      { headers: this.getHeaders() }
+    ).pipe(
+      tap({
+        next: (response) => console.log('Image uploaded successfully:', response),
+        error: (error) => {
+          console.error('Error uploading image:', error);
+          throw error;
+        }
+      })
+    );
+  }
+
+  getPost(postId: number): Observable<Post> {
+    return this.http.get<StrapiResponse<Post>>(
+      `${this.baseUrl}/api/posts/${postId}`,
+      { 
+        headers: this.getHeaders(),
+        params: {
+          'populate[users_permissions_user]': '*',
+          'populate[images]': '*',
+          'populate[topic]': '*',
+          'populate[post]': '*',
+          'populate[posts]': '*'
+        }
+      }
+    ).pipe(
+      map(response => normalizeResponse(response)[0])
+    );
   }
 }

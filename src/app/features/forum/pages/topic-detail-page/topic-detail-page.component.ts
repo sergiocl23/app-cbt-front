@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ForumService } from '../../services/forum.service';
@@ -40,9 +40,12 @@ export class TopicDetailComponent implements OnInit {
   newPostContent: string = '';
   showReplyPreview = false;
   replyPreview!: SafeHtml;
-  replyingTo: Post | null = null;
+  replyingTo: Post | undefined = undefined;
   
   private marked = new Marked();
+  @ViewChild(MarkdownEditorComponent) markdownEditor!: MarkdownEditorComponent;
+
+  referencedPosts: Map<number, Post> = new Map();
 
   constructor(
     private route: ActivatedRoute,
@@ -92,29 +95,31 @@ export class TopicDetailComponent implements OnInit {
     });
   }
 
-  onSubmitPost() {
-    if (this.topic.closed) {
-      console.warn('Este tópico está cerrado y no acepta nuevas respuestas');
-      return;
+  async onSubmitPost() {
+    if (this.topic.closed || !this.newPostContent.trim()) return;
+
+    try {
+      const { images, content } = await this.markdownEditor.uploadStoredImages();
+
+      this.forumService.createPost(
+        this.topic,
+        content,
+        this.replyingTo || undefined,  // Pass undefined if replyingTo is null
+        images
+      ).subscribe({
+        next: (response) => {
+          console.log('Post created successfully:', response);
+          this.loadTopic(this.topic.id);
+          this.newPostContent = '';
+          this.replyingTo = undefined;  // Reset to undefined
+        },
+        error: (error) => {
+          console.error('Error creating post:', error);
+        }
+      });
+    } catch (error) {
+      console.error('Error uploading images:', error);
     }
-
-    if (!this.topic || !this.newPostContent.trim()) return;
-
-    this.forumService.createPost(
-      this.topic.id, 
-      this.newPostContent,
-      this.replyingTo?.id
-    ).subscribe({
-      next: (response) => {
-        console.log('Post created successfully:', response);
-        this.loadTopic(this.topic.id);
-        this.newPostContent = '';
-        this.replyingTo = null;
-      },
-      error: (error) => {
-        console.error('Error creating post:', error);
-      }
-    });
   }
 
   onDeletePost(post: Post) {
@@ -169,11 +174,24 @@ export class TopicDetailComponent implements OnInit {
   }
 
   clearReplyTo() {
-    this.replyingTo = null;
+    this.replyingTo = undefined;
   }
 
   scrollToPost(event: Event, postId: number) {
     event.preventDefault();
+    
+    // First ensure the post is loaded
+    if (!this.referencedPosts.has(postId)) {
+      this.forumService.getPost(postId).subscribe(post => {
+        this.referencedPosts.set(postId, post);
+        this.scrollToElement(postId);
+      });
+    } else {
+      this.scrollToElement(postId);
+    }
+  }
+
+  private scrollToElement(postId: number) {
     const element = document.getElementById(`post-${postId}`);
     if (element) {
       element.scrollIntoView({ 
@@ -191,5 +209,17 @@ export class TopicDetailComponent implements OnInit {
 
   onImageUploaded(media: Media) {
     console.log('Image uploaded:', media);
+  }
+
+  getReferencedPost(postId: number): Post | undefined {
+    return this.referencedPosts.get(postId);
+  }
+
+  loadReferencedPost(postId: number) {
+    if (!this.referencedPosts.has(postId)) {
+      this.forumService.getPost(postId).subscribe(post => {
+        this.referencedPosts.set(postId, post);
+      });
+    }
   }
 }

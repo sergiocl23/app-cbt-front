@@ -20,8 +20,8 @@ export interface Subcategory {
 // Add Media interface for Strapi media type
 export interface Media {
   id: number;
-  name: string;
   url: string;
+  name: string;
   mime: string;
   size: number;
   width?: number;
@@ -36,7 +36,7 @@ export interface Media {
   };
 }
 
-// Topic interface (with timestamps)
+// Topic interface
 export interface Topic {
   id: number;
   createdAt: string;
@@ -51,21 +51,21 @@ export interface Topic {
   subcategory?: Subcategory;
   posts?: Post[];
   users_permissions_user?: User;
-  images?: Media[];  // Add the images field
+  images?: Media[];
 }
 
-// Updated Post interface to match Strapi schema
+// Post interface
 export interface Post {
   id: number;
+  body: string;
+  topic?: Topic;  // Changed from number to Topic
+  post?: Post;    // Changed from number to Post (self-reference)
+  posts?: Post[]; // Array of reply posts
+  images?: Media[];
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  body: string;                    
-  topic: Topic;                   
-  users_permissions_user?: User;   
-  post?: Post;     // The post this is replying to (previously reply_to)
-  posts?: Post[];  // Posts that reply to this post (previously replies)
-  images?: Media[];  // Add the images field
+  users_permissions_user?: User;
 }
 
 // Add User interface for the users-permissions relation

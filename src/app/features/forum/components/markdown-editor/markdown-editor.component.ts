@@ -1,9 +1,10 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, forwardRef } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, forwardRef, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Media } from '../../interfaces/forum.interface';
 import { ForumService } from '../../services/forum.service';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-markdown-editor',
@@ -24,6 +25,8 @@ export class MarkdownEditorComponent implements OnInit, OnDestroy, ControlValueA
   @Input() placeholder: string = 'Escriba aquí...';
   @Input() initialValue: string = '';
   @Output() imageUploaded = new EventEmitter<Media>();
+  private uploadedImages: Media[] = [];
+  private tempImages: { file: File, tempUrl: string, markdown: string }[] = [];
 
   private editor: any = null;
   private onChange: (value: string) => void = () => {};
@@ -31,14 +34,18 @@ export class MarkdownEditorComponent implements OnInit, OnDestroy, ControlValueA
 
   constructor(
     private forumService: ForumService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
-    this.initializeEditor();
+    if (isPlatformBrowser(this.platformId)) {
+      this.initializeEditor();
+    }
   }
 
   ngOnDestroy() {
+    this.tempImages.forEach(img => URL.revokeObjectURL(img.tempUrl));
     if (this.editor) {
       this.editor.toTextArea();
       this.editor = null;
@@ -138,43 +145,49 @@ export class MarkdownEditorComponent implements OnInit, OnDestroy, ControlValueA
       const file = target.files?.[0];
       
       if (file) {
-        const loadingSnackBar = this.snackBar.open('Subiendo imagen...', '', {
-          duration: undefined,
+        const tempUrl = URL.createObjectURL(file);
+        const imageMarkdown = `![${file.name}](${tempUrl})`;
+        
+        this.tempImages.push({ 
+          file, 
+          tempUrl,
+          markdown: imageMarkdown 
         });
-
-        const formData = new FormData();
-        formData.append('files', file);
-
-        this.forumService.uploadImage(formData).subscribe({
-          next: (response) => {
-            loadingSnackBar.dismiss();
-            const imageUrl = response.url;
-            const imageMarkdown = `![${file.name}](${imageUrl})`;
-            editor.codemirror.replaceSelection(imageMarkdown);
-            
-            this.snackBar.open('Imagen subida correctamente', 'OK', {
-              duration: 3000,
-            });
-            
-            this.imageUploaded.emit(response);
-            document.body.removeChild(fileInput);
-          },
-          error: (error) => {
-            loadingSnackBar.dismiss();
-            console.error('Error uploading image:', error);
-            
-            this.snackBar.open('Error al subir la imagen', 'OK', {
-              duration: 5000,
-              panelClass: ['error-snackbar']
-            });
-            
-            document.body.removeChild(fileInput);
-          }
-        });
+        
+        editor.codemirror.replaceSelection(imageMarkdown);
+        document.body.removeChild(fileInput);
       }
     };
 
     fileInput.click();
+  }
+
+  async uploadStoredImages(): Promise<{images: Media[], content: string}> {
+    const uploadedImages: Media[] = [];
+    let content = this.editor.value();
+
+    for (const img of this.tempImages) {
+      const formData = new FormData();
+      formData.append('files', img.file);
+
+      try {
+        const response = await this.forumService.uploadImage(formData).toPromise() as Media;
+        if (response && response.url) {
+          uploadedImages.push(response);
+          // Replace temp URL with real URL in content
+          content = content.replace(img.markdown, `![${img.file.name}](${response.url})`);
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        throw error;
+      }
+    }
+
+    // Clean up temp URLs
+    this.tempImages.forEach(img => URL.revokeObjectURL(img.tempUrl));
+    this.tempImages = [];
+
+    return { images: uploadedImages, content };
   }
 
   // ControlValueAccessor implementation
@@ -196,5 +209,9 @@ export class MarkdownEditorComponent implements OnInit, OnDestroy, ControlValueA
     if (this.editor) {
       this.editor.codemirror.setOption('readOnly', isDisabled);
     }
+  }
+
+  getUploadedImages(): Media[] {
+    return this.uploadedImages;
   }
 }
