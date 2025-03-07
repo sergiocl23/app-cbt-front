@@ -1219,3 +1219,27 @@
   margin-top: 1rem !important;
 }
 
+/* Estilos para noticias creadas manualmente */
+.news-card.manual-creation {
+  border: 2px solid #4caf50;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+.manual-image {
+  border-radius: 8px;
+  background-color: #f0f8f0;
+}
+
+.manual-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #4caf50;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 2;
+}
+

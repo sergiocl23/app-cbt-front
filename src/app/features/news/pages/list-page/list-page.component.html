@@ -16,7 +16,9 @@
           <div *ngIf="latestNews" class="main-featured" (click)="navigateToNews(latestNews)">
             <div class="featured-image">
               <img [src]="getImageUrl(latestNews)" [alt]="latestNews.title"
-                   [class.default-image]="!latestNews.mainImage">
+                   [class.default-image]="!latestNews.mainImage"
+                   [class.manual-image]="latestNews.manualCreation">
+              <span class="manual-badge" *ngIf="latestNews.manualCreation">Noticia interna</span>
             </div>
             <a *ngIf="latestNews.sourceUrl" [href]="latestNews.sourceUrl" 
                class="source-url" target="_blank">
@@ -69,7 +71,9 @@
             <article *ngFor="let news of secondaryNews" class="secondary-news-card" (click)="navigateToNews(news)">
               <div class="card-image">
                 <img [src]="getImageUrl(news)" [alt]="news.title"
-                     [class.default-image]="!news.mainImage">
+                     [class.default-image]="!news.mainImage"
+                     [class.manual-image]="news.manualCreation">
+                <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
               </div>
               <div class="card-content">
                 <span class="date">
@@ -166,10 +170,14 @@
           </aside>
         </div>
         <div class="news-grid">
-          <article class="news-card" *ngFor="let news of previousNews" (click)="navigateToNews(news)">
+          <article class="news-card" *ngFor="let news of previousNews" 
+                  [class.manual-creation]="news.manualCreation" 
+                  (click)="navigateToNews(news)">
             <div class="card-image">
               <img [src]="getImageUrl(news)" [alt]="news.title"
-                   [class.default-image]="!news.mainImage">
+                   [class.default-image]="!news.mainImage"
+                   [class.manual-image]="news.manualCreation">
+              <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
             </div>
             <div class="card-content">
               <div class="card-meta">

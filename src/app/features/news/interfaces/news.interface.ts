@@ -21,6 +21,9 @@ export interface NewsItem {
   };
   tags?: Tag[];
   pais?: string;
+  featuredImage?: MediaItem;
+  additionalImages?: MediaItem[];
+  manualCreation?: boolean;
 }
 
 export interface MediaItem {

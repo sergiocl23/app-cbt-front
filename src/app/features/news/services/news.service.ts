@@ -31,6 +31,9 @@ interface StrapiResponse {
       images: string[];
       createdAt: string;
       articleType: 'regular' | 'topicFeatured' | 'topicSmall';
+      featuredImage?: any;
+      additionalImages?: any[];
+      manualCreation?: boolean;
     }>;
     count: number;
     timestamp: string;
@@ -73,6 +76,9 @@ interface StrapiArticle {
   images: string[];
   createdAt: string;
   articleType: 'regular' | 'topicFeatured' | 'topicSmall';
+  featuredImage?: any;
+  additionalImages?: any[];
+  manualCreation?: boolean;
 }
 
 interface StrapiSingleResponse {
@@ -101,6 +107,9 @@ interface StrapiSingleResponse {
     images: string[];
     createdAt: string;
     articleType: 'regular' | 'topicFeatured' | 'topicSmall';
+    featuredImage?: any;
+    additionalImages?: any[];
+    manualCreation?: boolean;
   };
 }
 
@@ -182,6 +191,8 @@ export class NewsService {
           throw new Error('Noticia no encontrada');
         }
 
+        console.log('Artículo recuperado del backend:', article);
+
         return {
           id: article.id,
           title: article.title,
@@ -208,8 +219,25 @@ export class NewsService {
           })) || [],
           images: article.images || [],
           createdAt: article.createdAt,
-          articleType: article.articleType
+          articleType: article.articleType,
+          featuredImage: article.featuredImage,
+          additionalImages: article.additionalImages,
+          manualCreation: article.manualCreation || false
         };
+      })
+    );
+  }
+
+  getNewsComplete(id: string): Observable<any> {
+    const url = `${this.baseUrlStrapi}/api/noticias/ver/${id}?format=json`;
+    
+    return this.http.get<any>(url, { 
+      headers: this.headers,
+      observe: 'body'
+    }).pipe(
+      catchError(error => {
+        console.error('[ERROR] Error al obtener noticia completa:', error);
+        throw error;
       })
     );
   }

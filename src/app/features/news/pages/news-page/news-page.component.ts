@@ -67,7 +67,69 @@ export class NewsPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Método auxiliar para extraer la URL de imagen del objeto MediaItem de Strapi 5
+  private extractMediaUrl(mediaItem: any): string | null {
+    if (!mediaItem) return null;
+    
+    console.log('[DEBUG] Estructura de mediaItem en news-page:', mediaItem);
+    
+    // Verificar si es un objeto directo con URL
+    if (typeof mediaItem === 'object' && mediaItem.url) {
+      return mediaItem.url;
+    }
+    
+    // Verificar si tiene la estructura data.attributes común en Strapi 5
+    if (mediaItem.data && mediaItem.data.attributes) {
+      const attrs = mediaItem.data.attributes;
+      
+      // Intentar obtener la URL directamente
+      if (attrs.url) {
+        return attrs.url;
+      }
+      
+      // Intentar obtener formatos de imagen si están disponibles
+      if (attrs.formats) {
+        // Preferir formato mediano, pequeño, miniatura o cualquiera disponible en ese orden
+        const format = attrs.formats.medium || attrs.formats.small || attrs.formats.thumbnail;
+        if (format && format.url) {
+          return format.url;
+        }
+      }
+    }
+    
+    // Verificar si es un array, como suele ser con additionalImages
+    if (Array.isArray(mediaItem.data)) {
+      // Tomar el primer elemento si existe
+      const firstItem = mediaItem.data[0];
+      if (firstItem && firstItem.attributes) {
+        const attrs = firstItem.attributes;
+        if (attrs.url) {
+          return attrs.url;
+        }
+        
+        // Intentar obtener formatos de imagen
+        if (attrs.formats) {
+          const format = attrs.formats.medium || attrs.formats.small || attrs.formats.thumbnail;
+          if (format && format.url) {
+            return format.url;
+          }
+        }
+      }
+    }
+    
+    return null;
+  }
+
   getImageUrl(): string {
+    // Para noticias con imágenes en formato MEDIA
+    if (this.newsItem?.featuredImage) {
+      const mediaUrl = this.extractMediaUrl(this.newsItem.featuredImage);
+      if (mediaUrl) {
+        return mediaUrl;
+      }
+    }
+    
+    // Para noticias con mainImage o images en formato string
     return this.newsItem?.mainImage || 
            this.newsItem?.images?.[0] || 
            'assets/images/CBioceanicoTarapacafondo_blanco.png';

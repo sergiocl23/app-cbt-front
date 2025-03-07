@@ -12,6 +12,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepickerIntl } from '@angular/material/datepicker';
+import { environments } from '@environments/environments';
 
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -142,6 +143,12 @@ export class ListPageComponent implements OnInit, OnDestroy {
     end: new FormControl<Date | null>(null),
   });
 
+  // Caché para las imágenes de noticias
+  private newsImagesCache: { [id: number]: { featuredImage: any, additionalImages: any[] } } = {};
+
+  // Marca si una imagen está siendo cargada actualmente
+  private loadingImages: Set<number> = new Set();
+  
   constructor(
     private newsService: NewsService,
     private router: Router,
@@ -162,6 +169,7 @@ export class ListPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadNews();
+    this.checkSpecificNews();
   }
 
   ngOnDestroy(): void {
@@ -181,6 +189,8 @@ export class ListPageComponent implements OnInit, OnDestroy {
         sort: 'publishedAt:desc'
       }).subscribe({
         next: (response) => {
+          console.log('[DEBUG] Respuesta completa del servidor:', response);
+          
           if (response?.status === 'success' && Array.isArray(response?.data)) {
             const articles = this.mapArticles(response.data);
             this.latestNews = articles[0] || null;
@@ -190,12 +200,12 @@ export class ListPageComponent implements OnInit, OnDestroy {
             // Cargar noticias anteriores excluyendo las destacadas
             this.loadPreviousNews(featuredIds);
           } else {
-            console.error('Formato de respuesta inválido:', response);
+            console.error('[ERROR] Formato de respuesta inválido:', response);
             this.isLoading = false;
           }
         },
         error: (error) => {
-          console.error('Error cargando noticias:', error);
+          console.error('[ERROR] Error cargando noticias:', error);
           this.isLoading = false;
         }
       });
@@ -214,9 +224,11 @@ export class ListPageComponent implements OnInit, OnDestroy {
     
     this.newsService.getNews(params).subscribe({
       next: (response) => {
-        console.log('[RESPUESTA] Respuesta del backend:', response);
+        console.log('[DEBUG] Respuesta para noticias anteriores:', response);
         if (response?.status === 'success' && Array.isArray(response?.data)) {
           const articles = this.mapArticles(response.data);
+          console.log('[DEBUG] Artículos mapeados:', articles);
+          
           this.previousNews = articles
             .filter(article => !excludeIds.includes(article.id))
             .slice(0, this.pageSize);
@@ -227,12 +239,12 @@ export class ListPageComponent implements OnInit, OnDestroy {
           }
           this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
         } else {
-          console.error('Formato de respuesta inválido:', response);
+          console.error('[ERROR] Formato de respuesta inválido para noticias anteriores:', response);
         }
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('[ERROR] Error en la solicitud:', error);
+        console.error('[ERROR] Error cargando noticias anteriores:', error);
         if (error.error) {
           console.error('[ERROR] Detalles del error:', error.error);
         }
@@ -343,7 +355,105 @@ export class ListPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Método auxiliar para extraer la URL de imagen del objeto MediaItem de Strapi 5
+  private extractMediaUrl(mediaItem: any): string | null {
+    if (!mediaItem) return null;
+    
+    console.log('[DEBUG] Estructura de mediaItem:', mediaItem);
+    
+    // Verificar si es un objeto directo con URL
+    if (typeof mediaItem === 'object' && mediaItem.url) {
+      return mediaItem.url;
+    }
+    
+    // Verificar si tiene la estructura data.attributes común en Strapi 5
+    if (mediaItem.data && mediaItem.data.attributes) {
+      const attrs = mediaItem.data.attributes;
+      
+      // Intentar obtener la URL directamente
+      if (attrs.url) {
+        return attrs.url;
+      }
+      
+      // Intentar obtener formatos de imagen si están disponibles
+      if (attrs.formats) {
+        // Preferir formato mediano, pequeño, miniatura o cualquiera disponible en ese orden
+        const format = attrs.formats.medium || attrs.formats.small || attrs.formats.thumbnail;
+        if (format && format.url) {
+          return format.url;
+        }
+      }
+    }
+    
+    // Verificar si es un array, como suele ser con additionalImages
+    if (Array.isArray(mediaItem.data)) {
+      // Tomar el primer elemento si existe
+      const firstItem = mediaItem.data[0];
+      if (firstItem && firstItem.attributes) {
+        const attrs = firstItem.attributes;
+        if (attrs.url) {
+          return attrs.url;
+        }
+        
+        // Intentar obtener formatos de imagen
+        if (attrs.formats) {
+          const format = attrs.formats.medium || attrs.formats.small || attrs.formats.thumbnail;
+          if (format && format.url) {
+            return format.url;
+          }
+        }
+      }
+    }
+    
+    console.warn('[ADVERTENCIA] No se pudo extraer URL de imagen:', mediaItem);
+    return null;
+  }
+
   getImageUrl(newsItem: NewsItem): string {
+    // Para noticias creadas manualmente
+    if (newsItem?.manualCreation === true) {
+      console.log('[DEBUG] Noticia creada manualmente, ID:', newsItem.id);
+      
+      // Verificar si ya tenemos esta noticia en caché
+      if (this.newsImagesCache[newsItem.id]?.featuredImage) {
+        const featuredImage = this.newsImagesCache[newsItem.id].featuredImage;
+        console.log('[DEBUG] Usando imagen en caché para noticia ID:', newsItem.id);
+        // Preferir versión medium o small si existe
+        if (featuredImage.formats?.medium?.url) {
+          return featuredImage.formats.medium.url;
+        } else if (featuredImage.formats?.small?.url) {
+          return featuredImage.formats.small.url;
+        }
+        return featuredImage.url;
+      }
+      
+      // Si no está en caché, cargar los datos completos de la noticia
+      if (!this.isLoadingImage(newsItem.id)) {
+        this.loadNewsImages(newsItem.id);
+      }
+      
+      // Si tiene featuredImage, intentar extraer la URL
+      if (newsItem.featuredImage) {
+        const mediaUrl = this.extractMediaUrl(newsItem.featuredImage);
+        if (mediaUrl) {
+          console.log('[DEBUG] URL de imagen obtenida para noticia manual:', mediaUrl);
+          return mediaUrl;
+        }
+      }
+      
+      // Mientras se carga, mostrar una imagen predeterminada
+      return 'assets/images/CBioceanicoTarapacafondo_blanco.png';
+    }
+    
+    // Para noticias con imágenes en formato MEDIA
+    if (newsItem?.featuredImage) {
+      const mediaUrl = this.extractMediaUrl(newsItem.featuredImage);
+      if (mediaUrl) {
+        return mediaUrl;
+      }
+    }
+    
+    // Si no hay featuredImage, continuar con la lógica actual
     const url = newsItem?.mainImage || newsItem?.images?.[0];
     
     if (url && this.isValidUrl(url) && !url.includes('default')) {
@@ -412,7 +522,28 @@ export class ListPageComponent implements OnInit, OnDestroy {
 
   // Se obtiene la URL de la imagen actual
   getCurrentImageUrl(newsItem: NewsItem): string {
-    return newsItem?.images?.[0] || 'assets/images/default-news.jpg';
+    // Para noticias creadas manualmente con imágenes en caché
+    if (newsItem?.manualCreation && this.newsImagesCache[newsItem.id]?.featuredImage) {
+      const featuredImage = this.newsImagesCache[newsItem.id].featuredImage;
+      // Preferir versión medium o small si existe
+      if (featuredImage.formats?.medium?.url) {
+        return featuredImage.formats.medium.url;
+      } else if (featuredImage.formats?.small?.url) {
+        return featuredImage.formats.small.url;
+      }
+      return featuredImage.url;
+    }
+    
+    // Para noticias con imágenes en formato MEDIA
+    if (newsItem?.featuredImage) {
+      const mediaUrl = this.extractMediaUrl(newsItem.featuredImage);
+      if (mediaUrl) {
+        return mediaUrl;
+      }
+    }
+    
+    // Para noticias con mainImage o images en formato string
+    return newsItem?.images?.[0] || newsItem?.mainImage || 'assets/images/default-news.jpg';
   }
 
   // Método para detener el slider
@@ -425,6 +556,36 @@ export class ListPageComponent implements OnInit, OnDestroy {
   }
 
   getAllImages(newsItem: NewsItem): string[] {
+    // Para noticias creadas manualmente con imágenes en caché
+    if (newsItem?.manualCreation && this.newsImagesCache[newsItem.id]?.additionalImages) {
+      const cachedImages = this.newsImagesCache[newsItem.id].additionalImages;
+      if (cachedImages.length > 0) {
+        // Extraer URLs de las imágenes adicionales en caché
+        return cachedImages.map(img => {
+          // Preferir versión medium o small si existe
+          if (img.formats?.medium?.url) {
+            return img.formats.medium.url;
+          } else if (img.formats?.small?.url) {
+            return img.formats.small.url;
+          }
+          return img.url;
+        });
+      }
+    }
+    
+    // Para noticias con imágenes en formato MEDIA
+    if (newsItem?.additionalImages && newsItem.additionalImages.length > 0) {
+      // Extraer URLs de cada imagen adicional
+      const mediaUrls = newsItem.additionalImages
+        .map(img => this.extractMediaUrl(img))
+        .filter((url): url is string => !!url); // Filtrar valores nulos
+      
+      if (mediaUrls.length > 0) {
+        return mediaUrls;
+      }
+    }
+    
+    // Para noticias con imágenes en formato de array de strings
     return newsItem?.images || [];
   }
 
@@ -464,30 +625,135 @@ export class ListPageComponent implements OnInit, OnDestroy {
   private mapArticles(articles: any[]): NewsItem[] {
     if (!articles) return [];
     
-    return articles.map(article => ({
-      id: article.id,
-      title: article.title || '',
-      content: article.content || '',
-      summary: article.summary || '',
-      mainImage: article.mainImage || '',
-      sourceUrl: article.sourceUrl || '',
-      sourceName: article.sourceName || '',
-      publishedAt: article.publishedAt || null,
-      articleDate: article.articleDate || null,
-      articleType: article.articleType || 'regular',
-      tags: Array.isArray(article.tags) ? article.tags.map((tag: any) => ({
-        id: tag.id || 0,
-        name: tag.nombre || tag.name || 'Sin nombre',
-        nombre: tag.nombre || tag.name || 'Sin nombre',
-        documentId: tag.documentId || '',
-        createdAt: tag.createdAt || null,
-        updatedAt: tag.updatedAt || null,
-        publishedAt: tag.publishedAt || null,
-        locale: tag.locale || null,
-        id_tag: tag.id_tag || ''
-      })) : [],
-      images: article.images || [],
-      createdAt: article.createdAt || null
-    }));
+    return articles.map(article => {
+      // Determinar si estamos recibiendo datos en formato Strapi 5 (data/attributes)
+      let processedArticle = article;
+      
+      // Si tiene estructura data/attributes (formato Strapi v5)
+      if (article.attributes) {
+        processedArticle = article.attributes;
+        processedArticle.id = article.id;
+      }
+      
+      // Añadir log para depuración
+      console.log('[DEBUG] Mapeando artículo ID:', processedArticle.id, processedArticle);
+      
+      // Detectar si es una noticia creada manualmente
+      // Podría estar indicado por el campo manualCreation o por la ausencia de sourceUrl
+      const isManualCreation = processedArticle.manualCreation === true || 
+                             (!processedArticle.sourceUrl && !processedArticle.mainImage);
+      
+      if (isManualCreation) {
+        console.log('[DEBUG] Noticia creada manualmente detectada, ID:', processedArticle.id);
+      }
+      
+      // Verificar específicamente el ID 27
+      if (processedArticle.id === 27) {
+        console.log('[DEBUG] Artículo ID 27 encontrado:', processedArticle);
+        console.log('[DEBUG] featuredImage:', processedArticle.featuredImage);
+        console.log('[DEBUG] additionalImages:', processedArticle.additionalImages);
+        console.log('[DEBUG] Es creación manual:', isManualCreation);
+      }
+      
+      // Procesar etiquetas que pueden venir en diferentes formatos
+      let tags = [];
+      if (Array.isArray(processedArticle.tags)) {
+        tags = processedArticle.tags.map((tag: any) => ({
+          id: tag.id || 0,
+          name: tag.nombre || tag.name || 'Sin nombre',
+          nombre: tag.nombre || tag.name || 'Sin nombre',
+          documentId: tag.documentId || '',
+          createdAt: tag.createdAt || null,
+          updatedAt: tag.updatedAt || null,
+          publishedAt: tag.publishedAt || null,
+          locale: tag.locale || null,
+          id_tag: tag.id_tag || ''
+        }));
+      } else if (processedArticle.tags?.data) {
+        // Formato Strapi v5
+        tags = processedArticle.tags.data.map((tagData: any) => {
+          const tag = tagData.attributes || tagData;
+          return {
+            id: tagData.id || 0,
+            name: tag.nombre || tag.name || 'Sin nombre',
+            nombre: tag.nombre || tag.name || 'Sin nombre',
+            documentId: tag.documentId || '',
+            createdAt: tag.createdAt || null,
+            updatedAt: tag.updatedAt || null,
+            publishedAt: tag.publishedAt || null,
+            locale: tag.locale || null,
+            id_tag: tag.id_tag || ''
+          };
+        });
+      }
+      
+      return {
+        id: processedArticle.id,
+        title: processedArticle.title || '',
+        content: processedArticle.content || '',
+        summary: processedArticle.summary || '',
+        mainImage: processedArticle.mainImage || '',
+        sourceUrl: processedArticle.sourceUrl || '',
+        sourceName: processedArticle.sourceName || '',
+        publishedAt: processedArticle.publishedAt || null,
+        articleDate: processedArticle.articleDate || null,
+        articleType: processedArticle.articleType || 'regular',
+        tags: tags,
+        images: processedArticle.images || [],
+        createdAt: processedArticle.createdAt || null,
+        // Mapeando propiedades de imágenes en formato MEDIA de Strapi
+        featuredImage: processedArticle.featuredImage || null,
+        additionalImages: processedArticle.additionalImages || [],
+        manualCreation: isManualCreation
+      };
+    });
+  }
+
+  // Método auxiliar para depurar
+  private checkSpecificNews() {
+    // Buscar la noticia con ID 27 para depuración
+    this.newsService.getNewsById('27').subscribe({
+      next: (news) => {
+        console.log('Noticia con ID 27 cargada directamente:', news);
+        console.log('featuredImage:', news.featuredImage);
+        console.log('additionalImages:', news.additionalImages);
+      },
+      error: (error) => {
+        console.error('Error al cargar noticia con ID 27:', error);
+      }
+    });
+  }
+
+  // Marca si una imagen está siendo cargada actualmente
+  private isLoadingImage(newsId: number): boolean {
+    return this.loadingImages.has(newsId);
+  }
+
+  // Carga las imágenes de una noticia y las guarda en caché
+  private loadNewsImages(newsId: number): void {
+    if (this.isLoadingImage(newsId)) {
+      return; // Evitar cargar la misma noticia múltiples veces
+    }
+    
+    this.loadingImages.add(newsId);
+    console.log('[DEBUG] Cargando imágenes para noticia ID:', newsId);
+    
+    this.newsService.getNewsComplete(newsId.toString()).subscribe({
+      next: (newsData) => {
+        console.log('[DEBUG] Noticia completa cargada:', newsData);
+        
+        // Guardar en caché
+        this.newsImagesCache[newsId] = {
+          featuredImage: newsData.featuredImage,
+          additionalImages: newsData.additionalImages || []
+        };
+        
+        this.loadingImages.delete(newsId);
+      },
+      error: (error) => {
+        console.error('[ERROR] Error al cargar imágenes para noticia ID:', newsId, error);
+        this.loadingImages.delete(newsId);
+      }
+    });
   }
 }
