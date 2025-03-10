@@ -179,26 +179,58 @@ export class NewsService {
 
   getNewsById(id: string): Observable<NewsItem> {
     const url = `${this.baseUrlStrapi}/api/noticias?filters[id][$eq]=${id}&populate=*`;
-
-    return this.http.get<StrapiResponse>(url, { 
+    console.log("[DEBUG SERVICE] Solicitando noticia:", url);
+    
+    return this.http.get<any>(url, { 
       headers: this.headers,
       observe: 'body'
     }).pipe(
       map(response => {
-        const article = response.data?.articles?.find(a => a.id.toString() === id);
+        console.log("[DEBUG SERVICE] Respuesta del backend (getNewsById):", response);
+        
+        // Verificar la estructura de la respuesta para adaptarnos a diferentes formatos
+        let article;
+        
+        // Adaptamos a diferentes estructuras posibles del backend
+        if (response.data && Array.isArray(response.data)) {
+          // Caso 1: La respuesta tiene un array en data (estructura actual)
+          article = response.data[0];
+        } else if (response.data?.articles && Array.isArray(response.data.articles)) {
+          // Caso 2: La respuesta tiene un array en data.articles (estructura anterior)
+          article = response.data.articles.find((a: any) => a.id.toString() === id);
+        } else if (response.status === 'success' && response.data) {
+          // Caso 3: Formato especial con status success
+          article = Array.isArray(response.data) ? response.data[0] : response.data;
+        }
         
         if (!article) {
+          console.error("[ERROR SERVICE] No se encontró la noticia en la respuesta:", response);
           throw new Error('Noticia no encontrada');
         }
+ 
+        console.log("[DEBUG SERVICE] Artículo encontrado:", article);
+        console.log("[DEBUG SERVICE] mainImage del artículo:", article.mainImage);
+        console.log("[DEBUG SERVICE] Valores originales:", {
+          mainImage: article.mainImage,
+          featuredImage: article.featuredImage,
+          additionalImages: article.additionalImages,
+          manualCreation: article.manualCreation
+        });
 
-        console.log('Artículo recuperado del backend:', article);
+        // Convertir el contenido a formato adecuado si es necesario
+        let formattedContent;
+        if (typeof article.content === 'string') {
+          // Si el contenido es una cadena de HTML
+          formattedContent = [{ type: 'paragraph', children: [{ text: article.content }] }];
+        } else {
+          // Si ya es un array o tiene otro formato
+          formattedContent = article.content;
+        }
 
         return {
           id: article.id,
           title: article.title,
-          content: Array.isArray(article.content) 
-            ? article.content 
-            : [{ type: 'paragraph', children: [{ text: article.content }] }],
+          content: formattedContent,
           summary: article.summary,
           mainImage: article.mainImage,
           sourceUrl: article.sourceUrl,
@@ -206,7 +238,7 @@ export class NewsService {
           publishedAt: article.publishedAt,
           articleDate: article.articleDate,
           pais: article.pais,
-          tags: article.tags?.map(tag => ({
+          tags: article.tags?.map((tag: any) => ({
             id: tag.id,
             name: tag.nombre || 'Sin nombre',
             nombre: tag.nombre,
@@ -217,26 +249,55 @@ export class NewsService {
             locale: null,
             id_tag: tag.id_tag
           })) || [],
-          images: article.images || [],
+          images: Array.isArray(article.images) ? article.images : 
+                 (article.mainImage ? [article.mainImage] : []),
           createdAt: article.createdAt,
-          articleType: article.articleType,
-          featuredImage: article.featuredImage,
-          additionalImages: article.additionalImages,
+          articleType: article.articleType || 'regular',
+          featuredImage: article.featuredImage || null,
+          additionalImages: Array.isArray(article.additionalImages) ? article.additionalImages : [],
           manualCreation: article.manualCreation || false
         };
+      }),
+      catchError(error => {
+        console.error('[ERROR SERVICE] Error al obtener noticia:', error);
+        throw error;
       })
     );
   }
 
   getNewsComplete(id: string): Observable<any> {
     const url = `${this.baseUrlStrapi}/api/noticias/ver/${id}?format=json`;
+    console.log("[DEBUG SERVICE] Solicitando datos completos:", url);
     
     return this.http.get<any>(url, { 
       headers: this.headers,
       observe: 'body'
     }).pipe(
+      map(response => {
+        console.log("[DEBUG SERVICE] Respuesta completa del backend:", response);
+        console.log("[DEBUG SERVICE] mainImage en la respuesta completa:", response.mainImage);
+        
+        // Asegurarnos de que featuredImage y additionalImages estén correctamente estructurados
+        // incluso si vienen como null o undefined desde el backend
+        const processedResponse = {
+          ...response,
+          featuredImage: response.featuredImage || null,
+          additionalImages: response.additionalImages || [],
+          // Si no tiene imagen principal pero tiene images array, usar la primera como mainImage
+          mainImage: response.mainImage || (response.images && response.images.length > 0 ? response.images[0] : null)
+        };
+        
+        console.log("[DEBUG SERVICE] Respuesta procesada:", {
+          mainImage: processedResponse.mainImage,
+          featuredImage: processedResponse.featuredImage,
+          additionalImages: processedResponse.additionalImages,
+          manualCreation: processedResponse.manualCreation
+        });
+        
+        return processedResponse;
+      }),
       catchError(error => {
-        console.error('[ERROR] Error al obtener noticia completa:', error);
+        console.error('[ERROR SERVICE] Error al obtener noticia completa:', error);
         throw error;
       })
     );

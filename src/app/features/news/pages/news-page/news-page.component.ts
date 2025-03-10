@@ -54,14 +54,81 @@ export class NewsPageComponent implements OnInit, OnDestroy {
 
   private loadNewsItem(id: string) {
     this.isLoading = true;
+    
+    // Primero intentamos cargar con el método normal
     this.newsService.getNewsById(id).subscribe({
       next: (news) => {
-        // Asignar directamente la noticia, sin acceder a .data
-        this.newsItem = news;
+        console.log("==================== DATOS DE NOTICIA ====================");
+        console.log("[DEBUG] ID de la noticia:", id);
+        console.log("[DEBUG] Noticia cargada con getNewsById:", news);
+        console.log("[DEBUG] mainImage:", news.mainImage);
+        console.log("[DEBUG] featuredImage:", news.featuredImage);
+        console.log("[DEBUG] additionalImages:", news.additionalImages);
+        console.log("[DEBUG] manualCreation:", news.manualCreation);
+        console.log("[DEBUG] sourceUrl:", news.sourceUrl);
+        console.log("==========================================================");
+        
+        // Si es una noticia manual o no tiene imágenes, cargamos los datos completos
+        if (news.manualCreation === true || !news.mainImage) {
+          console.log("[DEBUG] Cargando datos completos para noticia:", id);
+          this.loadCompleteNewsItem(id);
+        } else {
+          // Es una noticia normal con datos completos
+          this.newsItem = news;
+          this.isLoading = false;
+        }
+      },
+      error: (error) => {
+        console.error('[ERROR] Error al cargar la noticia:', error);
+        // Si falla, intentamos con el método completo
+        this.loadCompleteNewsItem(id);
+      }
+    });
+  }
+
+  private loadCompleteNewsItem(id: string) {
+    this.newsService.getNewsComplete(id).subscribe({
+      next: (newsData) => {
+        console.log("================ DATOS COMPLETOS DE NOTICIA ================");
+        console.log("[DEBUG] Noticia completa cargada:", newsData);
+        console.log("[DEBUG] mainImage:", newsData.mainImage);
+        console.log("[DEBUG] featuredImage:", newsData.featuredImage);
+        console.log("[DEBUG] additionalImages:", newsData.additionalImages);
+        console.log("[DEBUG] manualCreation:", newsData.manualCreation);
+        console.log("[DEBUG] images array:", newsData.images);
+        console.log("============================================================");
+        
+        // Asegurar que el contenido esté en el formato esperado
+        let formattedContent;
+        if (typeof newsData.content === 'string') {
+          // Si es HTML o texto plano
+          formattedContent = [{ type: 'paragraph', children: [{ text: newsData.content }] }];
+        } else if (Array.isArray(newsData.content)) {
+          // Si ya es un array
+          formattedContent = newsData.content;
+        } else {
+          // Caso de fallback
+          formattedContent = [{ type: 'paragraph', children: [{ text: 'Sin contenido disponible' }] }];
+        }
+        
+        // Procesar mainImage: usar la primera de images array si existe y mainImage no está disponible
+        const mainImage = newsData.mainImage || 
+                         (newsData.images && newsData.images.length > 0 ? newsData.images[0] : null);
+        
+        this.newsItem = {
+          ...newsData,
+          // Aseguramos que las propiedades estén definidas correctamente
+          content: formattedContent,
+          mainImage: mainImage,
+          featuredImage: newsData.featuredImage || null,
+          additionalImages: newsData.additionalImages || [],
+          images: newsData.images || [],
+          tags: newsData.tags || []
+        };
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error al cargar la noticia:', error);
+        console.error('[ERROR] Error al cargar datos completos:', error);
         this.isLoading = false;
       }
     });
@@ -121,18 +188,84 @@ export class NewsPageComponent implements OnInit, OnDestroy {
   }
 
   getImageUrl(): string {
+    console.log("[DEBUG getImageUrl] Datos de imagen disponibles:");
+    console.log("[DEBUG getImageUrl] newsItem?.mainImage:", this.newsItem?.mainImage);
+    console.log("[DEBUG getImageUrl] newsItem?.featuredImage:", this.newsItem?.featuredImage);
+    console.log("[DEBUG getImageUrl] newsItem?.additionalImages:", this.newsItem?.additionalImages);
+    console.log("[DEBUG getImageUrl] newsItem?.images:", this.newsItem?.images);
+    
+    // Primero verificamos si hay una URL directa en mainImage para noticias scrapeadas
+    if (this.newsItem?.mainImage && this.isValidUrl(this.newsItem.mainImage)) {
+      console.log("[DEBUG getImageUrl] Usando mainImage directamente:", this.newsItem.mainImage);
+      return this.newsItem.mainImage;
+    }
+    
     // Para noticias con imágenes en formato MEDIA
     if (this.newsItem?.featuredImage) {
+      console.log("[DEBUG getImageUrl] Usando featuredImage:", this.newsItem.featuredImage);
+      
+      // Si es un objeto con URL directa
+      if (typeof this.newsItem.featuredImage === 'object' && this.newsItem.featuredImage.url) {
+        console.log("[DEBUG getImageUrl] Usando URL directa:", this.newsItem.featuredImage.url);
+        return this.newsItem.featuredImage.url;
+      }
+      
+      // Si tiene formatos, preferir medium o small
+      if (this.newsItem.featuredImage.formats) {
+        if (this.newsItem.featuredImage.formats.medium?.url) {
+          return this.newsItem.featuredImage.formats.medium.url;
+        } else if (this.newsItem.featuredImage.formats.small?.url) {
+          return this.newsItem.featuredImage.formats.small.url;
+        }
+      }
+      
+      // Intentar extraer la URL con el método auxiliar
       const mediaUrl = this.extractMediaUrl(this.newsItem.featuredImage);
+      if (mediaUrl) {
+        console.log("[DEBUG getImageUrl] URL extraída:", mediaUrl);
+        return mediaUrl;
+      }
+    }
+    
+    // Si hay additionalImages, usar la primera
+    if (this.newsItem?.additionalImages && this.newsItem.additionalImages.length > 0) {
+      const firstImage = this.newsItem.additionalImages[0];
+      console.log("[DEBUG getImageUrl] Intentando usar additionalImages[0]:", firstImage);
+      
+      // Si es un objeto con URL directa
+      if (typeof firstImage === 'object' && firstImage.url) {
+        return firstImage.url;
+      }
+      
+      // Si tiene formatos, preferir medium o small
+      if (firstImage.formats) {
+        if (firstImage.formats.medium?.url) {
+          return firstImage.formats.medium.url;
+        } else if (firstImage.formats.small?.url) {
+          return firstImage.formats.small.url;
+        }
+      }
+      
+      // Intentar extraer la URL con el método auxiliar
+      const mediaUrl = this.extractMediaUrl(firstImage);
       if (mediaUrl) {
         return mediaUrl;
       }
     }
     
-    // Para noticias con mainImage o images en formato string
-    return this.newsItem?.mainImage || 
-           this.newsItem?.images?.[0] || 
-           'assets/images/CBioceanicoTarapacafondo_blanco.png';
+    // Verificar si hay imágenes en formato de array de strings (campo 'images')
+    if (this.newsItem?.images && Array.isArray(this.newsItem.images) && this.newsItem.images.length > 0) {
+      console.log("[DEBUG getImageUrl] Usando primera imagen del array:", this.newsItem.images[0]);
+      
+      // Verificar si la imagen es una URL válida
+      const imageUrl = this.newsItem.images[0];
+      if (this.isValidUrl(imageUrl)) {
+        return imageUrl;
+      }
+    }
+    
+    console.log("[DEBUG getImageUrl] No se encontró ninguna imagen, usando imagen predeterminada");
+    return 'assets/images/CBioceanicoTarapacafondo_blanco.png';
   }
 
   getFormattedDate(dateStr: string | undefined): Date {
@@ -188,5 +321,43 @@ export class NewsPageComponent implements OnInit, OnDestroy {
     return Array.isArray(this.newsItem.content) 
       ? this.newsItem.content[0]?.children?.[0]?.text || ''
       : this.newsItem.content as string;
+  }
+
+  getAdditionalImageUrl(image: any): string {
+    // Si es un objeto con URL directa
+    if (typeof image === 'object' && image.url) {
+      return image.url;
+    }
+    
+    // Si tiene formatos, preferir medium o small
+    if (image.formats) {
+      if (image.formats.medium?.url) {
+        return image.formats.medium.url;
+      } else if (image.formats.small?.url) {
+        return image.formats.small.url;
+      } else if (image.formats.thumbnail?.url) {
+        return image.formats.thumbnail.url;
+      }
+    }
+    
+    // Intentar extraer la URL con el método auxiliar
+    const mediaUrl = this.extractMediaUrl(image);
+    if (mediaUrl) {
+      return mediaUrl;
+    }
+    
+    return 'assets/images/CBioceanicoTarapacafondo_blanco.png';
+  }
+
+  // Método para verificar si una string es una URL válida
+  private isValidUrl(url: string): boolean {
+    if (!url) return false;
+    
+    try {
+      new URL(url);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
