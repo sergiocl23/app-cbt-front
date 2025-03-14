@@ -7,8 +7,10 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ButtonModule } from 'primeng/button';
+import { CarouselModule } from 'primeng/carousel';
 
 import { ListPageComponent } from './pages/list-page/list-page.component';
+import { ListPageCarouselComponent } from './pages/list-page-carousel/list-page-carousel.component';
 
 @NgModule({
   declarations: [],
@@ -20,10 +22,13 @@ import { ListPageComponent } from './pages/list-page/list-page.component';
     DropdownModule,
     MultiSelectModule,
     ButtonModule,
-    ListPageComponent
+    CarouselModule,
+    ListPageComponent,
+    ListPageCarouselComponent
   ],
   exports: [
-    ListPageComponent
+    ListPageComponent,
+    ListPageCarouselComponent
   ]
 })
 export class NewsModule { } 

@@ -9,7 +9,13 @@
     <div [class.hidden]="isLoading">
       <!-- Sección de noticias destacadas -->
       <div class="featured-section">
-        <h2 class="featured-label">Última actualización</h2>
+        <div class="featured-header">
+          <h2 class="featured-label">Última actualización</h2>
+          <a [routerLink]="['/news/carousel']" class="view-carousel-link">
+            <i class="pi pi-images"></i>
+            Ver en carrusel
+          </a>
+        </div>
         
         <div class="featured-content-wrapper">
           <!-- Noticia Principal -->
