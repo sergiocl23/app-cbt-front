@@ -44,6 +44,11 @@ export class NewsPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Desplazar al inicio de la página cuando se carga el componente
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
+
     this.routeSub = this.route.params.subscribe(params => {
       const id = params['id'];
       if (id) {
@@ -66,10 +71,11 @@ export class NewsPageComponent implements OnInit, OnDestroy {
         console.log("[DEBUG] additionalImages:", news.additionalImages);
         console.log("[DEBUG] manualCreation:", news.manualCreation);
         console.log("[DEBUG] sourceUrl:", news.sourceUrl);
+        console.log("[DEBUG] content:", news.content);
         console.log("==========================================================");
         
-        // Si es una noticia manual o no tiene imágenes, cargamos los datos completos
-        if (news.manualCreation === true || !news.mainImage) {
+        // Si es una noticia manual, no tiene imágenes, o no tiene contenido, cargamos los datos completos
+        if (news.manualCreation === true || !news.mainImage || !news.content) {
           console.log("[DEBUG] Cargando datos completos para noticia:", id);
           this.loadCompleteNewsItem(id);
         } else {
@@ -96,11 +102,17 @@ export class NewsPageComponent implements OnInit, OnDestroy {
         console.log("[DEBUG] additionalImages:", newsData.additionalImages);
         console.log("[DEBUG] manualCreation:", newsData.manualCreation);
         console.log("[DEBUG] images array:", newsData.images);
+        console.log("[DEBUG] content:", newsData.content);
         console.log("============================================================");
         
         // Asegurar que el contenido esté en el formato esperado
         let formattedContent;
-        if (typeof newsData.content === 'string') {
+        
+        // Si no hay contenido, intentar usar el resumen como contenido
+        if (!newsData.content && newsData.summary) {
+          console.log("[DEBUG] Usando summary como contenido ya que content está vacío");
+          formattedContent = [{ type: 'paragraph', children: [{ text: newsData.summary }] }];
+        } else if (typeof newsData.content === 'string') {
           // Si es HTML o texto plano
           formattedContent = [{ type: 'paragraph', children: [{ text: newsData.content }] }];
         } else if (Array.isArray(newsData.content)) {
@@ -108,7 +120,7 @@ export class NewsPageComponent implements OnInit, OnDestroy {
           formattedContent = newsData.content;
         } else {
           // Caso de fallback
-          formattedContent = [{ type: 'paragraph', children: [{ text: 'Sin contenido disponible' }] }];
+          formattedContent = [{ type: 'paragraph', children: [{ text: 'Sin contenido disponible. Por favor visite la fuente original para más información.' }] }];
         }
         
         // Procesar mainImage: usar la primera de images array si existe y mainImage no está disponible
@@ -311,16 +323,82 @@ export class NewsPageComponent implements OnInit, OnDestroy {
       .replace(/<br\s*\/?>/gi, '\n') // Reemplaza <br> por salto de línea
       .replace(/&nbsp;/gi, ' ')      // Reemplaza &nbsp; por espacio
       .replace(/<[^>]+>/g, '')       // Elimina cualquier otra etiqueta
+      .replace(/\n\s*\n/g, '\n\n')   // Normaliza múltiples saltos de línea
+      .replace(/\s+/g, ' ')          // Normaliza espacios múltiples
       .trim();
     console.log('✅ Contenido limpio:', cleaned);
     return cleaned;
   }
 
   getContent(): string {
-    if (!this.newsItem?.content) return '';
-    return Array.isArray(this.newsItem.content) 
-      ? this.newsItem.content[0]?.children?.[0]?.text || ''
-      : this.newsItem.content as string;
+    // Si no hay noticia o contenido, devolver mensaje informativo
+    if (!this.newsItem) return 'Noticia no disponible';
+    if (!this.newsItem.content) {
+      // Si hay URL de origen, sugerir visitar la fuente original
+      if (this.newsItem.sourceUrl) {
+        return `Esta noticia no tiene contenido completo disponible. Por favor, visite la fuente original para más información.`;
+      }
+      return 'Contenido no disponible';
+    }
+    
+    // Si el contenido es un string directo
+    if (typeof this.newsItem.content === 'string') {
+      return this.cleanHtmlTags(this.newsItem.content);
+    }
+    
+    // Si es un array (formato estructurado)
+    if (Array.isArray(this.newsItem.content)) {
+      let fullContent = '';
+      
+      // Recorrer todos los bloques de contenido
+      for (const block of this.newsItem.content) {
+        // Usar acceso seguro con any para evitar errores de tipo
+        const blockAny = block as any;
+        
+        // Manejar diferentes formatos de bloque
+        if (blockAny.type === 'paragraph' && blockAny.children) {
+          // Procesar bloques de párrafo con children
+          for (const child of blockAny.children) {
+            if (child.text) {
+              fullContent += child.text;
+            }
+          }
+          fullContent += '\n\n'; // Doble salto de línea entre párrafos
+        } else if (blockAny.children && Array.isArray(blockAny.children)) {
+          // Procesar bloques generales con children
+          for (const child of blockAny.children) {
+            if (child.text) {
+              fullContent += child.text;
+            }
+          }
+          fullContent += '\n\n';
+        } else if (blockAny.text) {
+          // Bloque con texto directo
+          fullContent += blockAny.text + '\n\n';
+        } else if (blockAny.content) {
+          // Bloque con propiedad content
+          fullContent += blockAny.content + '\n\n';
+        }
+      }
+      
+      // Si hay contenido, devolverlo, si no, buscar alternativas
+      if (fullContent.trim()) {
+        return fullContent;
+      }
+      
+      // Intentar extraer cualquier texto posible como último recurso
+      try {
+        return JSON.stringify(this.newsItem.content, null, 2);
+      } catch (e) {
+        // Si todo falla, mensaje genérico
+        return this.newsItem.sourceUrl 
+          ? 'Contenido no disponible. Por favor, visite la fuente original para más información.' 
+          : 'Contenido no disponible.';
+      }
+    }
+    
+    // Fallback final: convertir a string sea lo que sea
+    return String(this.newsItem.content);
   }
 
   getAdditionalImageUrl(image: any): string {

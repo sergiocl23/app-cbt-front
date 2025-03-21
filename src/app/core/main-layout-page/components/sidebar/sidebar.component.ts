@@ -23,18 +23,18 @@ export class SidebarComponent {
   public sidebarItems = [
     { label: 'Genericas', show: false, sections: [
       { label: 'Inicio', icon: 'home', url: 'home'},
-      { label: 'Portal de Noticias', icon: 'newspaper', url: 'news'},
+      { label: 'Portal de Noticias', icon: 'newspaper', url: 'news/carousel'},
       // { label: 'Catálogo de Empresas', icon: 'store', url: 'a'},
       { label: 'Mapa Interactivo', icon: 'map', url: 'map'},
-      // { label: 'Foro', icon: 'forum', url: 'forum'},
+      { label: 'Foro', icon: 'forum', url: 'forum'},
       { label: 'Simulación', icon: 'route', url: 'simulation'},
       // { label: 'Contactos', icon: 'perm_contact_calendar', url: 'a'},
       // { label: 'Aprende', icon: 'menu_book', url: 'a'},
     ]},
-    { label: 'Portal de Noticias', show: true, sections: [
-      { label: 'Ver Noticias', icon: 'newspaper', url: 'news/list'},
-      { label: 'Noticias Carrusel', icon: 'view_carousel', url: 'news/carousel'},
-    ]},
+    //{ label: 'Portal de Noticias', show: true, sections: [
+      //{ label: 'Ver Noticias', icon: 'newspaper', url: 'news/list'},
+      //{ label: 'Noticias Carrusel', icon: 'view_carousel', url: 'news/carousel'},
+    //]},
     // { label: 'Catálogo de Empresas', show: true, sections: [
     //   { label: 'Ver Empresas', icon: 'store', url: 'companies'},
     //   { label: 'Matchmaking', icon: 'groups', url: 'a'},

@@ -1,32 +1,29 @@
-/* Layout principal */
-.news-container {
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 1rem;
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: 0.5rem;
-  background: #ffffff;
-  position: relative;
-}
-
+/* ===== ESTILOS BÁSICOS ===== */
 body {
   background: #ffffff;
   margin: 0;
   padding: 0;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+}
+
+.news-container {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 1.5rem;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 0.5rem;
+  background: #ffffff;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 
 .news-content {
-  margin-left: 0;
-  margin-right: 0;
+  margin: 0.25rem 0 0 0;
   padding: 0;
   background: #ffffff;
-  padding-top: 0;
-  margin-top: 0.25rem;
 }
 
-/* NUEVOS ELEMENTOS PARA PARECERSE A UN PORTAL DE NOTICIAS */
-/* Encabezado del portal - NUEVO DISEÑO */
+/* ===== ENCABEZADO DEL PORTAL ===== */
 .news-header {
   background: #202445;
   padding: 0.8rem 1.3rem;
@@ -41,30 +38,6 @@ body {
   overflow: hidden;
 }
 
-/* Decoración de fondo para el header */
-.news-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(135deg, transparent 0%, rgba(54, 169, 225, 0.3) 100%);
-  z-index: 1;
-}
-
-.news-header::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 20%;
-  width: 15px;
-  height: 100%;
-  background: rgba(54, 169, 225, 0.4);
-  transform: skewX(-15deg);
-  z-index: 1;
-}
-
 .news-logo {
   position: relative;
   z-index: 2;
@@ -73,47 +46,7 @@ body {
   gap: 0.6rem;
 }
 
-.news-logo::before {
-  content: '';
-  display: block;
-  width: 24px;
-  height: 24px;
-  background: #36A9E1;
-  border-radius: 50%;
-  position: relative;
-  box-shadow: 0 2px 10px rgba(54, 169, 225, 0.5);
-}
-
-.news-logo::after {
-  content: '↯';
-  position: absolute;
-  left: 8px;
-  top: 48%;
-  transform: translateY(-50%);
-  font-size: 1rem;
-  color: white;
-  font-weight: bold;
-}
-
-.news-logo span {
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  display: inline-block;
-}
-
-.news-logo span em {
-  font-style: normal;
-  color: #36A9E1;
-  font-weight: 900;
-}
-
 .news-date {
-  position: relative;
-  z-index: 2;
   font-size: 0.85rem;
   opacity: 0.9;
   display: flex;
@@ -122,213 +55,26 @@ body {
   background: rgba(0, 0, 0, 0.2);
   padding: 0.35rem 0.7rem;
   border-radius: 18px;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
-.news-date::before {
-  content: '\e927';
-  font-family: 'primeicons';
-  color: #36A9E1;
-}
-
-/* Filtros rediseñados - Nueva ubicación y diseño */
-.filter-container {
-  margin: 0 0 0.75rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-  padding: 0.8rem 1rem;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-.filter-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.8rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  padding-bottom: 0.6rem;
-}
-
-.filter-title {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #202445;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0;
-}
-
-.filter-title::before {
-  content: '\e90f'; /* Ícono de filtro */
-  font-family: 'primeicons';
-  color: #36A9E1;
-  font-size: 1rem;
-}
-
-.filter-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.filter-btn {
-  background: #f0f0f0;
-  border: none;
-  padding: 0.35rem 0.6rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  color: #555;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.filter-btn:hover {
-  background: #e0e0e0;
-}
-
-.filter-btn.active {
-  background: rgba(54, 169, 225, 0.15);
-  color: #36A9E1;
-  font-weight: 500;
-}
-
-.filter-btn.reset::before {
-  content: '\e90b'; /* Ícono de reset */
-  font-family: 'primeicons';
-  font-size: 0.8rem;
-}
-
-/* Actualizar secciones relacionadas */
-.featured-section {
-  margin-top: 0;
-}
-
-/* Nuevo encabezado de sección con título y filtro de fecha */
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  flex-wrap: nowrap;
-  width: 100%;
-}
-
-.section-title {
-  font-size: 1.5rem;
-  color: #202445;
-  font-weight: 600;
-  margin: 0;
-  white-space: nowrap;
-  flex-shrink: 0;
-  max-width: 200px;
-}
-
-.section-title:after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 60px;
-  height: 4px;
-  background: #A79964;
-}
-
-/* Filtro de fecha reposicionado */
-.date-filter {
-  position: relative;
-  display: flex;
-  align-items: center;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  background: white;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  overflow: visible;
-  max-width: 300px;
-  height: 38px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.date-filter:hover {
-  border-color: rgba(167, 153, 100, 0.3);
-  box-shadow: 0 2px 8px rgba(167, 153, 100, 0.1);
-}
-
-.date-toggle {
-  background: transparent;
-  border: none;
-  width: 40px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #A79964;
-  flex-shrink: 0;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  padding: 0;
-  line-height: 1;
-}
-
-.date-toggle i {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  margin: 0;
-  padding: 0;
-}
-
-.date-input {
-  border: none;
-  padding: 0.2rem 0.4rem;
-  font-size: 0.82rem;
-  width: 100px;
-  color: #555;
-  background: transparent;
-  cursor: pointer;
-  z-index: 2;
-  position: relative;
-}
-
-.date-range {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0 0.8rem;
-  transition: all 0.3s ease;
-}
-
-.search-container:focus-within ~ .date-filter .date-range {
-  opacity: 0;
-  width: 0;
-  padding: 0;
-}
-
-/* Estilos para el carrusel - CORRECCIÓN DE ALTURA */
+/* ===== ESTILOS DEL CARRUSEL ===== */
 .carousel-container {
-  margin-top: 0.5rem;
-  margin-bottom: 0.75rem;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  height: 580px; /* Aumentado para dar más espacio al degradado */
   position: relative;
-  background-color: transparent;
-  border: none;
-  padding: 0;
-  max-width: 100%;
-  line-height: 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  height: 550px;
+  margin-bottom: 50px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  background-color: #000; /* Fondo negro para evitar espacios en blanco */
 }
 
-/* Restaurar el overlay para asegurar que cubra toda la imagen */
+.carousel-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
 .carousel-overlay {
   position: absolute;
   top: 0;
@@ -339,102 +85,30 @@ body {
   height: 100%;
   background: linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.9) 0%,
-    rgba(0, 0, 0, 0.75) 25%,
-    rgba(0, 0, 0, 0.5) 40%,
-    rgba(0, 0, 0, 0.35) 60%,
-    rgba(0, 0, 0, 0.25) 75%,
-    rgba(0, 0, 0, 0.2) 90%,
-    rgba(0, 0, 0, 0.15) 100%
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.6) 30%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.2) 70%,
+    rgba(0, 0, 0, 0.1) 100%
   );
-  z-index: 1;
-  backdrop-filter: blur(1px);
-  margin: 0;
-  padding: 0;
-  border-radius: 12px;
+  z-index: 2;
+  pointer-events: none; /* Permitir clics a través del overlay */
 }
 
-/* Ajustes responsivos adicionales */
-@media (max-width: 1400px) {
-  .carousel-container {
-    height: 520px;
-  }
-}
-
-@media (max-width: 1200px) {
-  .carousel-container {
-    height: 470px;
-  }
-}
-
-@media (max-width: 992px) {
-  .carousel-container {
-    height: 430px;
-  }
-}
-
-@media (max-width: 768px) {
-  .carousel-container {
-    height: 380px;
-  }
-}
-
-/* Media query para pantallas más pequeñas */
-@media (max-width: 480px) {
-  .carousel-container {
-    height: 400px; /* Aumentar para dispositivos móviles para que quepa todo el contenido */
-  }
-}
-
-/* Media query para alturas pequeñas */
-@media (max-height: 700px) {
-  .carousel-container {
-    height: 400px;
-  }
-}
-
-/* Asegurar que el contenedor del carrusel no tenga relleno */
-:host ::ng-deep .p-carousel {
-  padding: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-  background-color: transparent !important;
-  overflow: hidden !important;
-  border-radius: 12px !important;
-  line-height: 0 !important;
-  font-size: 0 !important; /* Prevenir espacios en blanco */
-}
-
-/* Eliminar cualquier margen o relleno interno */
-:host ::ng-deep .p-carousel .p-carousel-content .p-carousel-items-content,
-:host ::ng-deep .p-carousel .p-carousel-content .p-carousel-items-container,
-:host ::ng-deep .p-carousel .p-carousel-content .p-carousel-items-content > div {
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  line-height: 0 !important;
-  font-size: 0 !important;
-  background-color: transparent !important;
-}
-
-/* Ajustar controles de navegación para que no estén demasiado cerca de los bordes */
-:host ::ng-deep .p-carousel .p-carousel-content .p-carousel-prev {
-  left: 20px;
-}
-
-:host ::ng-deep .p-carousel .p-carousel-content .p-carousel-next {
-  right: 20px;
-}
-
-/* Asegurar que la imagen y el contenido se ajusten correctamente */
-.carousel-image {
+.carousel-item {
   position: relative;
   width: 100%;
-  height: 100%; 
+  height: 100%;
   overflow: hidden;
-  border: none;
-  border-radius: 12px;
-  object-fit: cover;
+}
+
+.carousel-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
 .carousel-image img {
@@ -442,827 +116,129 @@ body {
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
-  object-position: center;
-  filter: brightness(1.05);
-  margin: 0;
-  padding: 0;
-  display: block; /* Elimina espacios debajo de la imagen */
-}
-
-/* Garantizar que el contenido sea visible y responsivo al zoom */
-.carousel-content {
-  position: absolute;
-  bottom: 50px; /* Reducido de 80px a 50px para bajar la posición */
-  left: 0;
-  width: 100%;
-  padding: 2rem 3rem;
-  color: white;
-  z-index: 2;
-  background: linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.85) 0%,
-    rgba(0, 0, 0, 0.7) 50%,
-    rgba(0, 0, 0, 0.4) 80%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  min-height: 300px; /* Aumentado para cubrir más área vertical */
-}
-
-/* Ajuste para garantizar visibilidad de todos los elementos a cualquier zoom */
-@media screen and (max-width: 100%) {
-  .carousel-content {
-    min-height: 30%; /* Al menos un 50% de la altura del carrusel */
-  }
-  
-  .carousel-content h2,
-  .carousel-content .summary,
-  .carousel-content .news-tags,
-  .carousel-content .meta-info {
-    display: block !important;
-    visibility: visible !important;
-  }
-}
-
-/* Configuración específica para Firefox y otros navegadores */
-@-moz-document url-prefix() {
-  .carousel-container {
-    height: 550px; /* Ajustado de 580px a 550px */
-  }
-  
-  .carousel-content {
-    min-height: 250px;
-    bottom: 70px; /* Añadido para Firefox */
-  }
-}
-
-/* Ajustes para diferentes niveles de zoom en Chrome */
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  @media (min-resolution: 0.98dppx) and (max-resolution: 1.02dppx) {
-    /* Zoom 100% */
-    .carousel-container {
-      height: 550px;
-    }
-    .carousel-content {
-      bottom: 50px; /* Actualizado para mantener consistencia */
-    }
-  }
-  
-  @media (min-resolution: 0.87dppx) and (max-resolution: 0.93dppx) {
-    /* Zoom 90% */
-    .carousel-container {
-      height: 530px;
-    }
-    .carousel-content {
-      bottom: 45px; /* Actualizado */
-    }
-  }
-  
-  @media (min-resolution: 0.77dppx) and (max-resolution: 0.83dppx) {
-    /* Zoom 80% */
-    .carousel-container {
-      height: 520px;
-    }
-    .carousel-content {
-      bottom: 40px; /* Actualizado */
-    }
-  }
-  
-  @media (min-resolution: 0.67dppx) and (max-resolution: 0.73dppx) {
-    /* Zoom 70% */
-    .carousel-container {
-      height: 500px;
-    }
-    .carousel-content {
-      bottom: 35px; /* Actualizado */
-    }
-  }
-  
-  @media (min-resolution: 0.57dppx) and (max-resolution: 0.63dppx) {
-    /* Zoom 60% */
-    .carousel-container {
-      height: 480px;
-    }
-    .carousel-content {
-      bottom: 30px; /* Actualizado */
-    }
-  }
-  
-  @media (min-resolution: 0.47dppx) and (max-resolution: 0.53dppx) {
-    /* Zoom 50% */
-    .carousel-container {
-      height: 460px;
-    }
-    .carousel-content {
-      bottom: 25px; /* Actualizado */
-    }
-  }
-}
-
-/* Mejorar tamaños de texto para mejor visibilidad */
-.carousel-content h2 {
-  font-size: 2rem;
-  line-height: 1.3;
-  margin-bottom: 0.6rem;
-  margin-top: 0.5rem; /* Añadido para dar un poco de espacio arriba */
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-  max-width: 100%;
-}
-
-.carousel-content .summary {
-  margin: 0.8rem 0;
-  font-size: 1.1rem;
-  line-height: 1.5;
-  max-height: 8rem;
-  -webkit-line-clamp: 3;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* Asegurar que la fecha sea visible */
-.carousel-content .date {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1.1rem;
-  display: inline-block;
-  margin-bottom: 0.8rem;
-  font-weight: 500;
-}
-
-/* Mejorar visualización del autor */
-.carousel-content .meta-info {
-  display: flex;
-  margin-top: 1rem;
-}
-
-.carousel-content .author {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.4rem 0.8rem;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 1rem;
-  margin-top: 0.5rem;
-  font-size: 1rem;
-  color: white;
-}
-
-.carousel-content .author i {
-  margin-right: 0.3rem;
-  color: #36A9E1;
 }
 
 .carousel-item:hover .carousel-image img {
   transform: scale(1.05);
 }
 
-/* Estilos para los elementos en el carrusel */
-.carousel-content .date {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1rem;
-  display: inline-block;
-  margin-bottom: 0.5rem;
+.carousel-content {
+  position: absolute;
+  bottom: 30%; /* Posición elevada */
+  left: 0;
+  width: 100%;
+  color: white;
+  padding: 1rem;
+  z-index: 3;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.7) 50%,
+    rgba(0, 0, 0, 0.5) 80%,
+    rgba(0, 0, 0, 0) 100%
+  );
 }
 
-.carousel-content .date i {
-  color: #36A9E1;
+.carousel-content h2 {
+  font-size: 1.4rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  line-height: 1.2;
+  color: white;
+  max-width: 90%;
+}
+
+.carousel-content .summary {
+  font-size: 0.85rem;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+  max-height: 2.6rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.carousel-content .date {
+  font-size: 0.8rem;
+  margin: 0 0.8rem 0.4rem 0;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(54, 169, 225, 0.3);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
 }
 
 .carousel-content .news-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin: 0.4rem 0;
+  margin: 0.5rem 0;
 }
 
-/* Rediseño de los tags del carrusel para hacerlos cuadrados como los demás tags */
 .carousel-content .tag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 220, 0, 0.12);
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 500;
-  padding: 0.5rem 0.8rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 220, 0, 0.3);
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.carousel-content .tag:hover {
-  background-color: rgba(255, 220, 0, 0.2);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transform: translateY(-1px);
-}
-
-/* Icono de reloj para Chile */
-.country-time:first-child::before {
-  content: '\e94f'; /* Mantenemos el código actual */
-  font-family: 'primeicons';
-  position: absolute;
-  left: -30px; /* Movido más a la izquierda */
-  top: 50%;
-  transform: translateY(-50%);
-  color: #36A9E1;
-  font-size: 1.4rem; /* Aumentado el tamaño */
-  text-shadow: 0 0 5px rgba(54, 169, 225, 0.4); /* Añadido efecto de brillo */
-}
-
-/* Ajuste para la primera casilla de país para darle más espacio al icono */
-.country-time:first-child {
-  margin-left: 12px; /* Añadir espacio para compensar la posición del icono */
-}
-
-.country-time:hover {
-  background: rgba(0, 0, 0, 0.25);
-  transform: translateY(-2px);
-}
-
-.country-name {
+  background-color: rgba(255, 220, 0, 0.25);
+  color: white;
   font-size: 0.75rem;
-  opacity: 0.9;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.country-hour {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #36A9E1;
-}
-
-/* Mover el botón de reset (remover filtros) más a la derecha */
-.reset-filters {
-  margin-right: 0.6rem;
-}
-
-/* Corregir el color del autor en el carrusel para mejor contraste */
-.carousel-content .author {
-  color: #ffffff;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 220, 0, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
 }
 
 .carousel-content .meta-info {
   display: flex;
   margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .carousel-content .author {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.5rem;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 0.75rem;
-  margin-top: 0.25rem;
-  font-size: 0.85rem;
-}
-
-.carousel-content .author i {
-  margin-right: 0.3rem;
-}
-
-.source-url {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 0.4rem 1rem;
-  border-radius: 50px;
-  backdrop-filter: blur(5px);
-  z-index: 5;
-  text-decoration: none;
-}
-
-.source-url:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.manual-badge {
-  position: absolute;
-  top: 1.5rem;
-  left: 1.5rem;
-  background: #36A9E1;
-  color: white;
-  z-index: 20;
-  padding: 0.3rem 0.8rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(54, 169, 225, 0.3);
-}
-
-/* Estilos para las noticias restantes - MEJORADO */
-.remaining-news {
-  margin-top: 1.25rem;
-}
-
-/* Grid de 3x3 - MEJORADO */
-.news-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.news-card {
-  position: relative;
-  padding-top: 10px;
-  margin-top: 15px;
-  background: white;
-  border-radius: 8px;
-  overflow: visible;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  height: auto;
-  min-height: 440px;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  box-sizing: border-box;
-}
-
-.news-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  border-color: #36A9E1;
-}
-
-/* CORREGIR LAS TARJETAS DE NOTICIAS ANTERIORES */
-/* Bajar el contenido en las tarjetas de noticias */
-.card-content {
-  padding: 2.5rem 1.5rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: visible;
-  margin-top: 0;
-  flex-grow: 1;
-  justify-content: flex-start;
-}
-
-/* Unificar y corregir el estilo de las fechas con fondo semi-transparente */
-.card-content .date {
-  position: absolute;
-  top: -26px;
-  right: 1.5rem;
-  background: rgba(54, 169, 225, 0.6);
-  color: white;
-  padding: 0.35rem 1rem;
-  border-radius: 25px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  z-index: 50;
-  box-shadow: 0 3px 10px rgba(54, 169, 225, 0.4);
-  border: 2px solid rgba(255, 255, 255, 0.95);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  letter-spacing: 0.2px;
-  transition: all 0.3s ease;
-}
-
-/* Efecto hover para la fecha */
-.card-content .date:hover {
-  background: rgba(54, 169, 225, 0.8);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(54, 169, 225, 0.5);
-}
-
-/* Mejorar el ícono de calendario */
-.card-content .date i {
-  color: white;
-  font-size: 0.9rem;
-  opacity: 0.95;
-  margin-right: 0.1rem;
-}
-
-/* Ajustar posición de elementos dentro de las tarjetas */
-.card-content h4 {
-  font-size: 1.15rem;
-  margin: 0.5rem 0 1rem;
-  font-weight: 600;
-  color: #202445;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  max-height: 3rem;
-}
-
-.card-summary {
-  font-size: 0.9rem;
-  color: #666;
-  margin: 0 0 1rem;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  flex-grow: 1;
-  max-height: 4.5rem;
-  margin-bottom: auto;
-}
-
-/* Mejoras para los tags en el grid de noticias */
-.news-grid .news-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin: 0.8rem 0 0.4rem;
-  width: 100%;
-}
-
-.news-grid .tag {
-  font-size: 0.7rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  background: rgba(167, 153, 100, 0.15);
-  color: #806F3D;
-  border: 1px solid #A79964;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100px;
-  box-sizing: border-box;
-  font-weight: 500;
-  display: inline-block;
-  transition: all 0.25s ease;
-}
-
-.news-grid .tag:hover {
-  background: rgba(167, 153, 100, 0.25);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Corrección para el indicador +N de tags */
-.news-grid .extra-tag {
-  background: #A79964;
-  color: white;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  transition: all 0.3s ease;
-}
-
-.news-grid .extra-tag:hover {
-  background: #8e825a;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-
-/* Estilos para la paginación */
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  margin: 2rem 0;
-}
-
-:host ::ng-deep .p-paginator {
-  background: transparent;
-  border: none;
-}
-
-:host ::ng-deep .p-paginator .p-paginator-page.p-highlight {
-  background: #A79964;
+  padding: 0.3rem 0.5rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 2rem;
+  font-size: 0.75rem;
   color: white;
 }
 
-:host ::ng-deep .p-paginator .p-paginator-page:not(.p-highlight):hover {
-  background: rgba(167, 153, 100, 0.1);
+.carousel-content .pais {
+  display: none; /* Ocultar el elemento del país */
 }
 
-/* Estilos para el sidebar */
-.news-sidebar {
-  padding: 0;
-  background: transparent;
-  border-radius: 8px;
-  position: sticky;
-  top: 0.5rem;
-  height: fit-content;
-  align-self: flex-start;
-  transition: top 0.3s ease;
-  max-height: calc(100vh - 4rem);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #36A9E1 #f0f0f0;
-  z-index: 10;
-  margin-top: 0;
-  padding-top: 0;
-}
-
-.news-sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.news-sidebar::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 10px;
-}
-
-.news-sidebar::-webkit-scrollbar-thumb {
-  background-color: #36A9E1;
-  border-radius: 10px;
-}
-
-/* Cajas dentro del sidebar */
-.sidebar-box {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  padding: 1.25rem;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  margin-bottom: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.sidebar-box:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transform: translateY(-5px);
-}
-
-.sidebar-box:last-child {
-  margin-bottom: 0;
-}
-
-.sidebar-box:first-child {
-  margin-top: 0.25rem;
-}
-
-/* Estilos para la sección "Podría interesarte" - MEJORADO */
-.sidebar-interest {
-  margin-top: 0.25rem;
-  background: transparent;
-  border-radius: 12px;
-  overflow: hidden;
-  padding: 1.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-}
-
-.sidebar-interest:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-  transform: translateY(-5px);
-}
-
-.sidebar-title {
-  font-size: 1.3rem;
-  color: #202445;
-  margin-bottom: 0.75rem;
-  font-weight: 600;
-  position: relative;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #A79964;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.sidebar-title:after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 50px;
-  height: 3px;
-  background: #A79964;
-}
-
-.interest-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.interest-card {
-  display: flex;
-  gap: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(255, 255, 255, 0.5);
-  padding: 0.8rem;
-  border-radius: 8px;
-}
-
-.interest-card:last-child {
-  border-bottom: none;
-  padding-bottom: 0.8rem;
-}
-
-.interest-card:hover {
-  transform: translateX(5px);
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-}
-
-.interest-image {
-  width: 100px;
-  height: 70px;
-  border-radius: 8px;
-  overflow: hidden;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.interest-image img {
+/* ===== CONTROLES DEL CARRUSEL ===== */
+:host ::ng-deep .p-carousel {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.interest-card:hover .interest-image img {
-  transform: scale(1.1);
-}
-
-.interest-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.interest-content h4 {
-  font-size: 1rem;
-  color: #202445;
-  margin: 0;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
+  border: none !important;
+  background-color: transparent !important;
   overflow: hidden;
-  transition: color 0.3s ease;
 }
 
-.interest-card:hover .interest-content h4 {
-  color: #36A9E1;
-}
-
-.interest-date {
-  font-size: 0.8rem;
-  color: #666;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.interest-date i {
-  color: #A79964;
-  font-size: 0.9rem;
-}
-
-/* Estilos para el formulario de suscripción */
-.subscribe-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.subscribe-container p {
-  font-size: 0.9rem;
-  color: #555;
-  margin: 0;
-}
-
-.subscribe-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-.email-input {
-  padding: 0.8rem;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  font-size: 0.9rem;
+:host ::ng-deep .p-carousel .p-carousel-content,
+:host ::ng-deep .p-carousel .p-carousel-container,
+:host ::ng-deep .p-carousel .p-carousel-items-container,
+:host ::ng-deep .p-carousel .p-carousel-items-content,
+:host ::ng-deep .p-carousel .p-carousel-item {
   width: 100%;
-  transition: all 0.3s ease;
+  height: 100%;
+  border: none !important;
+  background: transparent !important;
 }
 
-.email-input:focus {
-  outline: none;
-  border-color: #36A9E1;
-  box-shadow: 0 0 0 3px rgba(54, 169, 225, 0.2);
-}
-
-/* Opciones de frecuencia para suscripción */
-.frequency-options {
-  display: flex;
-  gap: 1rem;
-  margin: 0.5rem 0;
-}
-
-.frequency-option {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  cursor: pointer;
-}
-
-.frequency-option input {
-  cursor: pointer;
-}
-
-.frequency-option label {
-  font-size: 0.9rem;
-  color: #555;
-  cursor: pointer;
-}
-
-.subscribe-button {
-  background: linear-gradient(to right, #36A9E1, #2980b9);
-  color: white;
-  border: none;
-  padding: 0.8rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 0.9rem;
-}
-
-.subscribe-button:hover {
-  background: linear-gradient(to right, #2980b9, #36A9E1);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(54, 169, 225, 0.3);
-}
-
-/* Estilos para el módulo de redes sociales */
-.social-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.social-icons {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.8rem;
-  flex-wrap: wrap;
-}
-
-.social-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.2rem;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.social-icon:nth-child(1) {
-  background: #1877f2; /* Facebook */
-}
-
-.social-icon:nth-child(2) {
-  background: #1da1f2; /* Twitter */
-}
-
-.social-icon:nth-child(3) {
-  background: #0a66c2; /* LinkedIn */
-}
-
-.social-icon:nth-child(4) {
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); /* Instagram */
-}
-
-.social-icon:nth-child(5) {
-  background: #ff0000; /* YouTube */
-}
-
-.social-icon:hover {
-  transform: translateY(-3px) scale(1.1);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Nuevos indicadores del carrusel */
 :host ::ng-deep .p-carousel .p-carousel-indicators {
-  padding: 1rem;
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 5;
 }
 
 :host ::ng-deep .p-carousel .p-carousel-indicators .p-carousel-indicator button {
@@ -1271,10 +247,222 @@ body {
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.4);
   border: none !important;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
   margin: 0 5px;
-  padding: 0;
-  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-indicators .p-carousel-indicator.p-highlight button {
+  background-color: white !important;
+  transform: scale(1.2);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+:host ::ng-deep .p-carousel .p-carousel-prev,
+:host ::ng-deep .p-carousel .p-carousel-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 4;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.7;
+  border: none !important;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-prev {
+  left: 1.5rem;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-next {
+  right: 1.5rem;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-prev:hover,
+:host ::ng-deep .p-carousel .p-carousel-next:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+  opacity: 1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== MEDIA QUERIES ===== */
+@media (max-width: 1200px) {
+  .carousel-container {
+    height: 450px;
+  }
+  
+  .carousel-content {
+    bottom: 25%;
+    padding: 1.5rem;
+  }
+  
+  .carousel-content h2 {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .carousel-container {
+    height: 400px;
+  }
+  
+  .carousel-content {
+    bottom: 20%;
+    padding: 1.2rem;
+  }
+  
+  .carousel-content h2 {
+    font-size: 1.2rem;
+  }
+  
+  .carousel-content .summary {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .news-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .carousel-container {
+    height: 350px;
+  }
+  
+  .carousel-content {
+    bottom: 15%;
+    padding: 1rem;
+  }
+  
+  .carousel-content h2 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .carousel-container {
+    height: 300px;
+  }
+  
+  .carousel-content {
+    bottom: 10%;
+    padding: 0.8rem;
+  }
+  
+  .carousel-content h2 {
+  font-size: 1rem;
+  }
+  
+  .carousel-content .summary {
+    display: none;
+  }
+}
+
+:host ::ng-deep .p-carousel .p-carousel-indicators .p-carousel-indicator.p-highlight button {
+  background-color: white !important;
+}
+
+/* Estilos para el título - REDUCIDO TAMAÑO AÚN MÁS */
+.carousel-content h2 {
+  font-size: 1.5rem; /* Reducido de 1.8rem a 1.5rem */
+  margin-bottom: 0.5rem; /* Reducido margen inferior */
+  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  line-height: 1.2;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+  color: white;
+}
+
+/* Estilos para el resumen - REDUCIDO TAMAÑO AÚN MÁS */
+.carousel-content .summary {
+  font-size: 0.9rem; /* Reducido de 1rem a 0.9rem */
+  margin-bottom: 0.6rem; /* Reducido margen inferior */
+  line-height: 1.3; /* Reducida altura de línea */
+  max-height: 3.5rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Reducido a 2 líneas */
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  opacity: 1;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Estilos para la fecha - REDUCIDO TAMAÑO AÚN MÁS */
+.carousel-content .date {
+  font-size: 0.8rem; /* Reducido de 0.9rem a 0.8rem */
+  margin-bottom: 0.4rem; /* Reducido margen inferior */
+  display: flex;
+  align-items: center;
+  opacity: 1;
+  background: rgba(54, 169, 225, 0.3);
+  padding: 0.2rem 0.5rem; /* Reducido padding */
+  border-radius: 4px;
+  display: inline-flex;
+  margin-right: 0.8rem;
+}
+
+/* Estilos para las etiquetas - REDUCIDO TAMAÑO */
+.carousel-content .news-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem; /* Reducido espacio entre etiquetas */
+  margin-top: 0.8rem; /* Reducido margen superior */
+}
+
+.carousel-content .tag {
+  background-color: rgba(255, 220, 0, 0.25);
+  color: white;
+  font-size: 0.75rem; /* Reducido tamaño */
+  padding: 0.25rem 0.5rem; /* Reducido padding */
+  border-radius: 4px;
+  border: 1px solid rgba(255, 220, 0, 0.5);
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilos para la información del autor - REDUCIDO TAMAÑO */
+.carousel-content .meta-info {
+  display: flex;
+  margin-top: 0.6rem; /* Reducido margen superior */
+  padding-top: 0.6rem; /* Reducido padding superior */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.carousel-content .author {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.6rem; /* Reducido padding */
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 2rem;
+  font-size: 0.8rem; /* Reducido tamaño */
+  color: white;
+  transition: all 0.3s ease;
+}
+
+/* Estilos para los controles de navegación - MEJORADO */
+:host ::ng-deep .p-carousel .p-carousel-indicators {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 4;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-indicators .p-carousel-indicator button {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: none !important;
+  margin: 0 5px;
   transition: all 0.3s ease;
 }
 
@@ -1289,243 +477,247 @@ body {
   transform: scale(1.1);
 }
 
-/* Controles del carrusel */
-:host ::ng-deep .p-carousel .p-carousel-content .p-carousel-prev,
-:host ::ng-deep .p-carousel .p-carousel-content .p-carousel-next {
-  color: white;
-  background-color: rgba(0, 0, 0, 0.4);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  margin: 0;
+:host ::ng-deep .p-carousel .p-carousel-prev,
+:host ::ng-deep .p-carousel .p-carousel-next {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 10;
-  border: none !important;
-  outline: none !important;
+  z-index: 4;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   opacity: 0.7;
+  border: none !important;
 }
 
-:host ::ng-deep .p-carousel .p-carousel-content .p-carousel-prev:hover,
-:host ::ng-deep .p-carousel .p-carousel-content .p-carousel-next:hover {
-  background-color: rgba(0, 0, 0, 0.6);
+:host ::ng-deep .p-carousel .p-carousel-prev {
+  left: 1.5rem;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-next {
+  right: 1.5rem;
+}
+
+:host ::ng-deep .p-carousel .p-carousel-prev:hover,
+:host ::ng-deep .p-carousel .p-carousel-next:hover {
+  background-color: rgba(0, 0, 0, 0.7);
   transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   opacity: 1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Responsive mejorado */
+/* Estilos para el país - MEJORADO */
+.carousel-content .pais {
+  display: none; /* Ocultar el elemento del país */
+}
+
+.carousel-content .pais i {
+  margin-right: 0.5rem;
+  color: #A79964;
+}
+
+/* Estilos para las etiquetas - MEJORADO */
+.carousel-content .news-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+.carousel-content .tag {
+  background-color: rgba(255, 220, 0, 0.25); /* Más visible */
+  color: white;
+  font-size: 0.9rem; /* Aumentado */
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 220, 0, 0.5); /* Borde más visible */
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Añadida sombra de texto */
+}
+
+.carousel-content .tag:hover {
+  background-color: rgba(255, 220, 0, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Estilos para la información del autor - MEJORADO */
+.carousel-content .meta-info {
+  display: flex;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.carousel-content .author {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  border-radius: 2rem;
+  font-size: 0.95rem;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.carousel-content .author:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  transform: translateY(-2px);
+}
+
+.carousel-content .author i {
+  margin-right: 0.5rem;
+  color: #36A9E1;
+}
+
+/* Media queries para responsividad - MEJORADO */
 @media (max-width: 1200px) {
-  .news-container {
-    grid-template-columns: 1fr;
+  .carousel-container {
+    height: 450px;
   }
   
-  .news-sidebar {
-    grid-column: 1;
-    margin-top: 2rem;
-    position: relative;
-    top: 0;
+  .carousel-content {
+    padding: 2rem 2.5rem;
   }
   
-  .news-categories {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  .carousel-content h2 {
+    font-size: 1.8rem;
   }
 }
 
 @media (max-width: 992px) {
-  .news-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .carousel-container {
+    height: 400px;
+  }
+  
+  .carousel-content {
+    padding: 1.8rem 2rem;
   }
   
   .carousel-content h2 {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
   }
   
-  .news-categories {
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  }
-  
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .section-title {
-    margin-bottom: 0.5rem;
-  }
-  
-  .date-filter {
-    width: 100%;
-    max-width: 100%;
+  .carousel-content .summary {
+    font-size: 1rem;
+    -webkit-line-clamp: 2;
+    max-height: 3rem;
   }
 }
 
 @media (max-width: 768px) {
   .carousel-container {
-    height: 300px;
+    height: 350px;
   }
   
-  .news-grid {
-    grid-template-columns: 1fr;
+  .carousel-content {
+    padding: 1.5rem;
   }
   
   .carousel-content h2 {
-    font-size: 1.2rem;
-    margin-bottom: 0.3rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.8rem;
   }
   
   .carousel-content .summary {
-    font-size: 0.9rem;
-    margin: 0.3rem 0;
-    -webkit-line-clamp: 2;
+    font-size: 0.95rem;
+    margin-bottom: 0.8rem;
   }
   
-  .news-categories {
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  :host ::ng-deep .p-carousel .p-carousel-prev,
+  :host ::ng-deep .p-carousel .p-carousel-next {
+    width: 35px;
+    height: 35px;
   }
   
-  .country-times {
-    flex-wrap: wrap;
-    justify-content: center;
+  :host ::ng-deep .p-carousel .p-carousel-prev {
+    left: 1rem;
+  }
+  
+  :host ::ng-deep .p-carousel .p-carousel-next {
+    right: 1rem;
   }
 }
 
 @media (max-width: 576px) {
+  .carousel-container {
+    height: 300px;
+  }
+  
   .carousel-content {
-    bottom: 0;
-    padding: 1rem 1.5rem;
-  }
-  
-  .carousel-content h2 {
-    font-size: 1.5rem;
-    margin-top: 0;
-  }
-  
-  .category-item {
-    padding: 0.4rem;
-    font-size: 0.8rem;
-  }
-  
-  .carousel-container {
-    height: 280px;
-  }
-  
-  .carousel-content .summary {
-    -webkit-line-clamp: 2;
-    max-height: 2.6rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .carousel-container {
-    height: 350px;
+    padding: 1.2rem;
   }
   
   .carousel-content h2 {
     font-size: 1.2rem;
+    margin-bottom: 0.6rem;
   }
   
   .carousel-content .summary {
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    font-size: 0.9rem;
+    display: none;
+  }
+  
+  .carousel-content .news-tags {
+    margin-top: 0.8rem;
+    gap: 0.4rem;
+  }
+  
+  .carousel-content .tag {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .carousel-content .meta-info {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+  }
+  
+  .carousel-content .author {
+    padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  }
+  
+  :host ::ng-deep .p-carousel .p-carousel-prev,
+  :host ::ng-deep .p-carousel .p-carousel-next {
+    width: 30px;
+    height: 30px;
   }
 }
 
-/* Tags generales y tooltips */
-.tag {
-  font-size: 0.7rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  background: rgba(167, 153, 100, 0.15);
-  color: #806F3D;
-  border: 1px solid #A79964;
-  transition: all 0.25s ease;
+/* Ajustes específicos para niveles de zoom reducidos */
+@media screen and (max-resolution: 0.9dppx) {
+  .carousel-content {
+    padding-bottom: 3rem;
+  }
 }
 
-.tag:hover {
-  background: rgba(167, 153, 100, 0.25);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+@media screen and (max-resolution: 0.8dppx) {
+  .carousel-content {
+    padding-bottom: 4rem;
+  }
 }
 
-/* Tooltip para etiquetas extras - Mejorado */
-.extra-tags-tooltip {
-  position: absolute;
-  bottom: 120%;
-  left: 0;
-  background: white;
-  padding: 0.8rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  min-width: 150px;
-  display: none;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 12px;
-  max-width: 250px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+@media screen and (max-resolution: 0.7dppx) {
+  .carousel-content {
+    padding-bottom: 5rem;
+  }
 }
 
-/* Posicionar correctamente el botón de etiquetas extra */
-.extra-tag {
-  cursor: pointer;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+@media screen and (max-resolution: 0.6dppx) {
+  .carousel-content {
+    padding-bottom: 6rem;
+  }
 }
 
-/* Mostrar el tooltip al hacer hover */
-.extra-tag:hover .extra-tags-tooltip {
-  display: flex;
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-/* Flecha para el tooltip */
-.extra-tags-tooltip::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 15px;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid white;
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.1));
-}
-
-/* Etiquetas dentro del tooltip */
-.extra-tags-tooltip .tag {
-  font-size: 0.7rem;
-  padding: 0.2rem 0.5rem;
-  background: rgba(167, 153, 100, 0.15);
-  color: #806F3D;
-  border: 1px solid #A79964;
-  border-radius: 4px;
-  display: block;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  box-sizing: border-box;
-  white-space: nowrap;
-  margin-bottom: 2px;
-}
-
-.extra-tags-tooltip .tag:hover {
-  background: rgba(167, 153, 100, 0.25);
-}
-
-/* Animación para el tooltip */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+@media screen and (max-resolution: 0.5dppx) {
+  .carousel-content {
+    padding-bottom: 7rem;
+  }
 }
 
 /* Ajustes adicionales para eliminar todos los bordes blancos del carrusel */
@@ -1626,19 +818,59 @@ body {
 /* Restaurar estilos para los elementos del carrusel */
 .carousel-item {
   position: relative;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-  border-radius: 12px;
-  overflow: hidden;
-  background-color: transparent;
+  overflow: hidden; /* Cambiado de visible a hidden */
   height: 100%;
   width: 100%;
-  border: none;
-  padding: 0;
-  margin: 0;
+  background-color: transparent; /* Cambiado de #000 a transparent */
 }
 
-/* Restaurar animación hover */
+.carousel-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  width: 100%;
+  transform: none;
+  z-index: 2;
+}
+
+.carousel-title {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+
+.carousel-date {
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+}
+
+.carousel-description {
+  font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+  max-height: 4.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.carousel-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  aspect-ratio: 16/9;
+}
+
+@media (max-width: 768px) {
+  .carousel-caption {
+    position: relative;
+    background: rgba(0, 0, 0, 0.9);
+  }
+}
+
 .carousel-item:hover {
   transform: translateY(-5px);
 }
@@ -1843,7 +1075,7 @@ body {
   }
   
   .date-filter {
-    width: 100%;
+  width: 100%;
     max-width: 100%;
   }
 }
@@ -1851,69 +1083,42 @@ body {
 /* Nuevo grupo de filtros - MEJORADO */
 .filters-group {
   display: flex;
+  gap: 1rem;
   align-items: center;
-  gap: 1.2rem;
-  margin: 0;
-  flex-grow: 1;
-  justify-content: flex-start;
-  padding-left: 0.5rem;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 0.5rem 0.8rem;
-  border-radius: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  min-width: 0;
-  width: calc(100% - 220px);
+  background: #ffffff;
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Contenedor de búsqueda expandible - MEJORADO */
+/* Estilos para el contenedor de búsqueda */
 .search-container {
   position: relative;
-  display: flex;
-  align-items: center;
-  flex-grow: 1;
-  max-width: 40px;
-  min-width: 40px;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.3s ease;
+  width: 40px;
   overflow: hidden;
+}
+
+.search-container.expanded {
+  width: 300px;
+  background: #f8f9fa;
   border-radius: 20px;
-  background: white;
-  border: 1px solid rgba(54, 169, 225, 0.2);
-  height: 38px;
-}
-
-.search-container:hover {
-  box-shadow: 0 2px 8px rgba(54, 169, 225, 0.15);
-  border-color: rgba(54, 169, 225, 0.3);
-}
-
-.search-container:focus-within {
-  max-width: 300px;
-  box-shadow: 0 2px 12px rgba(54, 169, 225, 0.2);
-  border-color: rgba(54, 169, 225, 0.4);
+  border: 1px solid #36A9E1;
 }
 
 .search-input {
   width: 100%;
-  padding: 0 2.5rem 0 0.9rem;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
   border: none;
   background: transparent;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  color: #333;
-  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  color: #202445;
   opacity: 0;
-  height: 100%;
+  transition: opacity 0.3s ease;
 }
 
-.search-container:focus-within .search-input {
+.search-container.expanded .search-input {
   opacity: 1;
-}
-
-.search-input:focus {
-  outline: none;
 }
 
 .search-toggle {
@@ -1923,207 +1128,102 @@ body {
   transform: translateY(-50%);
   background: transparent;
   border: none;
-  width: 40px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #36A9E1;
-  transition: all 0.3s ease;
-  z-index: 2;
-}
-
-.search-container:focus-within .search-toggle {
-  background: rgba(54, 169, 225, 0.1);
-  border-radius: 50%;
-}
-
-/* Filtro de fecha colapsable - MEJORADO */
-.date-filter {
-  position: relative;
-  display: flex;
-  align-items: center;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  background: white;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  overflow: visible;
-  max-width: 300px;
-  height: 38px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-.date-filter:hover {
-  border-color: rgba(167, 153, 100, 0.3);
-  box-shadow: 0 2px 8px rgba(167, 153, 100, 0.1);
-}
-
-.search-container:focus-within ~ .date-filter {
-  max-width: 40px;
-  transform: scale(0.95);
-  opacity: 0.8;
-}
-
-.date-toggle {
-  background: transparent;
-  border: none;
-  width: 40px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0.5rem;
   cursor: pointer;
   color: #A79964;
-  flex-shrink: 0;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  padding: 0;
-  line-height: 1;
+  transition: color 0.3s ease;
 }
 
-.date-filter:hover .date-toggle {
-  background: rgba(167, 153, 100, 0.1);
+.search-toggle:hover {
+  color: #36A9E1;
+}
+
+/* Estilos para los filtros de fecha y categoría */
+.date-filter, .category-filter {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.date-toggle, .category-toggle {
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: #A79964;
+  transition: color 0.3s ease;
+  border-radius: 50%;
+}
+
+.date-toggle:hover, .category-toggle:hover {
+  color: #36A9E1;
+  background: rgba(54, 169, 225, 0.1);
+}
+
+.date-filter.expanded .date-toggle,
+.category-filter.expanded .category-toggle {
+  color: #BE1622;
+  background: rgba(190, 22, 34, 0.1);
 }
 
 .date-range {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0 0.8rem;
-  transition: all 0.3s ease;
-}
-
-.search-container:focus-within ~ .date-filter .date-range {
-  opacity: 0;
-  width: 0;
-  padding: 0;
-}
-
-/* Selector de categorías colapsable - MEJORADO */
-.category-filter {
-  position: relative;
-  display: flex;
-  align-items: center;
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: absolute;
+  top: 100%;
+  right: 0;
   background: white;
-  border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  overflow: visible;
-  max-width: 220px;
-  height: 38px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 1000;
 }
 
-.category-filter:hover {
-  border-color: rgba(54, 169, 225, 0.3);
-  box-shadow: 0 2px 8px rgba(54, 169, 225, 0.1);
-}
-
-.search-container:focus-within ~ .category-filter {
-  max-width: 40px;
-  transform: scale(0.95);
-  opacity: 0.8;
-}
-
-.category-toggle {
-  background: transparent;
-  border: none;
-  width: 40px;
-  height: 36px;
+.date-filter.expanded .date-range {
   display: flex;
+  gap: 0.5rem;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #36A9E1;
-  flex-shrink: 0;
-  border-radius: 50%;
-  transition: all 0.3s ease;
 }
 
-.category-filter:hover .category-toggle {
-  background: rgba(54, 169, 225, 0.1);
-}
-
-/* Refinamiento de estilos para MultiSelect */
-:host ::ng-deep .category-filter .p-multiselect {
-  border: none;
+/* Estilos para el botón de reset */
+.reset-filters {
   background: transparent;
-  transition: all 0.3s ease;
-  font-size: 0.85rem;
-  min-width: 170px;
-}
-
-:host ::ng-deep .category-filter .p-multiselect-label {
-  padding: 0.4rem 0.5rem;
-  color: #444;
-}
-
-:host ::ng-deep .category-filter .p-multiselect-trigger {
-  width: 2rem;
-}
-
-.search-container:focus-within ~ .category-filter .p-multiselect {
-  opacity: 0;
-  width: 0;
-  padding: 0;
-}
-
-/* Estilos refinados para los inputs de fecha */
-.date-input {
   border: none;
-  padding: 0.2rem 0.4rem;
-  font-size: 0.82rem;
-  width: 100px;
-  color: #555;
-  background: transparent;
-}
-
-.date-input:focus {
-  outline: none;
-}
-
-.date-range-separator {
-  color: #888;
-  font-size: 0.75rem;
-  opacity: 0.7;
-}
-
-/* Mejoras al panel MultiSelect cuando se abre */
-:host ::ng-deep .p-multiselect-panel {
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-  margin-top: 5px;
-  border: 1px solid rgba(54, 169, 225, 0.1) !important;
-  z-index: 1000 !important;
-}
-
-:host ::ng-deep .p-multiselect-panel .p-multiselect-items {
   padding: 0.5rem;
+  cursor: pointer;
+  color: #BE1622;
+  transition: all 0.3s ease;
+  border-radius: 50%;
 }
 
-:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
-  padding: 0.6rem 0.8rem;
-  border-radius: 6px;
-  margin-bottom: 2px;
-  transition: all 0.2s ease;
+.reset-filters:hover {
+  background: rgba(190, 22, 34, 0.1);
+  transform: rotate(90deg);
 }
 
-:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item:hover {
+/* Estilos para el multiselect de categorías */
+:host ::ng-deep .p-multiselect {
+  min-width: 200px;
+  border-color: #36A9E1;
+}
+
+:host ::ng-deep .p-multiselect:not(.p-disabled).p-focus {
+  border-color: #A79964;
+  box-shadow: 0 0 0 2px rgba(167, 153, 100, 0.2);
+}
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-header {
+  background: #202445;
+  color: white;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
   background: rgba(54, 169, 225, 0.1);
-}
-
-:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-highlight {
-  background: rgba(54, 169, 225, 0.2) !important;
-  color: #36A9E1 !important;
-  font-weight: 500;
+  color: #36A9E1;
 }
 
 /* Ajustes responsive mejorados */
 @media (max-width: 992px) {
   .filters-group {
-    max-width: 100%;
+  max-width: 100%;
     margin-top: 1rem;
     flex-wrap: wrap;
     gap: 0.8rem;
@@ -2238,7 +1338,7 @@ body {
 @media (max-width: 768px) {
   .reset-filters {
     order: 2;
-    position: absolute;
+  position: absolute;
     top: 0.5rem;
     right: 0.5rem;
   }
@@ -2313,6 +1413,7 @@ body {
   position: relative;
   overflow: hidden;
   grid-column: 1 / -1; /* Asegurar que ocupe todo el ancho de la grid */
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 
 .bioceanic-header::before {
@@ -2348,6 +1449,7 @@ body {
   position: relative;
   z-index: 2;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 
 .bioceanic-title::before {
@@ -2508,10 +1610,24 @@ body {
   @media (min-resolution: 0.99dppx) and (max-resolution: 1.01dppx) {
     /* Ajustes para zoom 100% */
     .carousel-container {
-      height: 550px;
+      height: 900px; /* Aumentado para dar más espacio */
     }
+    
     .carousel-content {
-      bottom: 80px;
+      bottom: 30%; /* Subido un poco más para mejorar visibilidad */
+      padding: 2rem 3.5rem; /* Reducido padding */
+    }
+    
+    .carousel-content h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .carousel-content .summary {
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+      -webkit-line-clamp: 2;
+      max-height: 2.4rem;
     }
   }
   
@@ -2565,10 +1681,554 @@ body {
   color: #202445;
   font-weight: 600;
   margin-bottom: 0.75rem;
-  font-family: inherit;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
   position: relative;
   display: inline-block;
   letter-spacing: normal;
   text-transform: none;
   line-height: 1.4;
-} 
+}
+
+/* Aplicar la misma fuente a todos los títulos y elementos importantes */
+h1, h2, h3, h4, h5, h6, 
+.section-title, 
+.featured-label, 
+.sidebar-title,
+.filter-title,
+.news-card h4,
+.interest-card h4 {
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Mejorar la visualización del país en el carrusel */
+.carousel-content .pais {
+  display: none; /* Ocultar el elemento del país */
+}
+
+.carousel-content .pais i {
+  margin-right: 0.4rem;
+  color: #A79964;
+}
+
+/* Estilos mejorados para el grid de noticias */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.news-card {
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  height: 100%; 
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.news-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #36A9E1;
+}
+
+.card-image {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  object-position: center;
+}
+
+.news-card:hover .card-image img {
+  transform: scale(1.05);
+}
+
+.card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  position: relative;
+}
+
+.card-content .date {
+  position: absolute;
+  top: -26px;
+  right: 1.5rem;
+  background: rgba(54, 169, 225, 0.7);
+  color: white;
+  padding: 0.35rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 2;
+  box-shadow: 0 3px 10px rgba(54, 169, 225, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.card-content .date i {
+  color: white;
+  font-size: 0.9rem;
+}
+
+.card-content h4 {
+  font-size: 1.15rem;
+  margin: 0.5rem 0 1rem;
+  font-weight: 600;
+  color: #202445;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 3.2rem;
+}
+
+.card-summary {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+  max-height: 4.5rem;
+}
+
+.news-card .news-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.8rem 0 0.4rem;
+}
+
+.news-card .tag {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(167, 153, 100, 0.15);
+  color: #806F3D;
+  border: 1px solid #A79964;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+  transition: all 0.25s ease;
+  display: inline-block;
+}
+
+.news-card .tag:hover {
+  background: rgba(167, 153, 100, 0.25);
+}
+
+.news-card .extra-tag {
+  background: #A79964;
+  color: white;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.news-card .extra-tag:hover {
+  background: #8e825a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.news-card .meta-info {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.news-card .author {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.news-card .author i {
+  color: #36A9E1;
+  font-size: 1rem;
+}
+
+/* Estilos para el sidebar y "Podría interesarte" */
+.news-sidebar {
+  padding: 0;
+  background: transparent;
+  border-radius: 8px;
+  position: sticky;
+  top: 0.5rem;
+  height: fit-content;
+  align-self: flex-start;
+  transition: top 0.3s ease;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #36A9E1 #f0f0f0;
+  z-index: 10;
+  margin-top: 0;
+  padding-top: 0;
+  width: 100%;
+}
+
+.news-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.news-sidebar::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
+}
+
+.news-sidebar::-webkit-scrollbar-thumb {
+  background-color: #36A9E1;
+  border-radius: 10px;
+}
+
+.sidebar-box {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-box:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-5px);
+}
+
+.sidebar-title {
+  font-size: 1.3rem;
+  color: #202445;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #A79964;
+}
+
+.sidebar-title:after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: #A79964;
+}
+
+/* Podría interesarte */
+.interest-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.interest-card {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: row;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.interest-card:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.interest-image {
+  width: 70px;
+  height: 70px;
+  min-width: 70px;
+  overflow: hidden;
+  margin-right: 10px;
+  border-radius: 6px;
+  background-color: #f0f0f0;
+}
+
+.interest-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.interest-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.interest-content h4 {
+  margin: 0 0 5px 0;
+  font-size: 0.9rem;
+  line-height: 1.3;
+  max-height: 2.6rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.interest-date {
+  font-size: 0.75rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+}
+
+.interest-date i {
+  margin-right: 4px;
+  font-size: 0.7rem;
+}
+
+/* Formulario de suscripción */
+.subscribe-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.subscribe-container p {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 0 0 0.5rem;
+  line-height: 1.5;
+}
+
+.subscribe-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.email-input {
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 0.9rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.email-input:focus {
+  outline: none;
+  border-color: #36A9E1;
+  box-shadow: 0 0 0 3px rgba(54, 169, 225, 0.2);
+}
+
+.frequency-options {
+  display: flex;
+  gap: 1rem;
+  margin: 0.5rem 0;
+}
+
+.frequency-option {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.frequency-option input {
+  cursor: pointer;
+}
+
+.frequency-option label {
+  font-size: 0.9rem;
+  color: #555;
+  cursor: pointer;
+}
+
+.subscribe-button {
+  background: linear-gradient(to right, #36A9E1, #2980b9);
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+}
+
+.subscribe-button:hover {
+  background: linear-gradient(to right, #2980b9, #36A9E1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(54, 169, 225, 0.3);
+}
+
+/* Módulo de redes sociales */
+.social-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.social-icon:nth-child(1) {
+  background: #1877f2; /* Facebook */
+}
+
+.social-icon:nth-child(2) {
+  background: #1da1f2; /* Twitter */
+}
+
+.social-icon:nth-child(3) {
+  background: #0a66c2; /* LinkedIn */
+}
+
+.social-icon:nth-child(4) {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); /* Instagram */
+}
+
+.social-icon:nth-child(5) {
+  background: #ff0000; /* YouTube */
+}
+
+.social-icon:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos para la paginación */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+:host ::ng-deep .p-paginator {
+  background: transparent;
+  border: none;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-page.p-highlight {
+  background: #A79964;
+  color: white;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-page:not(.p-highlight):hover {
+  background: rgba(167, 153, 100, 0.1);
+}
+
+
+/* Cabecera de noticias */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #202445;
+  position: relative;
+  margin: 0;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, #A79964, #36A9E1);
+  border-radius: 2px;
+}
+
+/* Tooltip para etiquetas extras */
+.extra-tags-tooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 0;
+  background: white;
+  padding: 0.8rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 150px;
+  display: none;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 12px;
+  max-width: 250px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para la fuente en el sidebar */
+.source-domain {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+}
+

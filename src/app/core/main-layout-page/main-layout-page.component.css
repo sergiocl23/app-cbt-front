@@ -1,3 +1,96 @@
+/* Asegurar que el contenido principal se ajuste correctamente con el sidebar */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.main-container {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+.content-area {
+  flex: 1;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* Asegurar que el sidebar tenga un ancho fijo y no cause problemas con el zoom */
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+  max-width: 250px;
+  height: 100%;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+/* Ajustes para diferentes tamaños de pantalla */
+@media (max-width: 992px) {
+  .sidebar {
+    position: fixed;
+    left: -250px;
+    top: 0;
+    height: 100vh;
+    z-index: 1000;
+  }
+  
+  .sidebar.active {
+    left: 0;
+  }
+  
+  .content-area {
+    width: 100%;
+  }
+}
+
+/* Asegurar que el contenido se ajuste correctamente con diferentes niveles de zoom */
+@media screen and (min-resolution: 0.98dppx) and (max-resolution: 1.02dppx) {
+  /* Zoom 100% */
+  .content-area {
+    padding: 1rem;
+  }
+}
+
+@media screen and (min-resolution: 1.08dppx) and (max-resolution: 1.12dppx) {
+  /* Zoom 110% */
+  .content-area {
+    padding: 1rem;
+  }
+}
+
+@media screen and (min-resolution: 1.18dppx) and (max-resolution: 1.22dppx) {
+  /* Zoom 120% */
+  .content-area {
+    padding: 1rem;
+  }
+}
+
+@media screen and (min-resolution: 0.88dppx) and (max-resolution: 0.92dppx) {
+  /* Zoom 90% */
+  .content-area {
+    padding: 1rem;
+  }
+}
+
+@media screen and (min-resolution: 0.78dppx) and (max-resolution: 0.82dppx) {
+  /* Zoom 80% */
+  .content-area {
+    padding: 1rem;
+  }
+}
+
 .main-content {
   padding-left: 53px;
   transition: all 0.15s ease;
@@ -39,8 +132,6 @@
   height: 30px;
   margin: 0px 0px 0px 10px
 }
-
-
 
 /* sidebar {
   height: 100vh;

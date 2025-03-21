@@ -30,7 +30,7 @@ interface StrapiResponse {
       }>;
       images: string[];
       createdAt: string;
-      articleType: 'regular' | 'topicFeatured' | 'topicSmall';
+      articleType: 'regular';
       featuredImage?: any;
       additionalImages?: any[];
       manualCreation?: boolean;
@@ -48,70 +48,8 @@ interface StrapiResponse {
   };
 }
 
-interface StrapiArticle {
-  title: string;
-  content: string;
-  summary: string;
-  mainImage: string;
-  sourceUrl: string;
-  sourceName: string;
-  publishedAt: string;
-  articleDate: string;
-  pais: string;
-  tags: {
-    data: {
-      id: number;
-      attributes: {
-        name: string;
-        nombre: string;
-        documentId: string;
-        createdAt: string;
-        updatedAt: string;
-        publishedAt: string;
-        locale: string | null;
-        id_tag: string;
-      };
-    }[];
-  };
-  images: string[];
-  createdAt: string;
-  articleType: 'regular' | 'topicFeatured' | 'topicSmall';
-  featuredImage?: any;
-  additionalImages?: any[];
-  manualCreation?: boolean;
-}
 
-interface StrapiSingleResponse {
-  status: string;
-  data: {
-    id: number;
-    title: string;
-    content: string;
-    summary: string;
-    mainImage: string;
-    sourceUrl: string;
-    sourceName: string;
-    publishedAt: string;
-    articleDate: string;
-    pais: string;
-    tags: Array<{
-      id: number;
-      nombre: string;
-      documentId: string;
-      createdAt: string;
-      updatedAt: string;
-      publishedAt: string;
-      locale: string | null;
-      id_tag: string;
-    }>;
-    images: string[];
-    createdAt: string;
-    articleType: 'regular' | 'topicFeatured' | 'topicSmall';
-    featuredImage?: any;
-    additionalImages?: any[];
-    manualCreation?: boolean;
-  };
-}
+
 
 @Injectable({
   providedIn: 'root'
@@ -127,13 +65,6 @@ export class NewsService {
     });
   }
 
-  private cleanHtmlTags(text: string): string {
-    return text
-      .replace(/<\/?[^>]+(>|$)/g, '') // Elimina todas las etiquetas HTML
-      .replace(/&nbsp;/g, ' ')        // Reemplaza &nbsp; por espacio
-      .replace(/\s+/g, ' ')           // Reduce múltiples espacios a uno
-      .trim();                        // Elimina espacios al inicio y final
-  }
 
   getNews(params: {
     page: number;
@@ -166,6 +97,44 @@ export class NewsService {
           tag
         );
       });
+    }
+
+    // Agregar filtro para relevanceScore null
+    if (params.filters?.relevanceScore?.$null === true) {
+      queryParams = queryParams.set('filters[relevanceScore][$null]', 'true');
+    }
+    
+    // Agregar filtro para relevanceScore no null
+    if (params.filters?.relevanceScore?.$ne !== undefined) {
+      queryParams = queryParams.set('filters[relevanceScore][$notNull]', 'true');
+      console.log('[DEBUG SERVICE] Agregando filtro para relevanceScore NOT NULL');
+    }
+
+    // Agregar filtro para manualCreation
+    if (params.filters?.manualCreation?.$eq === true) {
+      queryParams = queryParams.set('filters[manualCreation][$eq]', 'true');
+    }
+    
+    // Agregar filtro para IDs específicos
+    if (params.filters?.id?.$in && Array.isArray(params.filters.id.$in)) {
+
+
+      // En Strapi v4, necesitamos usar una estructura específica para $in
+      const idList = params.filters.id.$in.join(',');
+      queryParams = queryParams.set('filters[id][$in]', idList);
+      console.log('[DEBUG SERVICE] Agregando filtro para IDs específicos:', idList);
+    }
+
+    // Agregar filtro para relevanceScore mayor que cierto valor
+    if (params.filters?.relevanceScore?.$gt !== undefined) {
+      queryParams = queryParams.set('filters[relevanceScore][$gt]', params.filters.relevanceScore.$gt.toString());
+      console.log('[DEBUG SERVICE] Agregando filtro para relevanceScore > ' + params.filters.relevanceScore.$gt);
+    }
+
+    // Agregar filtro para articleType
+    if (params.filters?.articleType) {
+      queryParams = queryParams.set('filters[articleType][$eq]', params.filters.articleType);
+      console.log('[DEBUG SERVICE] Agregando filtro para articleType:', params.filters.articleType);
     }
 
     console.log('Query params:', queryParams.toString());

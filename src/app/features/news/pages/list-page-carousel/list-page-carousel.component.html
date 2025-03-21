@@ -1,4 +1,4 @@
-<div class="news-container">
+<div class="news-container" [class.sidebar-open]="sidebarOpen">
   <!-- Nuevo header del Corredor Bioceánico -->
   <div class="bioceanic-header">
     <div class="bioceanic-title">Noticias Corredor Bioceánico</div>
@@ -35,243 +35,194 @@
         
         <!-- Carrusel de noticias destacadas -->
         <div class="carousel-container">
-          <!-- Solo renderizar el carrusel en el navegador -->
-          <ng-container *ngIf="isBrowser; else staticCarousel">
-            <!-- Carrusel usando PrimeNG -->
-            <p-carousel [value]="carouselNews" [numVisible]="1" [numScroll]="1" [circular]="true"
-                       [autoplayInterval]="5000" [responsiveOptions]="carouselResponsiveOptions"
-                       [showNavigators]="true" [showIndicators]="true">
-              <ng-template pTemplate="item" let-news>
-                <div class="carousel-item" (click)="navigateToNews(news)">
-                  <div class="carousel-image">
-                    <img [src]="getImageUrl(news)" [alt]="news.title">
-                    <div class="carousel-overlay"></div>
-                    <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
-                    <a *ngIf="news.sourceUrl" [href]="news.sourceUrl" 
-                       class="source-url" target="_blank" (click)="$event.stopPropagation()">
-                      <i class="pi pi-external-link"></i>
-                      {{ getFormattedSourceUrl(news.sourceUrl) }}
-                    </a>
-                    <div class="carousel-content">
-                      <span class="date">
-                        <i class="pi pi-calendar"></i>
-                        {{ getFormattedDate(news.publishedAt || news.articleDate) | date:'dd MMM, yyyy':'GMT-3':'es' }}
-                      </span>
-                      <h2>{{ news.title }}</h2>
-                      <p class="summary" style="white-space: pre-line;">{{ cleanHtmlTags(news.summary) }}</p>
-                      <!-- Tags para la noticia -->
-                      <ng-container *ngIf="(news.tags.length || 0) <= 3; else extraTags">
-                        <div class="news-tags">
-                          <span class="tag" *ngFor="let tag of (news.tags || []).slice(0, 3)">
-                            {{ tag.name || tag.nombre }}
-                          </span>
-                        </div>
-                      </ng-container>
-                      <ng-template #extraTags>
-                        <div class="news-tags">
-                          <!-- Muestra las tres primeras etiquetas -->
-                          <span class="tag" *ngFor="let tag of (news.tags || []).slice(0, 3)">
-                            {{ tag.name || tag.nombre }}
-                          </span>
-                          <!-- Botón extra solo si hay más de 3 etiquetas -->
-                          <span class="tag extra-tag" *ngIf="(news.tags.length || 0) > 3">
-                            +{{ (news.tags.length || 0) - 3 }}
-                            <div class="extra-tags-tooltip">
-                              <span class="tag" *ngFor="let tag of (news.tags || []).slice(3)">
-                                {{ tag.name || tag.nombre }}
-                              </span>
-                            </div>
-                          </span>
-                        </div>
-                      </ng-template>
-                      <div class="meta-info" *ngIf="news.author">
-                        <span class="author">
-                          <i class="pi pi-user"></i>
-                          {{ news.author.username }}
+          <p-carousel [value]="carouselNews" [numVisible]="1" [numScroll]="1" [circular]="true"
+                     [autoplayInterval]="5000" [responsiveOptions]="carouselResponsiveOptions"
+                     [showNavigators]="true" [showIndicators]="true">
+            <ng-template pTemplate="item" let-news>
+              <div class="carousel-item" (click)="navigateToNews(news)">
+                <div class="carousel-image">
+                  <img [src]="getImageUrl(news)" [alt]="news.title">
+                  <div class="carousel-overlay"></div>
+                  <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
+                  <a *ngIf="news.sourceUrl" [href]="news.sourceUrl" 
+                     class="source-url" target="_blank" (click)="$event.stopPropagation()">
+                    <i class="pi pi-external-link"></i>
+                    {{ getFormattedSourceUrl(news.sourceUrl) }}
+                  </a>
+                  <div class="carousel-content">
+                    <span class="date">
+                      <i class="pi pi-calendar"></i>
+                      {{ getFormattedDate(news.publishedAt || news.articleDate) | date:'dd MMM, yyyy':'GMT-3':'es' }}
+                    </span>
+                    <h2>{{ news.title }}</h2>
+                    <p class="summary" style="white-space: pre-line;">{{ cleanHtmlTags(news.summary) }}</p>
+                    <!-- Tags para la noticia -->
+                    <ng-container *ngIf="(news.tags?.length || 0) <= 3; else extraTags">
+                      <div class="news-tags">
+                        <span class="tag" *ngFor="let tag of (news.tags || []).slice(0, 3)">
+                          {{ tag.name || tag.nombre }}
                         </span>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </ng-template>
-            </p-carousel>
-          </ng-container>
-
-          <!-- Versión estática para SSR -->
-          <ng-template #staticCarousel>
-            <div *ngIf="carouselNews.length > 0" class="carousel-item" (click)="navigateToNews(carouselNews[0])">
-              <div class="carousel-image">
-                <img [src]="getImageUrl(carouselNews[0])" [alt]="carouselNews[0].title">
-                <div class="carousel-overlay"></div>
-                <span class="manual-badge" *ngIf="carouselNews[0].manualCreation">Noticia interna</span>
-                <a *ngIf="carouselNews[0].sourceUrl" [href]="carouselNews[0].sourceUrl" 
-                   class="source-url" target="_blank" (click)="$event.stopPropagation()">
-                  <i class="pi pi-external-link"></i>
-                  {{ getFormattedSourceUrl(carouselNews[0].sourceUrl) }}
-                </a>
-                <div class="carousel-content">
-                  <span class="date">
-                    <i class="pi pi-calendar"></i>
-                    {{ getFormattedDate(carouselNews[0].publishedAt || carouselNews[0].articleDate) | date:'dd MMM, yyyy':'GMT-3':'es' }}
-                  </span>
-                  <h2>{{ carouselNews[0].title }}</h2>
-                  <p class="summary" style="white-space: pre-line;">{{ cleanHtmlTags(carouselNews[0].summary) }}</p>
-                  <!-- Tags para la noticia -->
-                  <ng-container *ngIf="(carouselNews[0].tags.length || 0) <= 3; else extraTags">
-                    <div class="news-tags">
-                      <span class="tag" *ngFor="let tag of (carouselNews[0].tags || []).slice(0, 3)">
-                        {{ tag.name || tag.nombre }}
-                      </span>
-                    </div>
-                  </ng-container>
-                  <ng-template #extraTags>
-                    <div class="news-tags">
-                      <!-- Muestra las tres primeras etiquetas -->
-                      <span class="tag" *ngFor="let tag of (carouselNews[0].tags || []).slice(0, 3)">
-                        {{ tag.name || tag.nombre }}
-                      </span>
-                      <!-- Botón extra solo si hay más de 3 etiquetas -->
-                      <span class="tag extra-tag" *ngIf="(carouselNews[0].tags.length || 0) > 3">
-                        +{{ (carouselNews[0].tags.length || 0) - 3 }}
-                        <div class="extra-tags-tooltip">
-                          <span class="tag" *ngFor="let tag of (carouselNews[0].tags || []).slice(3)">
-                            {{ tag.name || tag.nombre }}
-                          </span>
-                        </div>
-                      </span>
-                    </div>
-                  </ng-template>
-                  <div class="meta-info" *ngIf="carouselNews[0].author">
-                    <span class="author">
-                      <i class="pi pi-user"></i>
-                      {{ carouselNews[0].author.username }}
-                    </span>
+                    </ng-container>
+                    <ng-template #extraTags>
+                      <div class="news-tags">
+                        <span class="tag" *ngFor="let tag of (news.tags || []).slice(0, 2)">
+                          {{ tag.name || tag.nombre }}
+                        </span>
+                        <span class="extra-tag">
+                          +{{ (news.tags?.length || 0) - 2 }}
+                        </span>
+                      </div>
+                    </ng-template>
                   </div>
                 </div>
               </div>
-            </div>
-          </ng-template>
+            </ng-template>
+          </p-carousel>
         </div>
+      </div>
 
-        <!-- Noticias Restantes -->
-        <div class="remaining-news">
-          <div class="section-header">
-            <h3 class="section-title">Noticias</h3>
-            
-            <div class="filters-group">
-              <!-- Barra de búsqueda expandible -->
-              <div class="search-container">
-                <input type="text" class="search-input" 
-                       placeholder="Buscar noticias..." 
-                       [(ngModel)]="searchQuery"
-                       (input)="onSearch($event)">
-                <button class="search-toggle" aria-label="Buscar">
-                  <i class="pi pi-search"></i>
-                </button>
-              </div>
-
-              <!-- Filtro de fecha colapsable -->
-              <div class="date-filter">
-                <button type="button" class="date-toggle" aria-label="Filtrar por fecha">
-                  <i class="pi pi-calendar"></i>
-                </button>
-                <div class="date-range">
-                  <input type="date" class="date-input" 
-                         placeholder="Fecha inicial"
-                         [(ngModel)]="dateStart"
-                         (change)="onDateChange()">
-                  <span class="date-range-separator">a</span>
-                  <input type="date" class="date-input" 
-                         placeholder="Fecha final"
-                         [(ngModel)]="dateEnd"
-                         (change)="onDateChange()">
-                </div>
-              </div>
-
-              <!-- Selector de categorías colapsable -->
-              <div class="category-filter">
-                <button type="button" class="category-toggle" aria-label="Filtrar por categoría">
-                  <i class="pi pi-tags"></i>
-                </button>
-                <p-multiSelect [options]="categories" 
-                             [(ngModel)]="selectedCategories" 
-                             placeholder="Seleccionar categorías"
-                             [showToggleAll]="true"
-                             [showHeader]="true"
-                             [appendTo]="'body'"
-                             (onChange)="onCategoryChange()">
-                  <ng-template pTemplate="header">
-                    <div class="multiselect-header">
-                      Selecciona categorías
-                    </div>
-                  </ng-template>
-                </p-multiSelect>
-              </div>
-
-              <!-- Botón para resetear filtros -->
-              <button class="reset-filters" *ngIf="searchQuery || selectedCategories.length || dateStart || dateEnd"
-                      (click)="resetFilters()" aria-label="Restablecer filtros">
-                <i class="pi pi-filter-slash"></i>
+      <!-- Sección de filtros -->
+      <div class="remaining-news">
+        <div class="section-header">
+          <h3 class="section-title">Noticias</h3>
+          
+          <div class="filters-group">
+            <!-- Barra de búsqueda expandible -->
+            <div class="search-container" [class.expanded]="isSearchExpanded">
+              <input type="text" class="search-input" 
+                     placeholder="Buscar noticias..." 
+                     [(ngModel)]="searchQuery"
+                     (keyup.enter)="onSearch($event)">
+              <button class="search-toggle" aria-label="Buscar" (click)="toggleSearchExpand()">
+                <i class="pi pi-search"></i>
               </button>
             </div>
-          </div>
-          
-          <div class="news-grid">
-            <article *ngFor="let news of displayedNews" class="news-card" (click)="navigateToNews(news)">
-              <div class="card-image">
-                <img [src]="getImageUrl(news)" [alt]="news.title"
-                     [class.default-image]="!news.mainImage"
-                     [class.manual-image]="news.manualCreation">
-                <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
+
+            <!-- Filtro de fecha colapsable -->
+            <div class="date-filter" [class.expanded]="isDateFilterExpanded">
+              <button type="button" class="date-toggle" aria-label="Filtrar por fecha" (click)="toggleDateFilter()">
+                <i class="pi pi-calendar"></i>
+              </button>
+              <div class="date-range">
+                <p-calendar
+                  [(ngModel)]="dateStart"
+                  [showIcon]="false"
+                  dateFormat="dd/mm/yy"
+                  placeholder="Desde"
+                  [showButtonBar]="true"
+                  (onSelect)="onDateChange()"
+                  [style]="{'width': '120px'}"
+                ></p-calendar>
+                <span class="date-range-separator">a</span>
+                <p-calendar
+                  [(ngModel)]="dateEnd"
+                  [showIcon]="false"
+                  dateFormat="dd/mm/yy"
+                  placeholder="Hasta"
+                  [showButtonBar]="true"
+                  (onSelect)="onDateChange()"
+                  [style]="{'width': '120px'}"
+                ></p-calendar>
               </div>
-              <div class="card-content">
-                <span class="date">
-                  <i class="pi pi-calendar"></i>
-                  {{ getFormattedDate(news.publishedAt || news.articleDate) | date:'dd MMM, yyyy':'GMT-3':'es' }}
-                </span>
-                <div class="content-wrapper">
-                  <h4>{{ news.title }}</h4>
-                  <p class="card-summary" style="white-space: pre-line;">{{ cleanHtmlTags(news.summary) }}</p>
-                  <!-- Para la noticia secundaria -->
-                  <div class="news-tags">
-                    <ng-container *ngIf="news.tags && news.tags.length > 0">
-                      <span class="tag" *ngFor="let tag of news.tags.slice(0, 2)">
-                        {{ tag.name || tag.nombre }}
-                      </span>
-                      
-                      <!-- MOSTRAR MÁS TAGS SI HAY MÁS DE 2 -->
-                      <span *ngIf="news.tags.length > 2" class="extra-tag">
-                        +{{ news.tags.length - 2 }}
-                        <div class="extra-tags-tooltip">
-                          <span class="tag" *ngFor="let tag of news.tags.slice(2)">
-                            {{ tag.name || tag.nombre }}
-                          </span>
-                        </div>
-                      </span>
-                    </ng-container>
+            </div>
+
+            <!-- Selector de categorías colapsable -->
+            <div class="category-filter" [class.expanded]="isCategoryFilterExpanded">
+              <button type="button" class="category-toggle" aria-label="Filtrar por categoría" (click)="toggleCategoryFilter()">
+                <i class="pi pi-tags"></i>
+              </button>
+              <p-multiSelect 
+                [options]="categories" 
+                [(ngModel)]="selectedCategories" 
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccionar categorías"
+                [showToggleAll]="true"
+                [showHeader]="true"
+                [appendTo]="'body'"
+                (onChange)="onCategoryChange()">
+                <ng-template pTemplate="header">
+                  <div class="multiselect-header">
+                    Selecciona categorías
                   </div>
-                  <div class="meta-info" *ngIf="news.author">
-                    <span class="author">
-                      <i class="pi pi-user"></i>
-                      {{ news.author.username }}
+                </ng-template>
+              </p-multiSelect>
+            </div>
+
+            <!-- Botón para resetear filtros -->
+            <button class="reset-filters" *ngIf="searchQuery || selectedCategories.length || dateStart || dateEnd"
+                    (click)="resetFilters()" aria-label="Restablecer filtros">
+              <i class="pi pi-filter-slash"></i>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Grid de noticias (noticias restantes) -->
+        <div class="news-grid">
+          <article *ngFor="let news of displayedNews" class="news-card" (click)="navigateToNews(news)" [@fadeInOut]>
+            <div class="card-image">
+              <img [src]="getImageUrl(news)" [alt]="news.title"
+                   [class.default-image]="!news.mainImage"
+                   [class.manual-image]="news.manualCreation">
+              <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
+              <a *ngIf="news.sourceUrl" [href]="news.sourceUrl" 
+                 class="source-url" target="_blank" (click)="$event.stopPropagation()">
+                <i class="pi pi-external-link"></i>
+                {{ getFormattedSourceUrl(news.sourceUrl) }}
+              </a>
+            </div>
+            <div class="card-content">
+              <span class="date">
+                <i class="pi pi-calendar"></i>
+                {{ getFormattedDate(news.publishedAt || news.articleDate) | date:'dd MMM, yyyy':'GMT-3':'es' }}
+              </span>
+              <div class="content-wrapper">
+                <h4>{{ news.title }}</h4>
+                <p class="card-summary" style="white-space: pre-line;">{{ cleanHtmlTags(news.summary) }}</p>
+                <div class="news-tags">
+                  <ng-container *ngIf="news.tags && news.tags.length > 0">
+                    <span class="tag" *ngFor="let tag of news.tags.slice(0, 2)">
+                      {{ tag.name || tag.nombre }}
                     </span>
-                  </div>
+                    
+                    <!-- Mostrar más tags si hay más de 2 -->
+                    <span *ngIf="news.tags.length > 2" class="extra-tag">
+                      +{{ news.tags.length - 2 }}
+                      <div class="extra-tags-tooltip">
+                        <span class="tag" *ngFor="let tag of news.tags.slice(2)">
+                          {{ tag.name || tag.nombre }}
+                        </span>
+                      </div>
+                    </span>
+                  </ng-container>
                 </div>
+                <span class="pais" *ngIf="news.pais">
+                  <i class="pi pi-map-marker"></i>
+                  {{ news.pais }}
+                </span>
               </div>
-            </article>
-          </div>
-          
-          <!-- PAGINACIÓN - SOLO 2 PÁGINAS -->
-          <div class="pagination-container">
-            <p-paginator [rows]="itemsPerPage" 
-                        [totalRecords]="Math.min(remainingNews.length, itemsPerPage * 2)"
-                        [first]="(currentPage-1) * itemsPerPage"
-                        [showCurrentPageReport]="true" 
-                        [rowsPerPageOptions]="[9]"
-                        (onPageChange)="onPageChange($event)" 
-                        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} noticias">
-            </p-paginator>
-          </div>
+            </div>
+          </article>
+        </div>
+
+        <!-- Mensaje cuando no hay resultados -->
+        <div class="no-results" *ngIf="displayedNews.length === 0 && !isLoading">
+          <i class="pi pi-search" style="font-size: 3rem"></i>
+          <h3>No se encontraron noticias</h3>
+          <p>Prueba con otros filtros o términos de búsqueda</p>
+          <button pButton label="Reiniciar filtros" icon="pi pi-filter-slash" (click)="resetFilters()"></button>
+        </div>
+        
+        <!-- Paginación -->
+        <div class="pagination-container" *ngIf="totalPages > 1">
+          <p-paginator 
+            [rows]="itemsPerPage" 
+            [totalRecords]="totalRecords"
+ 
+            (onPageChange)="onPageChange($event)"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} noticias">
+          </p-paginator>
         </div>
       </div>
     </div>
@@ -283,15 +234,19 @@
     <div class="sidebar-box sidebar-interest">
       <h3 class="sidebar-title">Podría interesarte</h3>
       <div class="interest-cards">
-        <div *ngFor="let news of carouselNews" class="interest-card" (click)="navigateToNews(news)">
-          <div class="interest-image">
+        <div *ngFor="let news of minimalNews" class="interest-card" (click)="openSourceUrl(news)">
+          <div class="interest-image" *ngIf="news.mainImage">
             <img [src]="getImageUrl(news)" [alt]="news.title">
           </div>
           <div class="interest-content">
             <h4>{{ news.title }}</h4>
             <span class="interest-date">
               <i class="pi pi-calendar"></i>
-              {{ getFormattedDate(news.publishedAt) | date:'dd MMM, yyyy':'GMT-3':'es' }}
+              {{ getFormattedDate(news.publishedAt || news.articleDate) | date:'dd MMM, yyyy':'GMT-3':'es' }}
+            </span>
+            <span class="source-domain" *ngIf="news.sourceUrl">
+              <i class="pi pi-external-link"></i>
+              {{ getFormattedSourceUrl(news.sourceUrl) }}
             </span>
           </div>
         </div>

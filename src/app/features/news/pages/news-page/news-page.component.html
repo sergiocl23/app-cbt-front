@@ -86,8 +86,12 @@
           <p>{{ newsItem.summary }}</p>
         </div>
 
-        <div class="content" style="white-space: pre-line;">
-          {{ cleanHtmlTags(getContent()) }}
+        <!-- Contenido principal de la noticia -->
+        <div class="content">
+          <!-- Mostrar contenido con formato de párrafos -->
+          <ng-container *ngFor="let paragraph of cleanHtmlTags(getContent()).split('\n\n')">
+            <p *ngIf="paragraph.trim()">{{ paragraph }}</p>
+          </ng-container>
         </div>
         
         <!-- Imágenes adicionales para noticias manuales -->
@@ -118,6 +122,6 @@
 </div>
 
 <!-- Botón modo lectura -->
-<button class="reading-mode-toggle" (click)="toggleReadingMode()" [title]="isReadingMode ? 'Modo normal' : 'Modo lectura'">
+<!-- <button class="reading-mode-toggle" (click)="toggleReadingMode()" [title]="isReadingMode ? 'Modo normal' : 'Modo lectura'">
   <i class="pi" [class.pi-eye]="!isReadingMode" [class.pi-eye-slash]="isReadingMode"></i>
-</button>
+</button> -->

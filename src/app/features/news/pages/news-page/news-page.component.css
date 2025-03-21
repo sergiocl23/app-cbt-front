@@ -184,30 +184,18 @@
 
 .content {
   margin: 2rem 0;
+  font-size: 1.1rem;
   line-height: 1.8;
-  white-space: pre-line;
-  font-family: 'Roboto', sans-serif;
-  font-size: 1.15rem;
-  font-weight: normal;
-  color: #333;
-  text-align: justify;
-  padding: 0 2rem;
-  hyphens: auto;
-}
-
-.content-paragraph {
-  margin-bottom: 2.5rem;
-  position: relative;
-  line-height: 1.8;
-  text-indent: 2em;
-}
-
-.content-paragraph:last-child {
-  margin-bottom: 1rem;
+  color: var(--text-light);
 }
 
 .content p {
-  margin-bottom: 2.5rem;
+  margin-bottom: 1.5rem;
+  text-align: justify;
+}
+
+.content p:last-child {
+  margin-bottom: 0;
 }
 
 .source-link {
