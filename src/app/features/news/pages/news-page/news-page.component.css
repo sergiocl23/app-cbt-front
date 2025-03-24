@@ -184,30 +184,20 @@
 
 .content {
   margin: 2rem 0;
+  font-size: 1.1rem;
   line-height: 1.8;
-  white-space: pre-line;
-  font-family: 'Roboto', sans-serif;
-  font-size: 1.15rem;
-  font-weight: normal;
-  color: #333;
+  color: var(--text-light);
+}
+
+.content p, .content-paragraph {
+  margin-bottom: 1.5rem;
   text-align: justify;
-  padding: 0 2rem;
-  hyphens: auto;
-}
-
-.content-paragraph {
-  margin-bottom: 2.5rem;
-  position: relative;
+  white-space: pre-line;
   line-height: 1.8;
-  text-indent: 2em;
 }
 
-.content-paragraph:last-child {
-  margin-bottom: 1rem;
-}
-
-.content p {
-  margin-bottom: 2.5rem;
+.content p:last-child, .content-paragraph:last-child {
+  margin-bottom: 0;
 }
 
 .source-link {
@@ -607,5 +597,91 @@
 .back-button:hover .back-text {
   color: var(--color-blue) !important;
   transform: scale(1.05);
+}
+
+/* Estilos para noticias manuales */
+.manual-tag {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.manual-tag i {
+  color: #4caf50;
+}
+
+.manual-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #4caf50;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 0 0 0 8px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.manual-badge i {
+  color: white;
+}
+
+/* Estilos para imágenes adicionales */
+.additional-images {
+  margin: 3rem 0;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+}
+
+.additional-images h3 {
+  color: var(--color-navy);
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  border-bottom: 2px solid var(--color-gold);
+  padding-bottom: 0.5rem;
+  width: fit-content;
+}
+
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.additional-image-container {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.additional-image-container:hover {
+  transform: translateY(-5px);
+}
+
+.additional-image {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+}
+
+/* Estilos para modo lectura */
+.reading-mode .additional-images {
+  background-color: var(--bg-dark-lighter);
+  color: var(--text-dark);
+}
+
+.reading-mode .additional-images h3 {
+  color: var(--text-dark);
+  border-bottom-color: var(--color-gold);
+}
+
+.reading-mode .manual-tag,
+.reading-mode .manual-tag i {
+  color: #81c784;
 }
 
