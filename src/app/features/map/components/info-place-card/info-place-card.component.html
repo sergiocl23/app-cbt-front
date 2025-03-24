@@ -1,0 +1,19 @@
+<div class="info-card" [class.open]="isInfoCardOpen">
+  <button class="close-btn" (click)="closeCard()">✖</button>
+  <h3><strong>{{ place?.name}}</strong></h3>
+  <!-- <img class="place-image" mat-card-image [src]="place! | placeImage"> -->
+  <div class="grid">
+    <div class="col-12">
+      <button
+        pButton
+        type="button"
+        label="¿Cómo llegar?"
+        size="small"
+        severity="info"
+        style="width: 100%;"
+        (click)="getDirections( place )"
+        ></button>
+    </div>
+  </div>
+  <p>{{ place?.description }}</p>
+</div>

@@ -81,3 +81,7 @@ body.reading-mode .navbar {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mapboxgl-ctrl-logo {
+  display: none !important;
+}

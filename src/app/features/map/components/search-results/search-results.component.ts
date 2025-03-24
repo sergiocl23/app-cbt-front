@@ -21,7 +21,7 @@ import { PlacesNominatim } from '../../interfaces/placesNominatim.interface';
 export class SearchResultsComponent {
 
   public selectedId: string | number = '';
-  private searchMarker: mapboxgl.Marker | null = null;
+  // private searchMarker: mapboxgl.Marker | null = null;
 
   constructor(
     private mapService: MapService
@@ -35,22 +35,46 @@ export class SearchResultsComponent {
     return this.mapService.places;
   }
 
-  onButtonClick(place: any) {
-    console.log('Botón clickeado para', place.properties.name );
-  }
-
   flyTo( place: PlacesNominatim ){
     this.selectedId = place.place_id;
     // const [ lng, lat ] = place.geometry.coordinates;
     const [ lng, lat ] = [Number(place.lon), Number(place.lat)] as [number, number];
 
-    if (this.searchMarker) {
-      this.searchMarker.remove();
-    }
+    // if (this.searchMarker) {
+    //   this.searchMarker.remove();
+    // }
 
     this.mapService.flyTo([ lng, lat ]);
     const map = this.mapService.Map
-    this.searchMarker = new mapboxgl.Marker().setLngLat([ lng, lat ]).addTo(map);
+    // this.searchMarker = new mapboxgl.Marker().setLngLat([ lng, lat ]).addTo(map);
+
+    const iconId = `circle-point-destination`;
+    const iconUrl = 'assets/images/icons/destination.png';
+
+    //Elimina cualquier marcador previo con el mismo ID
+    if (map.getLayer(iconId)) {
+      map.removeLayer(iconId);
+    }
+    if (map.getSource(iconId)) {
+      map.removeSource(iconId);
+    }
+
+    if (!map.hasImage(iconId)) {
+      map.loadImage(iconUrl, (error, image) => {
+        if (error) throw error;
+
+        // Agregar la imagen con un identificador único
+        map.addImage(iconId, image!);
+
+        // Agregar el punto al mapa con su icono correspondiente
+        this.mapService.addPointToMap(map, [ lng, lat ], iconId, place.display_name);
+      })
+    }
+    else{
+      // Si la imagen ya está cargada, solo agrega el punto con su icono
+      this.mapService.addPointToMap(map, [ lng, lat ], iconId, place.display_name);
+    }
+
   }
 
   getDirections( place: PlacesNominatim ){

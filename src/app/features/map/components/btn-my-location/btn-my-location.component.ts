@@ -23,7 +23,34 @@ export class BtnMyLocationComponent {
     this.mapService.flyTo( this.mapService.userLocation! );
 
     const map = this.mapService.Map
-    new mapboxgl.Marker().setLngLat(this.mapService.userLocation!).addTo(map);
+    const iconId = `circle-point-my-location`;
+    const iconUrl = 'assets/images/icons/my-location.png';
+
+    //Elimina cualquier marcador previo con el mismo ID
+    if (map.getLayer(iconId)) {
+      map.removeLayer(iconId);
+    }
+    if (map.getSource(iconId)) {
+      map.removeSource(iconId);
+    }
+
+    if (!map.hasImage(iconId)) {
+      map.loadImage(iconUrl, (error, image) => {
+        if (error) throw error;
+
+        // Agregar la imagen con un identificador único
+        map.addImage(iconId, image!);
+
+        // Agregar el punto al mapa con su icono correspondiente
+        this.mapService.addPointToMap(map, this.mapService.userLocation!, iconId, 'Mi ubicación');
+      })
+    }
+    else{
+      // Si la imagen ya está cargada, solo agrega el punto con su icono
+      this.mapService.addPointToMap(map, this.mapService.userLocation!, iconId, 'Mi ubicación');
+    }
+
+
   }
 
 }
