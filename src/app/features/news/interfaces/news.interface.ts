@@ -11,7 +11,8 @@ export interface NewsItem {
   images: string[];
   sourceUrl?: string;
   sourceName?: string;
-  articleType: 'regular' | 'topicFeatured' | 'topicSmall';
+
+  articleType: 'regular';
   createdAt: string;
   mainImage?: string;
   publishedAt?: string;
@@ -21,6 +22,10 @@ export interface NewsItem {
   };
   tags?: Tag[];
   pais?: string;
+  featuredImage?: MediaItem;
+  additionalImages?: MediaItem[];
+  manualCreation?: boolean;
+  relevanceScore?: number | null;
 }
 
 export interface MediaItem {

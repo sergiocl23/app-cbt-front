@@ -23,14 +23,17 @@ import { environments } from '@environments/environments';
             </div>
             <div class="news-content">
               <h4>{{item.title}}</h4>
+
+              <p class="snippet" *ngIf="item.snippet">{{item.snippet}}</p>
               <div class="news-meta">
                 <span class="source">
                   <i class="pi pi-link"></i>
                   {{item.source}}
                 </span>
-                <span class="date">
+
+                <span class="date" [title]="item.date | date:'full':'GMT-3':'es'">
                   <i class="pi pi-calendar"></i>
-                  {{item.date | date:'dd MMM, yyyy'}}
+                  {{item.date | date:'dd MMM, yyyy HH:mm':'GMT-3':'es'}}
                 </span>
               </div>
             </div>
@@ -113,7 +116,7 @@ import { environments } from '@environments/environments';
       text-decoration: none;
       color: inherit;
       transition: all 0.2s;
-      align-items: center;
+      align-items: start;
     }
     .news-link:hover {
       background: #36A9E1;
@@ -143,6 +146,15 @@ import { environments } from '@environments/environments';
       font-size: 0.95rem;
       line-height: 1.4;
     }
+    .snippet {
+      margin: 0 0 0.5rem 0;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: #666;
+    }
+    .news-link:hover .snippet {
+      color: rgba(255, 255, 255, 0.9);
+    }
     .news-meta {
       display: flex;
       gap: 1rem;
@@ -158,6 +170,9 @@ import { environments } from '@environments/environments';
     .link-icon {
       font-size: 1rem;
       opacity: 0.7;
+
+      align-self: flex-start;
+      margin-top: 0.2rem;
     }
     .loading, .no-results {
       padding: 2rem;
@@ -198,16 +213,152 @@ export class GoogleNewsWidgetComponent implements OnInit {
 
     this.http.get<any>(url).subscribe({
       next: (response) => {
-        this.newsItems = response.items.map((item: any) => ({
-          title: item.title,
-          link: item.link,
-          source: item.displayLink,
-          date: new Date(item.pagemap?.metatags?.[0]?.['article:published_time'] || new Date()),
-          image: item.pagemap?.cse_thumbnail?.[0]?.src ||
-                item.pagemap?.cse_image?.[0]?.src ||
-                item.pagemap?.metatags?.[0]?.['og:image'] ||
-                'assets/images/news-placeholder.jpg'
-        }));
+        console.log('Respuesta completa de Google News API:', response);
+        
+        this.newsItems = response.items.map((item: any) => {
+          console.log('==== DATOS DISPONIBLES PARA GUARDAR EN BD ====');
+          console.log('ID/Link único:', item.link);
+          console.log('Título:', item.title);
+          console.log('URL origen:', item.link);
+          console.log('Fuente:', item.displayLink);
+          console.log('Snippet:', item.snippet);
+          
+          // Revisar y mostrar todos los metadatos disponibles
+          if (item.pagemap?.metatags?.[0]) {
+            console.log('--- METADATOS DISPONIBLES ---');
+            const metadatos = item.pagemap.metatags[0];
+            Object.keys(metadatos).forEach(key => {
+              console.log(`${key}: ${metadatos[key]}`);
+            });
+          }
+          
+          // Revisar imágenes disponibles
+          console.log('--- IMÁGENES DISPONIBLES ---');
+          if (item.pagemap?.cse_thumbnail?.[0]?.src) {
+            console.log('Thumbnail:', item.pagemap.cse_thumbnail[0].src);
+          }
+          if (item.pagemap?.cse_image?.[0]?.src) {
+            console.log('Imagen principal:', item.pagemap.cse_image[0].src);
+          }
+          if (item.pagemap?.metatags?.[0]?.['og:image']) {
+            console.log('Imagen OG:', item.pagemap.metatags[0]['og:image']);
+          }
+          
+          // Revisar información de artículo si existe
+          if (item.pagemap?.newsarticle) {
+            console.log('--- DATOS DE ARTÍCULO ---');
+            const article = item.pagemap.newsarticle[0];
+            Object.keys(article).forEach(key => {
+              console.log(`${key}: ${article[key]}`);
+            });
+          }
+          
+          // Intentar obtener la fecha de múltiples fuentes posibles
+          let publishedDate: Date | null = null;
+          
+          // Intento 1: De los metadatos OpenGraph article:published_time
+          if (item.pagemap?.metatags?.[0]?.['article:published_time']) {
+            const dateStr = item.pagemap.metatags[0]['article:published_time'];
+            const parsedDate = new Date(dateStr);
+            if (!isNaN(parsedDate.getTime())) {
+              publishedDate = parsedDate;
+              console.log(`Fecha obtenida de article:published_time: ${dateStr}`);
+            }
+          }
+          
+          // Intento 2: De los metadatos date
+          if (!publishedDate && item.pagemap?.metatags?.[0]?.['date']) {
+            const dateStr = item.pagemap.metatags[0]['date'];
+            const parsedDate = new Date(dateStr);
+            if (!isNaN(parsedDate.getTime())) {
+              publishedDate = parsedDate;
+              console.log(`Fecha obtenida de metatags.date: ${dateStr}`);
+            }
+          }
+          
+          // Intento 3: De newsarticle.datepublished
+          if (!publishedDate && item.pagemap?.newsarticle?.[0]?.datepublished) {
+            const dateStr = item.pagemap.newsarticle[0].datepublished;
+            const parsedDate = new Date(dateStr);
+            if (!isNaN(parsedDate.getTime())) {
+              publishedDate = parsedDate;
+              console.log(`Fecha obtenida de newsarticle.datepublished: ${dateStr}`);
+            }
+          }
+          
+          // Intento 4: Buscar una fecha en el snippet 
+          if (!publishedDate && item.snippet) {
+            // Patrón común de fechas en formato "DD Month YYYY" o "Month DD, YYYY"
+            const datePattern = /\b(\d{1,2})\s+(de\s+)?([A-Za-zá-úÁ-Ú]+)(\s+de)?\s+(\d{4})\b|\b([A-Za-zá-úÁ-Ú]+)\s+(\d{1,2})(,|\s+de)?\s+(\d{4})\b/;
+            const match = item.snippet.match(datePattern);
+            
+            if (match) {
+              // Intentar parsear la fecha encontrada en el snippet
+              try {
+                const dateStr = match[0];
+                // Convertir mes en español a número si es necesario
+                let processedDate = dateStr;
+                const monthsES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+                monthsES.forEach((month, index) => {
+                  if (dateStr.toLowerCase().includes(month)) {
+                    processedDate = dateStr.toLowerCase().replace(month, (index + 1).toString());
+                  }
+                });
+                
+                const parsedDate = new Date(processedDate);
+                if (!isNaN(parsedDate.getTime())) {
+                  publishedDate = parsedDate;
+                  console.log(`Fecha extraída del snippet: ${dateStr}`);
+                }
+              } catch (e) {
+                console.log('Error al parsear fecha del snippet:', e);
+              }
+            }
+          }
+          
+          // Si ninguna de las fuentes anteriores funcionó, usar la fecha actual
+          if (!publishedDate) {
+            publishedDate = new Date();
+            console.log('Usando fecha actual como fallback');
+          }
+          
+          // Preparar y mostrar el objeto final que se podría guardar en BD
+          const newsItemToSave = {
+            title: item.title,
+            link: item.link,
+            source: item.displayLink,
+            snippet: item.snippet || item.pagemap?.metatags?.[0]?.['og:description'] || '',
+            publishedDate: publishedDate,
+            imageUrl: item.pagemap?.cse_thumbnail?.[0]?.src ||
+                    item.pagemap?.cse_image?.[0]?.src ||
+                    item.pagemap?.metatags?.[0]?.['og:image'] ||
+                    'assets/images/news-placeholder.jpg',
+            // Campos adicionales que se podrían guardar
+            description: item.pagemap?.metatags?.[0]?.['og:description'] || '',
+            author: item.pagemap?.metatags?.[0]?.['author'] || item.pagemap?.newsarticle?.[0]?.author || '',
+            category: item.pagemap?.metatags?.[0]?.['article:section'] || '',
+            language: item.pagemap?.metatags?.[0]?.['og:locale'] || 'es',
+            contentType: 'external',  // Marcar como contenido externo
+            createdAt: new Date(),    // Fecha de guardado en la BD
+            updatedAt: new Date()     // Fecha de actualización en la BD
+          };
+          
+          console.log('OBJETO FINAL PARA GUARDAR EN BD:', newsItemToSave);
+          console.log('===========================================');
+          
+          // Devolver solo lo necesario para mostrar en la UI
+          return {
+            title: item.title,
+            link: item.link,
+            source: item.displayLink,
+            snippet: item.snippet || item.pagemap?.metatags?.[0]?.['og:description'] || '',
+            date: publishedDate,
+            image: item.pagemap?.cse_thumbnail?.[0]?.src ||
+                  item.pagemap?.cse_image?.[0]?.src ||
+                  item.pagemap?.metatags?.[0]?.['og:image'] ||
+                  'assets/images/news-placeholder.jpg'
+          };
+        });
         this.loading = false;
       },
       error: (error) => {

@@ -1,12 +1,14 @@
 <div class="container" [class.reading-mode]="isReadingMode">
   <!-- Botón de retroceso -->
-  <!--<button 
+
+  <button 
     class="back-button"
     (click)="goBack()"
     title="Volver atrás">
     <i class="pi pi-arrow-left"></i>
     <span class="back-text">Regresar</span>
-  </button>-->
+
+  </button>
 
   <!-- Loading spinner -->
   <div *ngIf="isLoading" class="loading-spinner">
@@ -32,14 +34,20 @@
           <i class="pi pi-flag"></i>
           {{ newsItem.pais ? newsItem.pais.toUpperCase() : '' }}
         </span>
+
+        <span *ngIf="newsItem.manualCreation" class="manual-tag">
+          <i class="pi pi-pencil"></i>
+          Noticia interna
+        </span>
       </div>
     </div>
 
     <div class="news-image-container">
       <div class="news-image">
         <img [src]="getImageUrl()" [alt]="newsItem.title"
-             loading="lazy"
-             [class.default-image]="!newsItem.mainImage">
+
+             (error)="handleImageError($event)"
+             [class.default-image]="!newsItem.mainImage && !newsItem.featuredImage && (!newsItem.additionalImages || newsItem.additionalImages.length === 0)">
       </div>
     </div>
 
@@ -73,14 +81,32 @@
 
       <div class="news-content">
         <div *ngIf="newsItem.summary" class="summary">
-          <div class="ai-badge">
+
+          <div class="ai-badge" *ngIf="!newsItem.manualCreation">
             <i class="pi pi-bolt"></i>IA
+          </div>
+          <div class="manual-badge" *ngIf="newsItem.manualCreation">
+            <i class="pi pi-pencil"></i>Manual
           </div>
           <p>{{ newsItem.summary }}</p>
         </div>
 
-        <div class="content" style="white-space: pre-line;">
-          {{ cleanHtmlTags(getContent()) }}
+        <!-- Contenido principal de la noticia -->
+        <div class="content">
+          <!-- Mostrar contenido con formato de párrafos -->
+          <ng-container *ngFor="let paragraph of cleanHtmlTags(getContent()).split('\n\n')">
+            <p *ngIf="paragraph.trim()" class="content-paragraph">{{ paragraph }}</p>
+          </ng-container>
+        </div>
+        
+        <!-- Imágenes adicionales para noticias manuales -->
+        <div *ngIf="newsItem.additionalImages && newsItem.additionalImages.length > 1" class="additional-images">
+          <h3>Imágenes adicionales</h3>
+          <div class="images-grid">
+            <div *ngFor="let img of newsItem.additionalImages.slice(1)" class="additional-image-container">
+              <img [src]="getAdditionalImageUrl(img)" [alt]="newsItem.title" class="additional-image">
+            </div>
+          </div>
         </div>
 
         <a *ngIf="newsItem.sourceUrl" 
@@ -101,6 +127,7 @@
 </div>
 
 <!-- Botón modo lectura -->
-<button class="reading-mode-toggle" (click)="toggleReadingMode()" [title]="isReadingMode ? 'Modo normal' : 'Modo lectura'">
+
+<!-- <button class="reading-mode-toggle" (click)="toggleReadingMode()" [title]="isReadingMode ? 'Modo normal' : 'Modo lectura'">
   <i class="pi" [class.pi-eye]="!isReadingMode" [class.pi-eye-slash]="isReadingMode"></i>
-</button>
+</button> -->
