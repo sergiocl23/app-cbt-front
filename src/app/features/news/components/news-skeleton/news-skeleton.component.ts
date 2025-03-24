@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -6,7 +6,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="skeleton-wrapper">
+    <!-- Skeleton completo de página (carga inicial) -->
+    <div class="skeleton-wrapper" *ngIf="!cardsOnly">
       <h2 class="featured-label">Última actualización</h2>
       
       <div class="featured-content-wrapper">
@@ -51,6 +52,23 @@ import { CommonModule } from '@angular/common';
                 <div class="text-skeleton pulse"></div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skeleton solo para tarjetas (cardsOnly = true) -->
+    <div class="cards-skeleton-grid" *ngIf="cardsOnly">
+      <div class="news-card-skeleton" *ngFor="let i of cardItems">
+        <div class="card-image-skeleton pulse"></div>
+        <div class="card-content-skeleton">
+          <div class="date-line pulse"></div>
+          <div class="title-line pulse"></div>
+          <div class="summary-line pulse"></div>
+          <div class="summary-line pulse" style="width: 85%;"></div>
+          <div class="tags-area">
+            <div class="tag-pill pulse"></div>
+            <div class="tag-pill pulse"></div>
           </div>
         </div>
       </div>
@@ -260,6 +278,93 @@ import { CommonModule } from '@angular/common';
     .tags-skeleton {
       margin-top: 0.8rem;
     }
+
+    /* Estilos específicos para el skeleton de tarjetas */
+    .cards-skeleton-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    .news-card-skeleton {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      height: 380px;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card-image-skeleton {
+      width: 100%;
+      height: 180px;
+      background-color: #e0e0e0;
+    }
+
+    .card-content-skeleton {
+      padding: 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .date-line {
+      height: 15px;
+      width: 120px;
+      border-radius: 4px;
+      margin-bottom: 0.8rem;
+    }
+
+    .title-line {
+      height: 20px;
+      width: 90%;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+
+    .summary-line {
+      height: 12px;
+      width: 100%;
+      border-radius: 4px;
+      margin-bottom: 0.6rem;
+    }
+
+    .tags-area {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: auto;
+      padding-top: 1rem;
+    }
+
+    .tag-pill {
+      height: 22px;
+      width: 70px;
+      border-radius: 15px;
+    }
+
+    @media (max-width: 992px) {
+      .cards-skeleton-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 576px) {
+      .cards-skeleton-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   `]
 })
-export class NewsSkeletonComponent {} 
+export class NewsSkeletonComponent {
+  @Input() cardsOnly: boolean = false;
+  @Input() rows: number = 3;
+  @Input() columns: number = 4;
+
+  get cardItems(): number[] {
+    const totalItems = this.rows * this.columns;
+    return Array(totalItems).fill(0).map((_, index) => index);
+  }
+} 

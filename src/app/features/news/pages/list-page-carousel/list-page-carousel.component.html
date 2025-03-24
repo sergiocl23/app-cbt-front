@@ -24,10 +24,10 @@
 
   <!-- Contenido principal -->
   <main class="news-content">
-    <!-- Skeleton Loader -->
-    <app-news-skeleton *ngIf="isLoading"></app-news-skeleton>
+    <!-- Skeleton Loader para la carga inicial completa (solo muestra cuando isLoading es true) -->
+    <app-news-skeleton *ngIf="isLoading" [cardsOnly]="false"></app-news-skeleton>
 
-    <!-- Contenido real -->
+    <!-- Contenido real cuando no está cargando inicialmente -->
     <div [class.hidden]="isLoading">
       <!-- Sección de noticias destacadas con carrusel -->
       <div class="featured-section">
@@ -82,20 +82,24 @@
         </div>
       </div>
 
-      <!-- Sección de filtros -->
+      <!-- Sección de filtros y noticias restantes -->
       <div class="remaining-news">
         <div class="section-header">
           <h3 class="section-title">Noticias</h3>
           
+          <!-- Sección de filtros y búsqueda mejorada -->
           <div class="filters-group">
             <!-- Barra de búsqueda expandible -->
             <div class="search-container" [class.expanded]="isSearchExpanded">
               <input type="text" class="search-input" 
                      placeholder="Buscar noticias..." 
                      [(ngModel)]="searchQuery"
+                     (input)="onSearchInput()"
                      (keyup.enter)="onSearch($event)">
-              <button class="search-toggle" aria-label="Buscar" (click)="toggleSearchExpand()">
-                <i class="pi pi-search"></i>
+              <button class="search-toggle" aria-label="Buscar" 
+                      (click)="isSearchExpanded ? onSearch($event) : toggleSearchExpand()">
+                <i class="pi" [ngClass]="{'pi-search': !isSearchExpanded || !searchQuery, 'pi-times': isSearchExpanded && searchQuery}"></i>
+                <span class="filter-indicator" *ngIf="searchQuery && !isSearchExpanded"></span>
               </button>
             </div>
 
@@ -103,6 +107,7 @@
             <div class="date-filter" [class.expanded]="isDateFilterExpanded">
               <button type="button" class="date-toggle" aria-label="Filtrar por fecha" (click)="toggleDateFilter()">
                 <i class="pi pi-calendar"></i>
+                <span class="filter-indicator" *ngIf="dateStart || dateEnd"></span>
               </button>
               <div class="date-range">
                 <p-calendar
@@ -113,6 +118,8 @@
                   [showButtonBar]="true"
                   (onSelect)="onDateChange()"
                   [style]="{'width': '120px'}"
+                  [minDate]="desdeMinDate"
+                  [maxDate]="dateEnd || hastaMaxDate"
                 ></p-calendar>
                 <span class="date-range-separator">a</span>
                 <p-calendar
@@ -123,7 +130,13 @@
                   [showButtonBar]="true"
                   (onSelect)="onDateChange()"
                   [style]="{'width': '120px'}"
+                  [minDate]="dateStart || desdeMinDate"
+                  [maxDate]="hastaMaxDate"
                 ></p-calendar>
+                <button *ngIf="dateStart || dateEnd" class="clear-dates-btn" 
+                        (click)="clearDates()" aria-label="Limpiar fechas">
+                  <i class="pi pi-times"></i>
+                </button>
               </div>
             </div>
 
@@ -131,98 +144,109 @@
             <div class="category-filter" [class.expanded]="isCategoryFilterExpanded">
               <button type="button" class="category-toggle" aria-label="Filtrar por categoría" (click)="toggleCategoryFilter()">
                 <i class="pi pi-tags"></i>
+                <span class="filter-indicator" *ngIf="selectedCategories?.length"></span>
               </button>
-              <p-multiSelect 
-                [options]="categories" 
-                [(ngModel)]="selectedCategories" 
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Seleccionar categorías"
-                [showToggleAll]="true"
-                [showHeader]="true"
-                [appendTo]="'body'"
-                (onChange)="onCategoryChange()">
-                <ng-template pTemplate="header">
-                  <div class="multiselect-header">
-                    Selecciona categorías
-                  </div>
-                </ng-template>
-              </p-multiSelect>
+              <div class="category-panel">
+                <p-multiSelect 
+                  [options]="categories" 
+                  [(ngModel)]="selectedCategories" 
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Seleccionar categorías"
+                  [showToggleAll]="true"
+                  [showHeader]="true"
+                  [appendTo]="'body'"
+                  (onChange)="onCategoryChange()">
+                  <ng-template pTemplate="header">
+                    <div class="multiselect-header">
+                      Selecciona categorías
+                    </div>
+                  </ng-template>
+                </p-multiSelect>
+              </div>
             </div>
 
-            <!-- Botón para resetear filtros -->
-            <button class="reset-filters" *ngIf="searchQuery || selectedCategories.length || dateStart || dateEnd"
-                    (click)="resetFilters()" aria-label="Restablecer filtros">
+            <!-- Botón para resetear filtros, solo visible cuando hay filtros aplicados -->
+            <button class="reset-filters" *ngIf="searchQuery || selectedCategories?.length || dateStart || dateEnd"
+                    (click)="clearFilters()" aria-label="Restablecer filtros">
               <i class="pi pi-filter-slash"></i>
             </button>
           </div>
         </div>
         
-        <!-- Grid de noticias (noticias restantes) -->
-        <div class="news-grid">
-          <article *ngFor="let news of displayedNews" class="news-card" (click)="navigateToNews(news)" [@fadeInOut]>
-            <div class="card-image">
-              <img [src]="getImageUrl(news)" [alt]="news.title"
-                   [class.default-image]="!news.mainImage"
-                   [class.manual-image]="news.manualCreation">
-              <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
-              <a *ngIf="news.sourceUrl" [href]="news.sourceUrl" 
-                 class="source-url" target="_blank" (click)="$event.stopPropagation()">
-                <i class="pi pi-external-link"></i>
-                {{ getFormattedSourceUrl(news.sourceUrl) }}
-              </a>
-            </div>
-            <div class="card-content">
-              <span class="date">
-                <i class="pi pi-calendar"></i>
-                {{ getFormattedDate(news.publishedAt || news.articleDate) | date:'dd MMM, yyyy':'GMT-3':'es' }}
-              </span>
-              <div class="content-wrapper">
-                <h4>{{ news.title }}</h4>
-                <p class="card-summary" style="white-space: pre-line;">{{ cleanHtmlTags(news.summary) }}</p>
-                <div class="news-tags">
-                  <ng-container *ngIf="news.tags && news.tags.length > 0">
-                    <span class="tag" *ngFor="let tag of news.tags.slice(0, 2)">
-                      {{ tag.name || tag.nombre }}
-                    </span>
-                    
-                    <!-- Mostrar más tags si hay más de 2 -->
-                    <span *ngIf="news.tags.length > 2" class="extra-tag">
-                      +{{ news.tags.length - 2 }}
-                      <div class="extra-tags-tooltip">
-                        <span class="tag" *ngFor="let tag of news.tags.slice(2)">
-                          {{ tag.name || tag.nombre }}
-                        </span>
-                      </div>
-                    </span>
-                  </ng-container>
-                </div>
-                <span class="pais" *ngIf="news.pais">
-                  <i class="pi pi-map-marker"></i>
-                  {{ news.pais }}
-                </span>
-              </div>
-            </div>
-          </article>
-        </div>
+        <!-- Contenedor para noticias con clase especial que cambia según isCardsLoading -->
+        <div class="news-results-container" [class.isCardsLoading]="isCardsLoading">
+          <!-- Skeleton loader específico para las tarjetas de noticias -->
+          <app-news-skeleton *ngIf="isCardsLoading" [cardsOnly]="true" [rows]="3" [columns]="4" class="cards-skeleton"></app-news-skeleton>
 
-        <!-- Mensaje cuando no hay resultados -->
-        <div class="no-results" *ngIf="displayedNews.length === 0 && !isLoading">
-          <i class="pi pi-search" style="font-size: 3rem"></i>
-          <h3>No se encontraron noticias</h3>
-          <p>Prueba con otros filtros o términos de búsqueda</p>
-          <button pButton label="Reiniciar filtros" icon="pi pi-filter-slash" (click)="resetFilters()"></button>
-        </div>
-        
-        <!-- Paginación -->
-        <div class="pagination-container" *ngIf="totalPages > 1">
-          <p-paginator 
-            [rows]="itemsPerPage" 
-            [totalRecords]="totalRecords"
- 
-            (onPageChange)="onPageChange($event)"
-            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} noticias">
-          </p-paginator>
+          <!-- Grid de noticias -->
+          <div class="news-grid" [class.hidden]="isCardsLoading">
+            <article *ngFor="let news of displayedNews" class="news-card" (click)="navigateToNews(news)" [@fadeInOut]>
+              <div class="card-image">
+                <img [src]="getImageUrl(news)" [alt]="news.title"
+                     [class.default-image]="!news.mainImage"
+                     [class.manual-image]="news.manualCreation">
+                <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
+                <a *ngIf="news.sourceUrl" [href]="news.sourceUrl" 
+                   class="source-url" target="_blank" (click)="$event.stopPropagation()">
+                  <i class="pi pi-external-link"></i>
+                  {{ getFormattedSourceUrl(news.sourceUrl) }}
+                </a>
+              </div>
+              <div class="card-content">
+                <span class="date">
+                  <i class="pi pi-calendar"></i>
+                  {{ getFormattedDate(news.publishedAt || news.articleDate) | date:'dd MMM, yyyy':'GMT-3':'es' }}
+                </span>
+                <div class="content-wrapper">
+                  <h4>{{ news.title }}</h4>
+                  <p class="card-summary" style="white-space: pre-line;">{{ cleanHtmlTags(news.summary) }}</p>
+                  <div class="news-tags">
+                    <ng-container *ngIf="news.tags && news.tags.length > 0">
+                      <span class="tag" *ngFor="let tag of news.tags.slice(0, 2)">
+                        {{ tag.name || tag.nombre }}
+                      </span>
+                      
+                      <!-- Mostrar más tags si hay más de 2 -->
+                      <span *ngIf="news.tags.length > 2" class="extra-tag">
+                        +{{ news.tags.length - 2 }}
+                        <div class="extra-tags-tooltip">
+                          <span class="tag" *ngFor="let tag of news.tags.slice(2)">
+                            {{ tag.name || tag.nombre }}
+                          </span>
+                        </div>
+                      </span>
+                    </ng-container>
+                  </div>
+                  <span class="pais" *ngIf="news.pais">
+                    <i class="pi pi-map-marker"></i>
+                    {{ news.pais }}
+                  </span>
+                </div>
+              </div>
+            </article>
+          </div>
+          
+          <!-- Mensaje cuando no hay resultados -->
+          <div class="no-results" *ngIf="displayedNews.length === 0 && !isCardsLoading">
+            <i class="pi pi-search" style="font-size: 3rem"></i>
+            <h3>No se encontraron noticias</h3>
+            <p *ngIf="dateStart || dateEnd">
+              No hay noticias para el rango de fechas seleccionado.
+              <span *ngIf="dateStart && dateStart > hastaMaxDate">Las fechas futuras podrían no tener noticias.</span>
+            </p>
+            <p *ngIf="!(dateStart || dateEnd)">Prueba con otros filtros o términos de búsqueda</p>
+            <button pButton label="Reiniciar filtros" icon="pi pi-filter-slash" (click)="clearFilters()"></button>
+          </div>
+          
+          <!-- Paginador -->
+          <div class="paginator-container" *ngIf="displayedNews.length > 0 && !isCardsLoading">
+            <p-paginator 
+              [rows]="pageSize" 
+              [totalRecords]="totalRecords" 
+              (onPageChange)="onPageChange($event)">
+            </p-paginator>
+          </div>
         </div>
       </div>
     </div>

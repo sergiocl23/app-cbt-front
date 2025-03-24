@@ -189,12 +189,14 @@
   color: var(--text-light);
 }
 
-.content p {
+.content p, .content-paragraph {
   margin-bottom: 1.5rem;
   text-align: justify;
+  white-space: pre-line;
+  line-height: 1.8;
 }
 
-.content p:last-child {
+.content p:last-child, .content-paragraph:last-child {
   margin-bottom: 0;
 }
 

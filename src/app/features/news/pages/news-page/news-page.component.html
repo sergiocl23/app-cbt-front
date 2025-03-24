@@ -42,7 +42,7 @@
     <div class="news-image-container">
       <div class="news-image">
         <img [src]="getImageUrl()" [alt]="newsItem.title"
-             loading="lazy"
+             (error)="handleImageError($event)"
              [class.default-image]="!newsItem.mainImage && !newsItem.featuredImage && (!newsItem.additionalImages || newsItem.additionalImages.length === 0)">
       </div>
     </div>
@@ -90,7 +90,7 @@
         <div class="content">
           <!-- Mostrar contenido con formato de párrafos -->
           <ng-container *ngFor="let paragraph of cleanHtmlTags(getContent()).split('\n\n')">
-            <p *ngIf="paragraph.trim()">{{ paragraph }}</p>
+            <p *ngIf="paragraph.trim()" class="content-paragraph">{{ paragraph }}</p>
           </ng-container>
         </div>
         

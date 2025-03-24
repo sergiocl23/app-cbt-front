@@ -78,18 +78,30 @@ export class NewsService {
       .set('populate', '*')
       .set('sort', params.sort || 'articleDate:desc');
 
-    if (params.filters?.articleDate?.$gte) {
-      queryParams = queryParams.set('filters[articleDate][$gte]', params.filters.articleDate.$gte);
+    // Filtros de fecha
+    if (params.filters?.articleDate) {
+      // Fecha mayor o igual que (desde)
+      if (params.filters.articleDate.$gte) {
+        const fromDate = params.filters.articleDate.$gte;
+        console.log('[DEBUG SERVICE] Aplicando filtro desde fecha:', fromDate);
+        queryParams = queryParams.set('filters[articleDate][$gte]', fromDate);
+      }
+
+      // Fecha menor o igual que (hasta)
+      if (params.filters.articleDate.$lte) {
+        const toDate = params.filters.articleDate.$lte;
+        console.log('[DEBUG SERVICE] Aplicando filtro hasta fecha:', toDate);
+        queryParams = queryParams.set('filters[articleDate][$lte]', toDate);
+      }
     }
 
-    if (params.filters?.articleDate?.$lte) {
-      queryParams = queryParams.set('filters[articleDate][$lte]', params.filters.articleDate.$lte);
-    }
-
+    // Filtro de país
     if (params.filters?.pais) {
       queryParams = queryParams.set('filters[pais][$eq]', params.filters.pais);
+      console.log('[DEBUG SERVICE] Aplicando filtro por país:', params.filters.pais);
     }
 
+    // Filtro de tags
     if (params.filters?.tags?.nombre?.$in?.length > 0) {
       params.filters.tags.nombre.$in.forEach((tag: string, index: number) => {
         queryParams = queryParams.set(
@@ -97,11 +109,34 @@ export class NewsService {
           tag
         );
       });
+      console.log('[DEBUG SERVICE] Aplicando filtros por tags:', params.filters.tags.nombre.$in);
+    }
+
+    // Filtro de búsqueda de texto
+    if (params.filters?.$or?.length > 0) {
+      // El servicio construye un filtro OR para buscar en varios campos 
+      const searchFields = ['title']; // Solo buscar en el título
+      // Campos adicionales comentados por si se quieren habilitar en el futuro
+      // const searchFields = ['title', 'summary', 'content'];
+      
+      params.filters.$or.forEach((condition: any, index: number) => {
+        const field = Object.keys(condition)[0];
+        const value = condition[field].$containsi;
+        
+        if (searchFields.includes(field)) {
+          queryParams = queryParams.set(
+            `filters[$or][${index}][${field}][$containsi]`, 
+            value
+          );
+        }
+      });
+      console.log('[DEBUG SERVICE] Aplicando filtro de búsqueda por título');
     }
 
     // Agregar filtro para relevanceScore null
     if (params.filters?.relevanceScore?.$null === true) {
       queryParams = queryParams.set('filters[relevanceScore][$null]', 'true');
+      console.log('[DEBUG SERVICE] Agregando filtro para relevanceScore NULL');
     }
     
     // Agregar filtro para relevanceScore no null
@@ -113,12 +148,11 @@ export class NewsService {
     // Agregar filtro para manualCreation
     if (params.filters?.manualCreation?.$eq === true) {
       queryParams = queryParams.set('filters[manualCreation][$eq]', 'true');
+      console.log('[DEBUG SERVICE] Agregando filtro para manualCreation=true');
     }
     
     // Agregar filtro para IDs específicos
     if (params.filters?.id?.$in && Array.isArray(params.filters.id.$in)) {
-
-
       // En Strapi v4, necesitamos usar una estructura específica para $in
       const idList = params.filters.id.$in.join(',');
       queryParams = queryParams.set('filters[id][$in]', idList);
@@ -137,7 +171,7 @@ export class NewsService {
       console.log('[DEBUG SERVICE] Agregando filtro para articleType:', params.filters.articleType);
     }
 
-    console.log('Query params:', queryParams.toString());
+    console.log('[DEBUG SERVICE] Query params completos:', queryParams.toString());
 
     return this.http.get<StrapiResponse>(`${this.baseUrlStrapi}/api/noticias`, {
       headers: this.headers,
@@ -268,6 +302,78 @@ export class NewsService {
       catchError(error => {
         console.error('[ERROR SERVICE] Error al obtener noticia completa:', error);
         throw error;
+      })
+    );
+  }
+
+  /**
+   * Obtiene todos los tags disponibles en la base de datos
+   * @returns Observable con un array de tags
+   */
+  getTags(): Observable<any[]> {
+    // En lugar de intentar obtener los tags directamente de la API,
+    // obtendremos los tags únicos de las noticias existentes
+    console.log("[DEBUG SERVICE] Obteniendo tags de las noticias existentes");
+    
+    return this.getNews({
+      page: 1,
+      pageSize: 100, // Solicitar un número grande para obtener la mayoría de las noticias
+      sort: 'id:desc'
+    }).pipe(
+      map(response => {
+        console.log("[DEBUG SERVICE] Extrayendo tags de la respuesta:", response);
+        
+        // Verificar la estructura de la respuesta
+        if (!response?.data || !Array.isArray(response.data)) {
+          console.error("[ERROR SERVICE] Formato de respuesta inválido para extraer tags");
+          return [];
+        }
+        
+        // Extraer todos los tags de todas las noticias
+        const allTags: any[] = [];
+        response.data.forEach((item: any) => {
+          // El artículo puede tener diferentes estructuras
+          const article = item.attributes || item;
+          
+          if (article.tags) {
+            // Si el artículo tiene tags en formato Strapi v4 (data/attributes)
+            if (article.tags.data && Array.isArray(article.tags.data)) {
+              article.tags.data.forEach((tagData: any) => {
+                const tag = tagData.attributes || tagData;
+                allTags.push({
+                  id: tagData.id,
+                  nombre: tag.nombre || tag.name || 'Sin nombre',
+                  slug: tag.slug || '',
+                  documentId: tag.documentId || tag.document_id || ''
+                });
+              });
+            } 
+            // Si el artículo tiene tags en formato array simple
+            else if (Array.isArray(article.tags)) {
+              article.tags.forEach((tag: any) => {
+                allTags.push({
+                  id: tag.id || 0,
+                  nombre: tag.nombre || tag.name || 'Sin nombre',
+                  slug: tag.slug || '',
+                  documentId: tag.documentId || tag.document_id || ''
+                });
+              });
+            }
+          }
+        });
+        
+        // Eliminar duplicados basados en el nombre
+        const uniqueTags = allTags.filter((tag, index, self) =>
+          index === self.findIndex(t => t.nombre === tag.nombre)
+        );
+        
+        console.log("[DEBUG SERVICE] Tags únicos extraídos:", uniqueTags);
+        return uniqueTags;
+      }),
+      catchError(error => {
+        console.error('[ERROR SERVICE] Error al obtener tags de noticias:', error);
+        // Devolver un array vacío en caso de error
+        return [];
       })
     );
   }
