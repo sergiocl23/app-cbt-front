@@ -1,3 +1,4 @@
+
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -278,6 +279,7 @@ import { CommonModule } from '@angular/common';
     .tags-skeleton {
       margin-top: 0.8rem;
     }
+
 
     /* Estilos específicos para el skeleton de tarjetas */
     .cards-skeleton-grid {

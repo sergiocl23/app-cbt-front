@@ -14,6 +14,7 @@ export const routes: Routes = [
         component: ListPageComponent
       },
       {
+
         path: 'carousel',
         component: ListPageCarouselComponent
       },

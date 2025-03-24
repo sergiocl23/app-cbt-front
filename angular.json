@@ -26,7 +26,10 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/easymde/dist/easymde.min.css",
+              "node_modules/codemirror/lib/codemirror.css"
+
             ],
             "scripts": [],
             "server": "src/main.server.ts",

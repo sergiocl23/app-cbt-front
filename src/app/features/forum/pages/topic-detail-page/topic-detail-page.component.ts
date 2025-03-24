@@ -1,17 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { ForumService } from '../../services/forum.service';
-import { Topic, Post } from '../../interfaces/forum.interface';
+import { Topic, Post, Media } from '../../interfaces/forum.interface';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { marked } from 'marked';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { EditPostComponent } from '../../components/edit-post/edit-post.component';
+import { Marked } from 'marked';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MarkdownEditorComponent } from '../../components/markdown-editor/markdown-editor.component';
 
 @Component({
   selector: 'app-topic-detail',
@@ -23,10 +25,13 @@ import { EditPostComponent } from '../../components/edit-post/edit-post.componen
     MatIconModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatSnackBarModule, 
+    MarkdownEditorComponent,
   ],
   templateUrl: './topic-detail-page.component.html',
-  styleUrls: ['./topic-detail-page.component.scss']
+  styleUrls: ['./topic-detail-page.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class TopicDetailComponent implements OnInit {
   topic!: Topic;
@@ -35,13 +40,24 @@ export class TopicDetailComponent implements OnInit {
   newPostContent: string = '';
   showReplyPreview = false;
   replyPreview!: SafeHtml;
+  replyingTo: Post | undefined = undefined;
+  
+  private marked = new Marked();
+  @ViewChild(MarkdownEditorComponent) markdownEditor!: MarkdownEditorComponent;
+
+  referencedPosts: Map<number, Post> = new Map();
 
   constructor(
     private route: ActivatedRoute,
     private forumService: ForumService,
     private sanitizer: DomSanitizer,
-    private dialog: MatDialog,
-  ) {}
+    private dialog: MatDialog
+  ) {
+    this.marked.setOptions({
+      breaks: true,
+      gfm: true
+    });
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -51,7 +67,11 @@ export class TopicDetailComponent implements OnInit {
   }
 
   async formatContent(content: string): Promise<SafeHtml> {
-    const htmlContent = await marked(content);
+    this.marked.setOptions({
+      breaks: true,
+      gfm: true
+    });
+    const htmlContent = this.marked.parse(content) as string;
     return this.sanitizer.bypassSecurityTrustHtml(htmlContent);
   }
 
@@ -75,22 +95,31 @@ export class TopicDetailComponent implements OnInit {
     });
   }
 
-  onSubmitPost() {
-    if (this.topic.closed) {
-      console.warn('Este tópico está cerrado y no acepta nuevas respuestas');
-      return;
-    }
+  async onSubmitPost() {
+    if (this.topic.closed || !this.newPostContent.trim()) return;
 
-    if (!this.topic || !this.newPostContent.trim()) return;
+    try {
+      const { images, content } = await this.markdownEditor.uploadStoredImages();
 
-    this.forumService.createPost(this.topic.id, this.newPostContent)
-      .subscribe({
-        next: () => {
+      this.forumService.createPost(
+        this.topic,
+        content,
+        this.replyingTo || undefined,  // Pass undefined if replyingTo is null
+        images
+      ).subscribe({
+        next: (response) => {
+          console.log('Post created successfully:', response);
           this.loadTopic(this.topic.id);
           this.newPostContent = '';
+          this.replyingTo = undefined;  // Reset to undefined
         },
-        error: (error) => console.error('Error:', error)
+        error: (error) => {
+          console.error('Error creating post:', error);
+        }
       });
+    } catch (error) {
+      console.error('Error uploading images:', error);
+    }
   }
 
   onDeletePost(post: Post) {
@@ -115,20 +144,6 @@ export class TopicDetailComponent implements OnInit {
     return this.formattedPosts.find(p => p.id === postId)?.formattedContent;
   }
 
-  async updateReplyPreview() {
-    if (this.newPostContent) {
-      const htmlContent = await marked(this.newPostContent);
-      this.replyPreview = this.sanitizer.bypassSecurityTrustHtml(htmlContent);
-    }
-  }
-
-  async toggleReplyPreview() {
-    this.showReplyPreview = !this.showReplyPreview;
-    if (this.showReplyPreview) {
-      await this.updateReplyPreview();
-    }
-  }
-
   onEditPost(post: Post): void {
     const dialogRef = this.dialog.open(EditPostComponent, {
       width: '800px',
@@ -150,5 +165,61 @@ export class TopicDetailComponent implements OnInit {
         });
       }
     });
+  }
+
+  onReplyToPost(post: Post) {
+    console.log('Replying to post:', post);
+    this.replyingTo = post;
+    document.querySelector('.reply-form')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  clearReplyTo() {
+    this.replyingTo = undefined;
+  }
+
+  scrollToPost(event: Event, postId: number) {
+    event.preventDefault();
+    
+    // First ensure the post is loaded
+    if (!this.referencedPosts.has(postId)) {
+      this.forumService.getPost(postId).subscribe(post => {
+        this.referencedPosts.set(postId, post);
+        this.scrollToElement(postId);
+      });
+    } else {
+      this.scrollToElement(postId);
+    }
+  }
+
+  private scrollToElement(postId: number) {
+    const element = document.getElementById(`post-${postId}`);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'center'
+      });
+      
+      // Add and remove highlight class
+      element.classList.add('highlight-animation');
+      setTimeout(() => {
+        element.classList.remove('highlight-animation');
+      }, 2000); // Match animation duration
+    }
+  }
+
+  onImageUploaded(media: Media) {
+    console.log('Image uploaded:', media);
+  }
+
+  getReferencedPost(postId: number): Post | undefined {
+    return this.referencedPosts.get(postId);
+  }
+
+  loadReferencedPost(postId: number) {
+    if (!this.referencedPosts.has(postId)) {
+      this.forumService.getPost(postId).subscribe(post => {
+        this.referencedPosts.set(postId, post);
+      });
+    }
   }
 }

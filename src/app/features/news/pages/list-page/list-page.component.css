@@ -1159,6 +1159,7 @@
   background: rgba(54, 169, 225, 0.1);
 }
 
+
 /* Asegurar que el panel del calendario esté visible */
 :host ::ng-deep .p-calendar .p-datepicker {
   min-width: 280px;

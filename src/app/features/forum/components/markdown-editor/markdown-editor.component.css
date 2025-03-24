@@ -1,0 +1,44 @@
+.markdown-editor-container {
+  width: 100%;
+}
+
+/* EasyMDE styles */
+:host ::ng-deep .editor-preview h1,
+:host ::ng-deep .editor-preview h2,
+:host ::ng-deep .editor-preview h3,
+:host ::ng-deep .editor-preview h4,
+:host ::ng-deep .editor-preview h5,
+:host ::ng-deep .editor-preview h6,
+:host ::ng-deep .markdown-body h1,
+:host ::ng-deep .markdown-body h2,
+:host ::ng-deep .markdown-body h3,
+:host ::ng-deep .markdown-body h4,
+:host ::ng-deep .markdown-body h5,
+:host ::ng-deep .markdown-body h6 {
+  font-family: inherit !important;
+}
+
+:host ::ng-deep .editor-preview h1,
+:host ::ng-deep .markdown-body h1 {
+  font-size: 2em !important;
+  font-weight: bold !important;
+  margin: 0.67em 0 !important;
+}
+
+:host ::ng-deep .editor-preview,
+:host ::ng-deep .markdown-body {
+  font-family: initial;
+  line-height: initial;
+}
+
+:host ::ng-deep .editor-preview h1,
+:host ::ng-deep .editor-preview h2,
+:host ::ng-deep .editor-preview h3,
+:host ::ng-deep .editor-preview h4,
+:host ::ng-deep .editor-preview h5,
+:host ::ng-deep .editor-preview h6 {
+  font-family: initial !important;
+  line-height: initial !important;
+  letter-spacing: initial !important;
+  margin: revert !important;
+}

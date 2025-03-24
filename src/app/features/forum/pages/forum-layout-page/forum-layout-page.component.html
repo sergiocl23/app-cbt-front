@@ -1,42 +1,81 @@
 <div class="forum-container">
   <!-- Sidebar -->
   <div class="forum-sidebar">
-    <div class="sidebar-header">
-      <h3>Categorías</h3>
-      <button class="add-category-btn" (click)="onCreateSubcategory()">
-        <span class="fas fa-plus"></span>
-      </button>
-    </div>
-    <ul class="subcategories-list">
-      <li class="subcategory-item" 
-          [class.active]="!selectedSubcategory"
-          (click)="selectSubcategory(null)">
-        <span>Mostrar Todos</span>
-      </li>
+    <!-- Categories section -->
+    <div class="sidebar-section">
+      <div class="sidebar-header">
+        <h3>Categorías</h3>
+        <button class="add-category-btn" (click)="onCreateSubcategory()" title="Agregar categoría">
+          <i class="fas fa-plus"></i>
+        </button>
+      </div>
+      
+      <ul class="subcategories-list">
+        <li class="subcategory-item" 
+            [class.active]="!selectedSubcategory"
+            (click)="selectSubcategory(null)">
+          <div class="subcategory-content">
+            <i class="fas fa-layer-group"></i>
+            <span>Mostrar Todos</span>
+          </div>
+        </li>
 
-      <li *ngIf="subcategories.length === 0" class="loading-message">
-        Cargando categorías...
-      </li>
-      <li *ngFor="let subcategory of subcategories" 
-          class="subcategory-item"
-          [class.active]="selectedSubcategory?.id === subcategory.id">
-        <div class="subcategory-content" (click)="selectSubcategory(subcategory)">
-          <span>{{ subcategory.name }}</span>
-        </div>
-        <div class="subcategory-actions">
-          <button class="edit-btn" 
-                  (click)="onEditSubcategory($event, subcategory)"
-                  title="Editar categoría">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button class="delete-btn" 
-                  (click)="onDeleteSubcategory($event, subcategory)"
-                  title="Eliminar categoría">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      </li>
-    </ul>
+        <li *ngIf="subcategories.length === 0" class="loading-message">
+          <i class="fas fa-spinner fa-spin"></i> Cargando categorías...
+        </li>
+        <li *ngFor="let subcategory of subcategories" 
+            class="subcategory-item"
+            [class.active]="selectedSubcategory?.id === subcategory.id">
+          <div class="subcategory-content" (click)="selectSubcategory(subcategory)">
+            <i class="fas fa-folder"></i>
+            <span>{{ subcategory.name }}</span>
+          </div>
+          <div class="subcategory-actions">
+            <button class="edit-btn" 
+                    (click)="onEditSubcategory($event, subcategory)"
+                    title="Editar categoría">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="delete-btn" 
+                    (click)="onDeleteSubcategory($event, subcategory)"
+                    title="Eliminar categoría">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Social Media Section -->
+    <div class="sidebar-section">
+      <h4 class="section-title">Síguenos en Redes Sociales</h4>
+      <ul class="social-links-list">
+        <li>
+          <a href="https://www.instagram.com/cbioceanicotarapaca/" target="_blank" class="social-link">
+            <i class="fab fa-instagram"></i>
+            <span>Instagram</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://x.com/CBtarapaca" target="_blank" class="social-link">
+            <i class="fab fa-x-twitter"></i>
+            <span>X</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.linkedin.com/in/corredor-bioce%C3%A1nico-tarapac%C3%A1-026485310/" target="_blank" class="social-link">
+            <i class="fab fa-linkedin"></i>
+            <span>LinkedIn</span>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.facebook.com/profile.php?id=61559894535636" target="_blank" class="social-link">
+            <i class="fab fa-facebook"></i>
+            <span>Facebook</span>
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 
   <!-- Main content -->

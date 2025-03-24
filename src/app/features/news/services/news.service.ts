@@ -30,6 +30,7 @@ interface StrapiResponse {
       }>;
       images: string[];
       createdAt: string;
+
       articleType: 'regular';
       featuredImage?: any;
       additionalImages?: any[];
@@ -47,7 +48,6 @@ interface StrapiResponse {
     };
   };
 }
-
 
 
 

@@ -17,7 +17,26 @@ export interface Subcategory {
   category?: Category;  // Add the relation to Category
 }
 
-// Topic interface (with timestamps)
+// Add Media interface for Strapi media type
+export interface Media {
+  id: number;
+  url: string;
+  name: string;
+  mime: string;
+  size: number;
+  width?: number;
+  height?: number;
+  formats?: {
+    thumbnail?: {
+      url: string;
+      width: number;
+      height: number;
+    };
+    // Add other format sizes if needed (medium, small, etc.)
+  };
+}
+
+// Topic interface
 export interface Topic {
   id: number;
   createdAt: string;
@@ -32,17 +51,21 @@ export interface Topic {
   subcategory?: Subcategory;
   posts?: Post[];
   users_permissions_user?: User;
+  images?: Media[];
 }
 
-// Updated Post interface to match Strapi schema
+// Post interface
 export interface Post {
   id: number;
+  body: string;
+  topic?: Topic;  // Changed from number to Topic
+  post?: Post;    // Changed from number to Post (self-reference)
+  posts?: Post[]; // Array of reply posts
+  images?: Media[];
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
-  body: string;                    // Changed from 'content' to 'body'
-  topic?: Topic;                   // Relation with Topic
-  users_permissions_user?: User;   // Relation with User from users-permissions
+  users_permissions_user?: User;
 }
 
 // Add User interface for the users-permissions relation

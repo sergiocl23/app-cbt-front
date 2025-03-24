@@ -11,6 +11,7 @@ export interface NewsItem {
   images: string[];
   sourceUrl?: string;
   sourceName?: string;
+
   articleType: 'regular';
   createdAt: string;
   mainImage?: string;
