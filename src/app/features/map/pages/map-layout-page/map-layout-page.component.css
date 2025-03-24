@@ -15,3 +15,15 @@
   height: calc(100vh - 82px);
   position: relative;
 }
+
+.search-container{
+  position: absolute;
+  top: 20px;
+  left: 10px;
+}
+
+.btn-location-container{
+  position: absolute;
+  bottom: 20px;
+  left: 10px;
+}

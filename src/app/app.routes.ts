@@ -1,11 +1,15 @@
 import { Routes } from '@angular/router';
 import { NotFoundComponent } from './shared/pages/not-found/not-found.component';
 import { MainLayoutPageComponent } from './core/main-layout-page/main-layout-page.component';
+import { AuthLayoutPageComponent } from './core/auth-layout-page/auth-layout-page.component';
+import { isAuthenticatedGuard } from './features/auth/guards/is-authenticated.guard';
+import { isNotAuthenticatedGuard } from './features/auth/guards/is-not-authenticated.guard';
 
 
 export const routes: Routes = [
   {
     path: '',
+    canActivate: [ isAuthenticatedGuard ],
     component: MainLayoutPageComponent,
     children: [
       {
@@ -38,14 +42,16 @@ export const routes: Routes = [
       },
       {
         path: '',
-        // redirectTo: 'home',
-        redirectTo: 'map',
+        redirectTo: 'home',
+        // redirectTo: 'map',
         pathMatch: 'full'
       },
     ]
   },
   {
     path: 'auth',
+    component: AuthLayoutPageComponent,
+    canActivate: [ isNotAuthenticatedGuard ],
     loadChildren: () => import('./features/auth/auth.routes').then( r => r.routes)
   },
   {
