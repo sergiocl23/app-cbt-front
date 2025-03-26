@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { interval, Subscription } from 'rxjs';
+import { interval, Subscription, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -21,6 +22,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { CarouselModule } from 'primeng/carousel';
 import { LatestNewsCardComponent } from '../../components/latest-news-card/latest-news-card.component';
 import { PaginatorModule } from 'primeng/paginator';
 import { NewsSkeletonComponent } from '../../components/news-skeleton/news-skeleton.component';
@@ -33,7 +35,7 @@ import { NewsItem, MediaItem } from '../../interfaces/news.interface';
 registerLocaleData(localeEs, 'es');
 
 @Component({
-  selector: 'app-list-page',
+  selector: 'app-list-page-carousel',
   standalone: true,
   imports: [
     CommonModule,
@@ -54,10 +56,11 @@ registerLocaleData(localeEs, 'es');
     CardModule,
     ProgressSpinnerModule,
     PaginatorModule,
+    CarouselModule,
     GoogleNewsWidgetModule
   ],
-  templateUrl: './list-page.component.html',
-  styleUrls: ['./list-page.component.css'],
+  templateUrl: './list-page-carousel.component.html',
+  styleUrls: ['./list-page-carousel.component.css'],
   animations: [
     trigger('slideInOut', [
       state('true', style({
@@ -71,23 +74,44 @@ registerLocaleData(localeEs, 'es');
         visibility: 'hidden'
       })),
       transition('true <=> false', animate('400ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
+    ]),
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms ease-in', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-out', style({ opacity: 0 }))
+      ])
     ])
   ]
 })
-export class ListPageComponent implements OnInit, OnDestroy {
+export class ListPageCarouselComponent implements OnInit, OnDestroy {
   public news: NewsItem[] = [];
   public latestNews?: NewsItem;
   public secondaryNews: NewsItem[] = [];
   public previousNews: NewsItem[] = [];
   public isLoading: boolean = false;
+  public isCardsLoading: boolean = false;
   public isFiltersVisible: boolean = false;
+  public isBrowser: boolean;
+  public sidebarOpen: boolean = false;
+  public carouselNews: NewsItem[] = [];
+  public minimalNews: NewsItem[] = [];
+  public carouselResponsiveOptions: any;
+  public currentDate: Date = new Date();
+  public itemsPerPage: number = 6;
+  public displayedNews: NewsItem[] = [];
+  public searchQuery: string = '';
+  public isSearchExpanded: boolean = false;
+  public isDateFilterExpanded: boolean = false;
+  public isCategoryFilterExpanded: boolean = false;
+  public dateStart: Date | null = null;
+  public dateEnd: Date | null = null;
+  public categories: any[] = [];
+  public selectedCategories: any[] = [];
 
-  public tags = [
-    { name: 'Infraestructura' },
-    { name: 'Comercio' },
-    { name: 'Integración' },
-    { name: 'Gobierno' },
-  ];
+  public tags: any[] = [];
 
   public countries = [
     { name: 'Argentina' },
@@ -110,6 +134,7 @@ export class ListPageComponent implements OnInit, OnDestroy {
   public totalPages: number = 0;
 
   private imageCache: { [url: string]: boolean } = {};
+
   // Limitar que "Desde" no pueda ser anterior a 1 de enero de 2023
   public desdeMinDate: Date = new Date(2023, 0, 1);
   // Limitar que "Hasta" sea igual o menor a la fecha actual
@@ -142,22 +167,46 @@ export class ListPageComponent implements OnInit, OnDestroy {
     end: new FormControl<Date | null>(null),
   });
 
-
   // Caché para las imágenes de noticias
   private newsImagesCache: { [id: number]: { featuredImage: any, additionalImages: any[] } } = {};
 
   // Marca si una imagen está siendo cargada actualmente
   private loadingImages: Set<number> = new Set();
   
+  // Nuevo Subject para manejar la búsqueda con debounce
+  private searchSubject = new Subject<string>();
+  private searchSubscription?: Subscription;
+  
   constructor(
     private newsService: NewsService,
     private router: Router,
     private _adapter: DateAdapter<any>,
-    private _intl: MatDatepickerIntl
+    private _intl: MatDatepickerIntl,
+    @Inject(PLATFORM_ID) platformId: Object
   ) {
     this._adapter.setLocale('es');
     this._intl.nextMonthLabel = 'Mes siguiente';
     this._intl.prevMonthLabel = 'Mes anterior';
+    this.isBrowser = isPlatformBrowser(platformId);
+
+    // Configuración del carrusel
+    this.carouselResponsiveOptions = [
+      {
+        breakpoint: '1024px',
+        numVisible: 1,
+        numScroll: 1
+      },
+      {
+        breakpoint: '768px',
+        numVisible: 1,
+        numScroll: 1
+      },
+      {
+        breakpoint: '560px',
+        numVisible: 1,
+        numScroll: 1
+      }
+    ];
 
     // Suscribirse a los cambios del rango de fechas
     this.dateRange.valueChanges.subscribe(range => {
@@ -169,33 +218,62 @@ export class ListPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadNews();
-
-    this.checkSpecificNews();
+    this.loadMinimalNews();
+    this.loadTags();
+    
+    // Configurar el observable de búsqueda con debounce
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(400), // Esperar 400ms después de la última tecla presionada
+      distinctUntilChanged() // Solo disparar si el valor ha cambiado
+    ).subscribe(() => {
+      this.applyFilters();
+    });
   }
 
   ngOnDestroy(): void {
     if (this.imageSliderSubscription) {
       this.imageSliderSubscription.unsubscribe();
     }
+    if (this.searchSubscription) {
+      this.searchSubscription.unsubscribe();
+    }
+  }
+
+  // Método para asegurar ordenamiento consistente en cualquier solicitud
+  private getSortCriteria(): string {
+    return [
+      'publishedAt:desc',   // Primero por fecha de publicación (más reciente primero)
+      'articleDate:desc',   // Luego por fecha del artículo si publishedAt es igual
+      'createdAt:desc',     // Luego por fecha de creación
+      'id:desc'             // Finalmente por ID (asegura consistencia)
+    ].join(',');
   }
 
   loadNews() {
     this.isLoading = true;
     
-    // Cargar las últimas noticias solo una vez al inicio
+    // Cargar las últimas noticias manuales solo una vez al inicio
     if (!this.latestNews) {
       this.newsService.getNews({
         page: 1,
         pageSize: 3,
-        sort: 'publishedAt:desc'
+        // Usar método centralizado para el ordenamiento
+        sort: this.getSortCriteria(),
+        filters: {
+          relevanceScore: {
+            $null: true
+          }
+        }
       }).subscribe({
         next: (response) => {
-          console.log('[DEBUG] Respuesta completa del servidor:', response);
-          
           if (response?.status === 'success' && Array.isArray(response?.data)) {
             const articles = this.mapArticles(response.data);
             this.latestNews = articles[0] || null;
             this.secondaryNews = articles.slice(1, 3);
+            
+            // Asignar noticias al carrusel
+            this.carouselNews = articles;
+            
             const featuredIds = articles.map(article => article.id);
             
             // Cargar noticias anteriores excluyendo las destacadas
@@ -225,14 +303,15 @@ export class ListPageComponent implements OnInit, OnDestroy {
     
     this.newsService.getNews(params).subscribe({
       next: (response) => {
-        console.log('[DEBUG] Respuesta para noticias anteriores:', response);
         if (response?.status === 'success' && Array.isArray(response?.data)) {
           const articles = this.mapArticles(response.data);
-          console.log('[DEBUG] Artículos mapeados:', articles);
           
           this.previousNews = articles
             .filter(article => !excludeIds.includes(article.id))
             .slice(0, this.pageSize);
+            
+          // Asignar noticias a displayedNews
+          this.displayedNews = this.previousNews;
             
           this.totalRecords = response.meta?.pagination?.total || 0;
           if (excludeIds.length > 0) {
@@ -255,12 +334,15 @@ export class ListPageComponent implements OnInit, OnDestroy {
   }
 
   private buildQueryParams(excludeIds: number[]) {
-    const filters: any = {};
+    const filters: any = {
+      relevanceScore: {
+        $null: true
+      }
+    };
     
     // Filtro por país
     if (this.selectedCountry?.name) {
       filters.pais = this.selectedCountry.name.toLowerCase();
-      console.log('[FILTROS] País seleccionado:', filters.pais);
     }
 
     // Filtro por tags
@@ -270,36 +352,61 @@ export class ListPageComponent implements OnInit, OnDestroy {
           $in: this.selectedTags.map(tag => tag.name)
         }
       };
-      console.log('[FILTROS] Tags seleccionados:', filters.tags.nombre.$in);
     }
 
-    // Filtro por fechas
-    if (this.dateRange.value.start || this.dateRange.value.end) {
+    // Filtro por fechas - usar dateStart y dateEnd directamente en lugar de dateRange
+    if (this.dateStart || this.dateEnd) {
       filters.articleDate = {};
       
-      if (this.dateRange.value.start) {
-        const startDate = new Date(this.dateRange.value.start);
-        startDate.setUTCHours(0, 0, 0, 0);
-        filters.articleDate.$gte = startDate.toISOString();
-        console.log('[FILTROS] Fecha inicio procesada:', filters.articleDate.$gte);
+      if (this.dateStart) {
+        // Crear fecha en UTC a partir de la fecha local seleccionada
+        const startDate = new Date(this.dateStart);
+        const startUTC = new Date(Date.UTC(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate(),
+          0, 0, 0
+        ));
+        filters.articleDate.$gte = startUTC.toISOString();
+        console.log('[DEBUG] Filtro fecha inicio (local):', startDate.toString());
+        console.log('[DEBUG] Filtro fecha inicio (UTC):', startUTC.toISOString());
       }
       
-      if (this.dateRange.value.end) {
-        const endDate = new Date(this.dateRange.value.end);
-        endDate.setUTCHours(23, 59, 59, 999);
-        filters.articleDate.$lte = endDate.toISOString();
-        console.log('[FILTROS] Fecha fin procesada:', filters.articleDate.$lte);
+      if (this.dateEnd) {
+        // Crear fecha en UTC a partir de la fecha local seleccionada
+        const endDate = new Date(this.dateEnd);
+        const endUTC = new Date(Date.UTC(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate(),
+          23, 59, 59, 999
+        ));
+        filters.articleDate.$lte = endUTC.toISOString();
+        console.log('[DEBUG] Filtro fecha fin (local):', endDate.toString());
+        console.log('[DEBUG] Filtro fecha fin (UTC):', endUTC.toISOString());
       }
+    }
+
+    // Filtro por búsqueda de texto
+    if (this.searchQuery?.trim()) {
+      filters.$or = [
+        { title: { $containsi: this.searchQuery.trim() } },
+        // Búsqueda en resumen y contenido comentada (por si se quiere habilitar en el futuro)
+        // { summary: { $containsi: this.searchQuery.trim() } },
+        // { content: { $containsi: this.searchQuery.trim() } }
+      ];
+      console.log('[DEBUG] Filtro búsqueda por título:', this.searchQuery.trim());
     }
 
     const queryParams = {
       page: this.currentPage,
       pageSize: this.pageSize + (this.currentPage === 1 ? excludeIds.length : 0),
-      sort: 'articleDate:desc',
+      // Usar método centralizado para el ordenamiento
+      sort: this.getSortCriteria(),
       filters: filters
     };
 
-    console.log('[FILTROS] Parámetros finales:', JSON.stringify(queryParams, null, 2));
+    console.log('[DEBUG] Parámetros de consulta:', JSON.stringify(queryParams, null, 2));
     return queryParams;
   }
 
@@ -322,8 +429,10 @@ export class ListPageComponent implements OnInit, OnDestroy {
   }
 
   applyFilters() {
+    console.log('[DEBUG] list-page-carousel: aplicando filtros');
     this.currentPage = 1;
-    this.isLoading = true;
+    // Solo activar carga para la sección de tarjetas, no toda la página
+    this.isCardsLoading = true;
     
     const featuredIds = [
       this.latestNews?.id,
@@ -334,24 +443,44 @@ export class ListPageComponent implements OnInit, OnDestroy {
     
     this.newsService.getNews(params).subscribe({
       next: (response) => {
-        console.log('[RESPUESTA] Respuesta del backend:', response);
         if (response?.status === 'success' && Array.isArray(response?.data)) {
+          console.log('[DEBUG] Respuesta del backend:', response);
+          
+          // Mostrar todas las fechas encontradas en la respuesta
+          const fechasEncontradas = response.data.map(item => {
+            const article = item.attributes || item;
+            return {
+              id: item.id,
+              titulo: article.title,
+              publishedAt: article.publishedAt,
+              articleDate: article.articleDate,
+              createdAt: article.createdAt
+            };
+          });
+          console.log('[DEBUG] Fechas en los artículos recibidos:', fechasEncontradas);
+          
           const articles = this.mapArticles(response.data);
           this.previousNews = articles
             .filter(article => !featuredIds.includes(article.id))
             .slice(0, this.pageSize);
           
+          // Si no hay resultados, mostrar mensaje informativo
+          if (this.previousNews.length === 0) {
+            console.log('[DEBUG] No se encontraron noticias con los filtros aplicados');
+          }
+          
+          this.displayedNews = this.previousNews;
           this.totalRecords = response.meta?.pagination?.total || 0;
           this.totalPages = Math.ceil((this.totalRecords - featuredIds.length) / this.pageSize);
         }
-        this.isLoading = false;
+        this.isCardsLoading = false; // Finalizar carga solo de las tarjetas
       },
       error: (error) => {
         console.error('[ERROR] Error en la solicitud:', error);
         if (error.error) {
           console.error('[ERROR] Detalles del error:', error.error);
         }
-        this.isLoading = false;
+        this.isCardsLoading = false; // Finalizar carga solo de las tarjetas en caso de error
       }
     });
   }
@@ -359,8 +488,6 @@ export class ListPageComponent implements OnInit, OnDestroy {
   // Método auxiliar para extraer la URL de imagen del objeto MediaItem de Strapi 5
   private extractMediaUrl(mediaItem: any): string | null {
     if (!mediaItem) return null;
-    
-    console.log('[DEBUG] Estructura de mediaItem:', mediaItem);
     
     // Verificar si es un objeto directo con URL
     if (typeof mediaItem === 'object' && mediaItem.url) {
@@ -406,19 +533,15 @@ export class ListPageComponent implements OnInit, OnDestroy {
       }
     }
     
-    console.warn('[ADVERTENCIA] No se pudo extraer URL de imagen:', mediaItem);
     return null;
   }
 
   getImageUrl(newsItem: NewsItem): string {
     // Para noticias creadas manualmente
     if (newsItem?.manualCreation === true) {
-      console.log('[DEBUG] Noticia creada manualmente, ID:', newsItem.id);
-      
       // Verificar si ya tenemos esta noticia en caché
       if (this.newsImagesCache[newsItem.id]?.featuredImage) {
         const featuredImage = this.newsImagesCache[newsItem.id].featuredImage;
-        console.log('[DEBUG] Usando imagen en caché para noticia ID:', newsItem.id);
         // Preferir versión medium o small si existe
         if (featuredImage.formats?.medium?.url) {
           return featuredImage.formats.medium.url;
@@ -437,12 +560,10 @@ export class ListPageComponent implements OnInit, OnDestroy {
       if (newsItem.featuredImage) {
         const mediaUrl = this.extractMediaUrl(newsItem.featuredImage);
         if (mediaUrl) {
-          console.log('[DEBUG] URL de imagen obtenida para noticia manual:', mediaUrl);
           return mediaUrl;
         }
       }
       
-      // Mientras se carga, mostrar una imagen predeterminada
       return 'assets/images/CBioceanicoTarapacafondo_blanco.png';
     }
     
@@ -458,17 +579,14 @@ export class ListPageComponent implements OnInit, OnDestroy {
     const url = newsItem?.mainImage || newsItem?.images?.[0];
     
     if (url && this.isValidUrl(url) && !url.includes('default')) {
-      // En SSR o entornos sin window, regresar directamente la URL
       if (typeof window === 'undefined' || typeof Image === 'undefined') {
         return url;
       }
 
-      // Si ya verificamos esta URL antes, usar el resultado cacheado
       if (this.imageCache.hasOwnProperty(url)) {
         return this.imageCache[url] ? url : 'assets/images/CBioceanicoTarapacafondo_blanco.png';
       }
       
-      // Si es una nueva URL, verificar y cachear el resultado
       const img = new Image();
       img.onload = () => {
         this.imageCache[url] = true;
@@ -478,7 +596,6 @@ export class ListPageComponent implements OnInit, OnDestroy {
       };
       img.src = url;
       
-      // Mientras se verifica, mostrar la imagen predeterminada
       return 'assets/images/CBioceanicoTarapacafondo_blanco.png';
     }
     
@@ -523,7 +640,6 @@ export class ListPageComponent implements OnInit, OnDestroy {
 
   // Se obtiene la URL de la imagen actual
   getCurrentImageUrl(newsItem: NewsItem): string {
-
     // Para noticias creadas manualmente con imágenes en caché
     if (newsItem?.manualCreation && this.newsImagesCache[newsItem.id]?.featuredImage) {
       const featuredImage = this.newsImagesCache[newsItem.id].featuredImage;
@@ -558,7 +674,6 @@ export class ListPageComponent implements OnInit, OnDestroy {
   }
 
   getAllImages(newsItem: NewsItem): string[] {
-
     // Para noticias creadas manualmente con imágenes en caché
     if (newsItem?.manualCreation && this.newsImagesCache[newsItem.id]?.additionalImages) {
       const cachedImages = this.newsImagesCache[newsItem.id].additionalImages;
@@ -595,7 +710,31 @@ export class ListPageComponent implements OnInit, OnDestroy {
   // Cambio de páginas
   onPageChange(event: any) {
     this.currentPage = event.page + 1;
-    this.loadNews();
+    this.isCardsLoading = true; // Solo activar carga para las tarjetas
+    
+    const featuredIds = [
+      this.latestNews?.id,
+      ...this.secondaryNews.map(news => news.id)
+    ].filter((id): id is number => typeof id === 'number');
+    
+    const params = this.buildQueryParams(featuredIds);
+    
+    this.newsService.getNews(params).subscribe({
+      next: (response) => {
+        if (response?.status === 'success' && Array.isArray(response?.data)) {
+          const articles = this.mapArticles(response.data);
+          this.previousNews = articles
+            .filter(article => !featuredIds.includes(article.id))
+            .slice(0, this.pageSize);
+          this.displayedNews = this.previousNews;
+        }
+        this.isCardsLoading = false; // Finalizar carga solo de las tarjetas
+      },
+      error: (error) => {
+        console.error('[ERROR] Error al obtener página:', error);
+        this.isCardsLoading = false; // Finalizar carga solo de las tarjetas en caso de error
+      }
+    });
   }
 
   // Método que convierte la fecha recibida en un objeto Date válido
@@ -628,7 +767,8 @@ export class ListPageComponent implements OnInit, OnDestroy {
   private mapArticles(articles: any[]): NewsItem[] {
     if (!articles) return [];
     
-    return articles.map(article => {
+    // Realizar mapeo sin ordenamiento adicional, confiando en el orden del backend
+    const mappedArticles = articles.map(article => {
       // Determinar si estamos recibiendo datos en formato Strapi 5 (data/attributes)
       let processedArticle = article;
       
@@ -638,25 +778,10 @@ export class ListPageComponent implements OnInit, OnDestroy {
         processedArticle.id = article.id;
       }
       
-      // Añadir log para depuración
-      console.log('[DEBUG] Mapeando artículo ID:', processedArticle.id, processedArticle);
-      
       // Detectar si es una noticia creada manualmente
       // Podría estar indicado por el campo manualCreation o por la ausencia de sourceUrl
       const isManualCreation = processedArticle.manualCreation === true || 
                              (!processedArticle.sourceUrl && !processedArticle.mainImage);
-      
-      if (isManualCreation) {
-        console.log('[DEBUG] Noticia creada manualmente detectada, ID:', processedArticle.id);
-      }
-      
-      // Verificar específicamente el ID 27
-      if (processedArticle.id === 27) {
-        console.log('[DEBUG] Artículo ID 27 encontrado:', processedArticle);
-        console.log('[DEBUG] featuredImage:', processedArticle.featuredImage);
-        console.log('[DEBUG] additionalImages:', processedArticle.additionalImages);
-        console.log('[DEBUG] Es creación manual:', isManualCreation);
-      }
       
       // Procesar etiquetas que pueden venir en diferentes formatos
       let tags = [];
@@ -707,23 +832,53 @@ export class ListPageComponent implements OnInit, OnDestroy {
         // Mapeando propiedades de imágenes en formato MEDIA de Strapi
         featuredImage: processedArticle.featuredImage || null,
         additionalImages: processedArticle.additionalImages || [],
-        manualCreation: isManualCreation
+        manualCreation: isManualCreation,
+        relevanceScore: processedArticle.relevanceScore !== undefined ? 
+                       Number(processedArticle.relevanceScore) : null
       };
     });
-  }
 
-  // Método auxiliar para depurar
-  private checkSpecificNews() {
-    // Buscar la noticia con ID 27 para depuración
-    this.newsService.getNewsById('27').subscribe({
-      next: (news) => {
-        console.log('Noticia con ID 27 cargada directamente:', news);
-        console.log('featuredImage:', news.featuredImage);
-        console.log('additionalImages:', news.additionalImages);
-      },
-      error: (error) => {
-        console.error('Error al cargar noticia con ID 27:', error);
+    // Asegurar ordenamiento adicional por fecha después del mapeo
+    // Ordenar por fecha de publicación, luego por fecha de artículo, luego por fecha de creación
+    return mappedArticles.sort((a, b) => {
+      // Primero comparar publishedAt
+      if (a.publishedAt && b.publishedAt) {
+        const dateA = new Date(a.publishedAt);
+        const dateB = new Date(b.publishedAt);
+        if (dateA > dateB) return -1;
+        if (dateA < dateB) return 1;
+      } else if (a.publishedAt) {
+        return -1; // A tiene fecha pero B no, A va primero
+      } else if (b.publishedAt) {
+        return 1;  // B tiene fecha pero A no, B va primero
       }
+      
+      // Si publishedAt es igual o no existe, comparar articleDate
+      if (a.articleDate && b.articleDate) {
+        const dateA = new Date(a.articleDate);
+        const dateB = new Date(b.articleDate);
+        if (dateA > dateB) return -1;
+        if (dateA < dateB) return 1;
+      } else if (a.articleDate) {
+        return -1;
+      } else if (b.articleDate) {
+        return 1;
+      }
+      
+      // Si articleDate es igual o no existe, comparar createdAt
+      if (a.createdAt && b.createdAt) {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+        if (dateA > dateB) return -1;
+        if (dateA < dateB) return 1;
+      } else if (a.createdAt) {
+        return -1;
+      } else if (b.createdAt) {
+        return 1;
+      }
+      
+      // Si todo lo demás es igual, comparar ID (los más recientes suelen tener IDs mayores)
+      return (b.id || 0) - (a.id || 0);
     });
   }
 
@@ -739,12 +894,9 @@ export class ListPageComponent implements OnInit, OnDestroy {
     }
     
     this.loadingImages.add(newsId);
-    console.log('[DEBUG] Cargando imágenes para noticia ID:', newsId);
     
     this.newsService.getNewsComplete(newsId.toString()).subscribe({
       next: (newsData) => {
-        console.log('[DEBUG] Noticia completa cargada:', newsData);
-        
         // Guardar en caché
         this.newsImagesCache[newsId] = {
           featuredImage: newsData.featuredImage,
@@ -758,5 +910,212 @@ export class ListPageComponent implements OnInit, OnDestroy {
         this.loadingImages.delete(newsId);
       }
     });
+  }
+
+  // Métodos para manejar los filtros
+  toggleSearchExpand() {
+    this.isSearchExpanded = !this.isSearchExpanded;
+    
+    // Si tenemos consulta y estamos cerrando, limpiar la búsqueda
+    if (!this.isSearchExpanded && this.searchQuery) {
+      this.searchQuery = '';
+      this.applyFilters();
+    }
+  }
+
+  toggleDateFilter() {
+    this.isDateFilterExpanded = !this.isDateFilterExpanded;
+  }
+
+  toggleCategoryFilter() {
+    this.isCategoryFilterExpanded = !this.isCategoryFilterExpanded;
+  }
+
+  // Actualizar el método onSearch para recibir un parámetro de evento
+  onSearch(event?: Event): void {
+    console.log('[DEBUG] Ejecutando búsqueda con:', this.searchQuery);
+    
+    // Obtener el valor del input si se proporciona un evento
+    if (event && event.target) {
+      const target = event.target as HTMLInputElement;
+      this.searchQuery = target.value;
+    }
+    
+    // Ejecutar búsqueda inmediatamente
+    this.applyFilters();
+    
+    // Si la barra está expandida y no hay texto, colapsar
+    if (this.isSearchExpanded && !this.searchQuery) {
+      this.isSearchExpanded = false;
+    }
+  }
+
+  // Método para manejar cambios en el input de búsqueda (búsqueda automática)
+  onSearchInput(): void {
+    // Pasar el valor actual al subject para procesarlo con debounce
+    this.searchSubject.next(this.searchQuery);
+  }
+
+  onDateChange() {
+    // Sincronizar los valores de dateStart/dateEnd con dateRange
+    if (this.dateStart || this.dateEnd) {
+      // Actualizar el FormGroup con los valores seleccionados en la UI
+      this.dateRange.setValue({
+        start: this.dateStart,
+        end: this.dateEnd
+      });
+      
+      console.log('[DEBUG] Fecha inicio seleccionada:', this.dateStart);
+      console.log('[DEBUG] Fecha fin seleccionada:', this.dateEnd);
+    }
+    
+    // Aplicar filtros
+    this.applyFilters();
+  }
+
+  onCategoryChange() {
+    this.applyFilters();
+  }
+
+  // Renombrar resetFilters a clearFilters para ser consistente con el HTML
+  clearFilters() {
+    this.searchQuery = '';
+    this.dateStart = null;
+    this.dateEnd = null;
+    this.selectedCategories = [];
+    this.selectedTags = [];
+    this.selectedCountry = null;
+    this.dateRange.setValue({
+      start: null,
+      end: null
+    });
+    
+    // Recargar noticias con filtros eliminados
+    this.isCardsLoading = true; // Solo activar carga para las tarjetas
+    this.loadNews();
+  }
+
+  getCountryTime(timezone: string): string {
+    if (!this.isBrowser) return '';
+    return new Date().toLocaleTimeString('es-ES', { timeZone: timezone });
+  }
+
+  // Método para abrir la URL de origen de una noticia, o navegar a la página de detalle si no tiene URL
+  openSourceUrl(news: NewsItem): void {
+    if (news.sourceUrl) {
+      // Abrir URL en nueva pestaña
+      if (this.isBrowser) {
+        window.open(news.sourceUrl, '_blank');
+      }
+    } else {
+      // Si no tiene URL de origen, navegar a la página de detalle
+      this.navigateToNews(news);
+    }
+  }
+  
+  // Método para cargar noticias con relevanceScore usando los IDs que sabemos que tienen valor
+  loadMinimalNews() {
+    // Enfoque más simple: buscar por tipo de artículo 'minimal'
+    this.newsService.getNews({
+      page: 1,
+      pageSize: 10,
+      // Usar método centralizado para el ordenamiento
+      sort: this.getSortCriteria(),
+      filters: {
+        articleType: 'minimal'  // Filtrar por tipo de artículo
+      }
+    }).subscribe({
+      next: (response) => {
+        if (response?.status === 'success' && Array.isArray(response?.data)) {
+          const articles = this.mapArticles(response.data);
+          
+          // Eliminar duplicados basados en el título
+          const uniqueArticles = articles.filter((article, index, self) =>
+            index === self.findIndex(a => a.title === article.title)
+          );
+          
+          this.minimalNews = uniqueArticles;
+          console.log('Noticias para Podría interesarte:', this.minimalNews.length);
+        }
+      },
+      error: (error) => {
+        console.error('[ERROR] Error cargando noticias minimales:', error);
+      }
+    });
+  }
+
+  // Añadir este nuevo método para cargar los tags desde la API
+  loadTags(): void {
+    console.log('[DEBUG] Iniciando carga de tags...');
+    this.newsService.getTags().subscribe({
+      next: (tagsData: any[]) => {
+        console.log('[DEBUG] Tags cargados:', tagsData?.length || 0);
+        if (tagsData && Array.isArray(tagsData) && tagsData.length > 0) {
+          // Guardar tags en el formato original
+          this.tags = tagsData.map(tag => {
+            return {
+              id: tag.id,
+              name: tag.nombre,
+              nombre: tag.nombre
+            };
+          });
+          
+          // También asignar los tags a categories con el formato label/value para el multiselect
+          this.categories = tagsData.map(tag => {
+            return {
+              label: tag.nombre,
+              value: tag.nombre
+            };
+          });
+          
+          console.log('[DEBUG] Tags procesados:', this.tags.length);
+          console.log('[DEBUG] Categorías para selector:', this.categories);
+        } else {
+          console.warn('[ADVERTENCIA] No se encontraron tags o el formato es inválido');
+          this.setDefaultTags();
+        }
+      },
+      error: (error: any) => {
+        console.error('[ERROR] Error cargando tags:', error);
+        console.warn('[ADVERTENCIA] Usando valores predeterminados para tags');
+        this.setDefaultTags();
+      }
+    });
+  }
+  
+  // Método auxiliar para establecer tags predeterminados
+  private setDefaultTags(): void {
+    this.tags = [
+      { id: 1, name: 'Infraestructura', nombre: 'infraestructura' },
+      { id: 2, name: 'Comercio', nombre: 'comercio' },
+      { id: 3, name: 'Integración', nombre: 'integracion' },
+      { id: 4, name: 'Gobierno', nombre: 'gobierno' },
+    ];
+    
+    // También establecer categorías para el selector
+    this.categories = [
+      { label: 'Infraestructura', value: 'infraestructura' },
+      { label: 'Comercio', value: 'comercio' },
+      { label: 'Integración', value: 'integracion' },
+      { label: 'Gobierno', value: 'gobierno' },
+    ];
+    
+    console.log('[DEBUG] Tags predeterminados establecidos:', this.tags.length);
+    console.log('[DEBUG] Categorías predeterminadas:', this.categories);
+  }
+
+  // Método para limpiar sólo las fechas sin resetear otros filtros
+  clearDates(): void {
+    this.dateStart = null;
+    this.dateEnd = null;
+    
+    // Resetear también el FormGroup de fechas
+    this.dateRange.setValue({
+      start: null,
+      end: null
+    });
+    
+    console.log('[DEBUG] Fechas limpiadas');
+    this.applyFilters();
   }
 }
