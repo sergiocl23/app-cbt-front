@@ -110,7 +110,6 @@ export class ListPageComponent implements OnInit, OnDestroy {
   public totalPages: number = 0;
 
   private imageCache: { [url: string]: boolean } = {};
-
   // Limitar que "Desde" no pueda ser anterior a 1 de enero de 2023
   public desdeMinDate: Date = new Date(2023, 0, 1);
   // Limitar que "Hasta" sea igual o menor a la fecha actual
@@ -143,6 +142,7 @@ export class ListPageComponent implements OnInit, OnDestroy {
     end: new FormControl<Date | null>(null),
   });
 
+
   // Caché para las imágenes de noticias
   private newsImagesCache: { [id: number]: { featuredImage: any, additionalImages: any[] } } = {};
 
@@ -169,6 +169,7 @@ export class ListPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadNews();
+
     this.checkSpecificNews();
   }
 
@@ -522,6 +523,7 @@ export class ListPageComponent implements OnInit, OnDestroy {
 
   // Se obtiene la URL de la imagen actual
   getCurrentImageUrl(newsItem: NewsItem): string {
+
     // Para noticias creadas manualmente con imágenes en caché
     if (newsItem?.manualCreation && this.newsImagesCache[newsItem.id]?.featuredImage) {
       const featuredImage = this.newsImagesCache[newsItem.id].featuredImage;
@@ -556,6 +558,7 @@ export class ListPageComponent implements OnInit, OnDestroy {
   }
 
   getAllImages(newsItem: NewsItem): string[] {
+
     // Para noticias creadas manualmente con imágenes en caché
     if (newsItem?.manualCreation && this.newsImagesCache[newsItem.id]?.additionalImages) {
       const cachedImages = this.newsImagesCache[newsItem.id].additionalImages;

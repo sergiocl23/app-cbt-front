@@ -1,0 +1,480 @@
+.forum-container {
+    display: flex;
+    min-height: calc(100vh - 64px);
+    padding: 30px;
+    background-color: #ecf0f1;
+    gap: 20px;
+    position: relative;
+  }
+  
+  .forum-container.sidebar-open {
+    padding-left: 268px; /* Expanded sidebar width */
+  }
+  
+  .forum-sidebar {
+    width: 270px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-right: 20px;
+    position: sticky;
+    top: 30px;
+    height: calc(100vh - 94px);
+    overflow-y: auto;
+  }
+  
+  .forum-content {
+    flex: 1;
+    padding: 20px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-right: 15px;
+  }
+  
+  /* Rest of your existing CSS remains the same */
+  
+  .subcategories-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+  }
+  
+  .subcategory-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin: 4px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #4a5568;
+  }
+  
+  .subcategory-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .subcategory-item.active {
+    background-color: #ebf7fc;
+    color: #36A9E1;
+    font-weight: 500;
+  }
+  
+  .subcategory-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  
+  .subcategory-item .delete-btn {
+    visibility: hidden;
+    background: transparent;
+    border: none;
+    color: #dc3545;
+    padding: 4px 8px;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  
+  .subcategory-item .delete-btn:hover {
+    color: #c82333;
+  }
+  
+  .subcategory-item:hover .delete-btn {
+    visibility: visible;
+  }
+  
+  .topics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .new-topic-btn {
+    padding: 8px 16px;
+    background-color: #36A9E1;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .new-topic-btn:hover {
+    background-color: #2196D3;
+  }
+  
+  .topic-item {
+    display: flex;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+  }
+  
+  .topic-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    margin-right: 1rem;
+    min-width: 24px;
+  }
+  
+  /* Pinned topic styles */
+  .pinned-topic {
+    background-color: #f8f9fa;
+    border-left: 3px solid #36A9E1;
+  }
+  
+  /* Closed topic styles */
+  .closed-topic {
+    background-color: #f8f9fa;
+    border-left: 3px solid #dc3545;
+  }
+  
+  /* Combined state - pinned and closed */
+  .pinned-topic.closed-topic {
+    background-color: #f8f9fa;
+    border-left: 3px solid #6c757d;
+  }
+  
+  /* Icon styles */
+  .pin-icon {
+    color: #36A9E1;
+    transform: rotate(45deg);
+  }
+  
+  .lock-icon {
+    color: #dc3545;
+  }
+  
+  /* When both icons are present */
+  .topic-status:has(.pin-icon, .lock-icon) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .topic-content {
+    flex: 1;
+  }
+  
+  .topic-title {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #2c3e50;
+  }
+  
+  .topic-preview {
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  /* Hover effects */
+  .topic-item:hover {
+    background-color: #f1f3f5;
+    cursor: pointer;
+    transform: translateX(2px);
+  }
+  
+  .topic-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85em;
+    color: #666;
+  }
+
+  .topic-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #36A9E1; /* Or any color you prefer for categories */
+  }
+
+  .topic-category i {
+    color: inherit;
+  }
+
+  /* Loading message */
+  .loading-message {
+    text-align: center;
+    color: #6c757d;
+    padding: 20px;
+    font-size: 0.9rem;
+  }
+
+  /* Make topic items clickable */
+  .topic-item {
+    cursor: pointer;
+  }
+
+  /* Topic author */
+  .topic-author {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Icon spacing */
+  .fas {
+    margin-right: 5px;
+  }
+
+  .topic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .topic-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding-left: 1rem;
+    border-left: 1px solid #e9ecef;
+
+    .action-btn {
+      background: none;
+      border: none;
+      padding: 0.25rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.edit-btn {
+        color: #36A9E1;  /* Blue by default */
+        
+        &:hover {
+          background-color: #ebf7fc;
+        }
+      }
+
+      &.delete-btn {
+        color: #dc3545;  /* Red by default */
+        
+        &:hover {
+          background-color: #fee2e2;
+        }
+      }
+
+      i {
+        font-size: 14px;
+        margin: 0;
+      }
+    }
+  }
+
+  .sidebar-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .add-category-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background-color: #36A9E1;
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: #2196D3;
+      }
+
+      .fas {
+        font-size: 14px;
+        margin: 0;
+      }
+    }
+  }
+
+  .subcategory-actions {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    button {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      background-color: transparent;
+      padding: 0;
+
+      i {
+        font-size: 14px;
+        margin: 0;
+      }
+    }
+
+    .edit-btn {
+      color: #36A9E1;
+
+      &:hover {
+        background-color: #ebf7fc;
+      }
+    }
+
+    .delete-btn {
+      color: #dc3545;
+
+      &:hover {
+        background-color: #fee2e2;
+      }
+    }
+  }
+
+  .subcategory-item:hover .subcategory-actions {
+    opacity: 1;
+  }
+
+  .subcategory-content .fas {
+    margin-right: 0;
+  }
+
+  /* Add these new styles */
+  .sidebar-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    
+    &:first-child {
+      margin-bottom: 0;
+    }
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+  }
+
+  .section-title {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px 0;
+  }
+
+  .social-links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    color: #495057;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+
+    i {
+      width: 20px;
+      margin-right: 10px;
+      text-align: center;
+    }
+
+    &:hover {
+      background-color: #f8f9fa;
+      color: #36A9E1;
+      transform: translateX(2px);
+    }
+
+    /* Social media specific colors on hover */
+    &:hover i.fa-instagram {
+      color: #E1306C;
+    }
+
+    &:hover i.fa-x-twitter {
+      color: #000000;
+    }
+
+    &:hover i.fa-linkedin {
+      color: #0077B5;
+    }
+
+    &:hover i.fa-facebook {
+      color: #1877F2;
+    }
+  }
+
+  /* Add smooth scrollbar for the sidebar */
+  .forum-sidebar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .forum-sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .forum-sidebar::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+
+  .forum-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
+  }
+
+  /* Style the subcategories scrollbar */
+  .subcategories-list::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .subcategories-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .subcategories-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+  }
+
+  .subcategories-list::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
+  }

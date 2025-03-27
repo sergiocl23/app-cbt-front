@@ -1,0 +1,95 @@
+<div class="topic-container" *ngIf="topic">
+  <div class="topic-header">
+    <h2>{{ topic.name }}</h2>
+  </div>
+
+  <!-- Topic content -->
+  <div class="content-card topic-content">
+    <div class="post-header">
+      <span class="author">{{ topic.users_permissions_user?.username || 'Anónimo' }}</span>
+      <span class="date">Publicó {{ topic.createdAt | date:'MMM d, y, h:mm:ss a' }}</span>
+    </div>
+    <div class="markdown-body" [innerHTML]="formattedTopicContent"></div>
+  </div>
+
+  <!-- Add this right after the topic content -->
+  <div class="topic-status" *ngIf="topic.closed">
+    <i class="fas fa-lock"></i>
+    <span>Este tópico está cerrado y no acepta nuevas respuestas</span>
+  </div>
+
+  <!-- Posts/Replies -->
+  <div class="replies-section" *ngIf="topic.posts && topic.posts.length > 0">
+    <div class="content-card reply" 
+         *ngFor="let post of topic.posts"
+         [id]="'post-' + post.id">
+      <div class="post-header">
+        <span class="author">{{ post.users_permissions_user?.username || 'Anónimo' }}</span>
+        <span class="date">Respondió {{ post.createdAt | date:'MMM d, y, h:mm:ss a' }}</span>
+        
+        <!-- Changed reply_to to post -->
+        <span *ngIf="post.post" class="reply-reference">
+          en respuesta a 
+          <a href="#post-{{post.post.id}}" 
+             (click)="scrollToPost($event, post.post.id)">
+            {{ post.post.users_permissions_user?.username || 'Anónimo' }}
+          </a>
+        </span>
+        
+        <div class="post-actions">
+          <!-- Add reply button -->
+          <button class="reply-btn" 
+                  (click)="onReplyToPost(post)"
+                  title="Responder a este mensaje">
+            <i class="fas fa-reply"></i>
+          </button>
+          <!-- Existing edit/delete buttons -->
+          <button class="edit-btn" 
+                  (click)="onEditPost(post)"
+                  title="Editar respuesta">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="delete-btn" 
+                  *ngIf="canDeletePost(post)"
+                  (click)="onDeletePost(post)"
+                  title="Eliminar respuesta">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="markdown-body" [innerHTML]="getFormattedContent(post.id)"></div>
+    </div>
+  </div>
+
+  <!-- Reply form -->
+  <div class="reply-form" *ngIf="!topic.closed">
+    <div class="editor-header">
+      <h3>
+        Tu respuesta
+        <span *ngIf="replyingTo" class="replying-to">
+          en respuesta a 
+          <a href="#post-{{replyingTo.id}}" 
+             (click)="scrollToPost($event, replyingTo.id)">
+            {{ replyingTo.users_permissions_user?.username || 'Anónimo' }}
+          </a>
+          <button class="clear-reply" (click)="clearReplyTo()">&times;</button>
+        </span>
+      </h3>
+    </div>
+
+    <div class="editor-container">
+      <app-markdown-editor
+        [(ngModel)]="newPostContent"
+        [placeholder]="'Escriba su respuesta aquí...'"
+        (imageUploaded)="onImageUploaded($event)">
+      </app-markdown-editor>
+    </div>
+
+    <button mat-raised-button 
+            class="submit-button" 
+            (click)="onSubmitPost()">
+      Enviar respuesta
+    </button>
+  </div>
+</div>

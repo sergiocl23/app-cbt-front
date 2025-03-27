@@ -30,6 +30,7 @@ export class NewsPageComponent implements OnInit, OnDestroy {
   public isLoading: boolean = true;
   public isReadingMode: boolean = false;
   private routeSub?: Subscription;
+
   private originalImageUrl?: string;
 
   constructor(
@@ -45,6 +46,7 @@ export class NewsPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
     // Desplazar al inicio de la página cuando se carga el componente
     if (typeof window !== 'undefined') {
       window.scrollTo(0, 0);
@@ -60,6 +62,7 @@ export class NewsPageComponent implements OnInit, OnDestroy {
 
   private loadNewsItem(id: string) {
     this.isLoading = true;
+
     
     // Primero intentamos cargar con el método normal
     this.newsService.getNewsById(id).subscribe({
@@ -415,7 +418,6 @@ export class NewsPageComponent implements OnInit, OnDestroy {
 
   cleanHtmlTags(text: string): string {
     if (!text) return '';
-    
     // Primero reemplazar las etiquetas de párrafo por saltos de línea
     let cleaned = text
       .replace(/<\/p>\s*<p[^>]*>/gi, '\n\n')  // Cierre de párrafo seguido de apertura

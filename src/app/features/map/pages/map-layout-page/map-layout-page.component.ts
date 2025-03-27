@@ -10,22 +10,28 @@ import { Point } from '../../interfaces/point.interface';
 import { LoadingComponent } from '../../components/loading/loading.component';
 import { BtnMyLocationComponent } from '../../components/btn-my-location/btn-my-location.component';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
+import { InfoPlaceCardComponent } from '../../components/info-place-card/info-place-card.component';
+import { BtnClearRouteComponent } from '../../components/btn-clear-route/btn-clear-route.component';
 
 mapboxgl.accessToken = environments.mapBoxKey;
 
 @Component({
   selector: 'app-map-layout-page',
   standalone: true,
-  imports: [CommonModule, LoadingComponent, BtnMyLocationComponent, SearchBarComponent],
+  imports: [CommonModule, LoadingComponent, BtnMyLocationComponent, SearchBarComponent, InfoPlaceCardComponent, BtnClearRouteComponent],
   templateUrl: './map-layout-page.component.html',
   styleUrl: './map-layout-page.component.css'
 })
 export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
   private map!: Map;
   private currentLngLat: LngLat = new LngLat(-70.14056585946109, -20.24473796434132);
+  public message: string = 'Calculando ruta...'
 
   public mapPoints: Point[] = [];
-  private routePoints: [number, number, string][] = [];
+  // private routePoints: routePoint[] = [];
+
+  isInfoCardOpen = false;
+  selectedPlace: Point | null = null;
 
   constructor(
     @Inject(PLATFORM_ID)
@@ -39,48 +45,50 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
   }
 
   get isRoutePointsReady() {
-    return !!this.routePoints.length;
+    return !!this.mapPoints.length;
   }
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
 
 
   }
 
-  ngAfterViewInit() {
+  ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
-      this.mapService.getPoints()
-      .subscribe( points => {
-        this.mapPoints = points.data
+      // Corregir
+      setTimeout(() => {
+        this.map = new Map({
+          container: 'map',
+          style: 'mapbox://styles/mapbox/streets-v12',
+          center: [-57.99705313935333, -21.520013511251367],
+          zoom: 5.4,
+          // pitch: 50
+        })
 
-        this.routePoints = this.mapPoints.map(point => {
-          return [point.longitude, point.latitude, point.description];
-        });
+        // this.map.addControl(new NavigationControl());
+        this.mapService.setMap(this.map);
+      }, 100);
 
-        // Corregir
-        setTimeout(() => {
-          this.map = new Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v12',
-            center: [-57.59705313935333, -22.520013511251367],
-            zoom: 5.5,
-            pitch: 55
-          })
-
-          this.map.addControl(new NavigationControl());
-
-          this.setRoute(this.routePoints);
-
-          this.mapService.setMap(this.map);
-        }, 100);
-        // Fin corregir
-      });
+      setTimeout(() => {
+        this.loadThirdRoute();
+      }, 200);
+      setTimeout(() => {
+        this.loadSecondaryRoute();
+      }, 300);
+      setTimeout(() => {
+        this.loadPrimaryRoute();
+      }, 400);
+      setTimeout(() => {
+        this.addRoutePoints();
+      }, 1200);
     }
   }
 
+  // TODO: FALTA HACER QUE CUANDO SE ABRA O CIERRA EL SIDEBAR SE EJECUTE ESTO
   // Detecta cambios en el tamaño de la ventana
   @HostListener('window:resize', ['$event'])
   onResize(): void {
+    console.log('resize')
     if (this.map) {
       this.map.resize(); // Ajusta el mapa al nuevo tamaño del contenedor
     }
@@ -92,35 +100,49 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
     }
   }
 
-   // Obtener y graficar la ruta
-  setRoute(routePoints: [number, number, string][]) {
+  loadPrimaryRoute() {
+    this.mapService.getRoutePoints()
+    .subscribe( points => {
+      this.map = this.mapService.Map;
+      this.mapPoints = points.data
+
+      // Ordenar los puntos de oeste a este (menor a mayor en longitud)
+      this.mapPoints.sort((a, b) => a.longitude - b.longitude);
+      this.setRoute(this.mapPoints, '#FF5733', 'route1');
+    });
+  }
+
+  loadSecondaryRoute() {
+    this.mapService.getSecondRoutePoints()
+    .subscribe( points => {
+      this.map = this.mapService.Map;
+      this.mapPoints = points.data
+
+      // Ordenar los puntos de oeste a este (menor a mayor en longitud)
+      this.mapPoints.sort((a, b) => a.longitude - b.longitude);
+
+      this.setRoute(this.mapPoints, '#ff8633', 'route2');
+    });
+  }
+
+  loadThirdRoute() {
+    this.mapService.getThirdRoutePoints()
+    .subscribe( points => {
+      this.map = this.mapService.Map;
+      this.mapPoints = points.data
+
+      // Ordenar los puntos de oeste a este (menor a mayor en longitud)
+      this.mapPoints.sort((a, b) => a.latitude - b.latitude);
+
+      this.setRoute(this.mapPoints, '#9b59b6', 'route3');
+    });
+  }
 
 
-    /*
-    // Coordenadas ruta
-    const corridorRoute: [number, number, string][] = [
-      [-70.13662363926578, -20.23110856880029, 'Iquique, Chile'], // Iquique, Chile
-      [-70.10197033524106, -20.2687742004362, 'Alto Hospicio, Chile'], // Alto Hospicio, Chile
-      [-69.78974880198224, -20.25737089086163, 'Pozo Almonte, Chile'], // Pozo Almonte, Chile
-      // [-69.4536033094392, -21.64879980592402, 'Quillagua, Chile'], // Quillagua, Chile
-      // [-69.63246599865376, -22.355385948328205, 'Maria Elena, Chile'], // Maria Elena, Chile
-      [-68.92965130273234, -22.455163463844116, 'Calama, Chile'], // Calama, Chile
-      [-68.1728409202262, -22.912595149768027, 'San Pedro de Atacama, Chile'], // San Pedro de Atacama, Chile
-      [-67.01902297614322, -23.242704878207608, 'Jama, Argentina'], // Jama, Argentina
-      [-65.29765971340198, -24.18576145173499, 'San Salvador de Jujuy, Argentina'], // San Salvador de Jujuy, Argentina
-      [-63.805664469718685, -22.51730196140737, 'Tartagal, Argentina'], // Tartagal, Argentina
-      [-62.51579045636932, -22.370594917414362, 'Pozo Hondo, Paraguay'], // Pozo Hondo, Paraguay
-      [-60.597005594447374, -22.03383697565635, 'Mariscal Estigarribia, Paraguay'], // Mariscal Estigarribia, Paraguay
-      [-57.88345909398014, -21.697567863951402, 'Porto Mortinho, Brasil'], // Porto Mortinho, Brasil
-      [-54.62592446692572, -20.46274690445269, 'Campo Grande'], // Campo Grande
-      [-46.65440504613875, -23.565050300615344, 'Sao Paulo'], // Sao Paulo
-      [-46.30268270198697, -23.965736858376157, 'Porto de Santos']  // Destino: Porto de Santos
-    ];
-    */
-
-    const coordinates =  routePoints.map(point => point.slice(0, 2)).map(point => point.join(',')).join(';');
-
-    // console.log(coordinates)
+   //graficar la ruta
+  setRoute(mapPoints: Point[], routeColor: string, idRoute: string) {
+    // const coordinates =  routePoints.map(point => point.slice(0, 2)).map(point => point.join(',')).join(';');
+    const coordinates =  mapPoints.map(point => `${point.longitude},${point.latitude}`).join(';');
 
     const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${coordinates}?geometries=geojson&overview=full&access_token=${environments.mapBoxKey}`;
 
@@ -129,7 +151,7 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
 
       // Crear fuente para la ruta
       this.map.on('load', () => {
-        this.map.addSource('route', {
+        this.map.addSource(idRoute, {
           type: 'geojson',
           data: {
             type: 'Feature',
@@ -140,22 +162,18 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
 
         // Agregar la línea al mapa
         this.map.addLayer({
-          id: 'route',
+          id: idRoute,
           type: 'line',
-          source: 'route',
+          source: idRoute,
           layout: {
             'line-join': 'round',
             'line-cap': 'round'
           },
           paint: {
-            'line-color': '#FF5733', // Color de la línea (naranja en este caso)
-            'line-width': 6, // Grosor de la línea
+            'line-color': routeColor, // Color de la línea (naranja en este caso)
+            'line-width': 4, // Grosor de la línea
           }
         });
-
-
-
-        this.addRoutePoints(this.map, routePoints);
 
       });
 
@@ -172,109 +190,103 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
     });
   }
 
-  addRoutePoints(map: mapboxgl.Map, placesCoordinates: [number, number, string][]) {
-    placesCoordinates.forEach(coordinate => {
-      const id = `circle-point-${coordinate[0]}-${coordinate[1]}`;
-      map.addLayer({
-        id: id,
-        type: 'circle',
-        source: {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            geometry: {
-              type: 'Point',
-              coordinates: [coordinate[0], coordinate[1]]
-            },
-            properties: {}
-          }
-        },
-        paint: {
-          'circle-radius': 6, // Tamaño del círculo
-          'circle-color': '#3498db', // Color del círculo
-          'circle-stroke-width': 2, // Borde del círculo
-          'circle-stroke-color': '#FFFFFF' // Color del borde
+  addRoutePoints() {
+    this.mapService.getAllMapPoints()
+    .subscribe( points => {
+      const map = this.mapService.Map;
+      this.mapPoints = points.data
+
+      this.mapPoints.forEach(point => {
+        const iconUrl = point.id_categories[0].icon;
+        const iconId = `circle-point-${point.latitude}-${point.longitude}`;
+
+        if (!map.hasImage(iconId)) {
+          map.loadImage(iconUrl, (error, image) => {
+            if (error) throw error;
+
+            // Agregar la imagen con un identificador único
+            map.addImage(iconId, image!);
+
+            // Agregar el punto al mapa con su icono correspondiente
+            this.addPointToMap(map, point, iconId);
+          })
+        }
+        else{
+          // Si la imagen ya está cargada, solo agrega el punto con su icono
+          this.addPointToMap(map, point, iconId);
         }
       });
+    });
+  }
 
-      // Crear el popup
-      const popup = new mapboxgl.Popup({ offset: 25 }) // Offset para posicionar el popup
-        // .setHTML(coordinate[2]) // Contenido del popup
-        .setHTML(`
-          <div>
-            ${coordinate[2]}
-            <br />
-            <button id="view-more-${coordinate[2]}" style="margin-top: 10px; padding: 5px 10px; background: #3498db; color: #fff; border: none; border-radius: 5px; cursor: pointer;">
-              Ver más
-            </button>
-          </div>
-        `)
-        .setMaxWidth('300px'); // Tamaño máximo del popup
+  private addPointToMap(map: mapboxgl.Map, point: Point, iconId: string) {
+    const id = `circle-point-${point.latitude}-${point.longitude}}`;
 
-      // Asociar el popup al evento de clic
-      map.on('click', id, () => {
-        popup.setLngLat([coordinate[0], coordinate[1]]).addTo(map);
-        // Esperar a que se renderice el popup y luego asignar el evento al botón "Ver más"
-        setTimeout(() => {
-          const button = document.getElementById(`view-more-${coordinate[2]}`);
-          if (button) {
-            button.addEventListener('click', () => {
-              showSidebar('contenido de prueba');
-            });
-          }
-        }, 0);
-      });
-
-
-      // Asociar el popup al punto
-      map.on('mouseenter', id, () => {
-        map.getCanvas().style.cursor = 'pointer'; // Cambiar el cursor al pasar sobre el punto
-        // popup.setLngLat([coordinate[0], coordinate[1]]).addTo(map);
-      });
-
-      map.on('mouseleave', id, () => {
-        map.getCanvas().style.cursor = ''; // Restablecer el cursor
-        // popup.remove(); // Eliminar el popup al salir del punto
-      });
-
-
-
+    map.addLayer({
+      id: id,
+      type: 'symbol',
+      source: {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [point.longitude, point.latitude]
+          },
+          properties: {}
+        }
+      },
+      layout: {
+        'icon-image': iconId, // Usa el ID único del icono
+        'icon-size': point.id_categories[0].icon_size,
+        'icon-allow-overlap': true
+      }
     });
 
+    // Crear y asociar popup
+    const popup = new mapboxgl.Popup({ offset: 25 })
+      .setHTML(`
+        <div>
+          <strong>${point.name}</strong>
+          <br />
+          <button id="view-more-${point.description}" style="margin-top: 10px; padding: 5px 10px; background: #3498db; color: #fff; border: none; border-radius: 5px; cursor: pointer;">
+            Ver más
+          </button>
+        </div>
+      `)
+      .setMaxWidth('300px');
+
+    map.on('click', id, () => {
+      popup.setLngLat([point.longitude, point.latitude]).addTo(map);
+      setTimeout(() => {
+        const button = document.getElementById(`view-more-${point.description}`);
+        if (button) {
+          button.addEventListener('click', () => {
+            // showSidebar('contenido de prueba');
+            this.showPlaceCard(point);
+            popup.remove();
+          });
+        }
+      }, 0);
+    });
+
+    map.on('mouseenter', id, () => {
+      map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', id, () => {
+      map.getCanvas().style.cursor = '';
+    });
   }
 
-}
-function showSidebar(content: string) {
-  let sidebar = document.getElementById('map-sidebar');
-  if (!sidebar) {
-    // Crear el panel lateral si no existe
-    sidebar = document.createElement('div');
-    sidebar.id = 'map-sidebar';
-    sidebar.style.position = 'absolute';
-    sidebar.style.top = '0';
-    sidebar.style.right = '0';
-    sidebar.style.width = '300px';
-    sidebar.style.height = '100%';
-    sidebar.style.background = '#f7f7f7';
-    sidebar.style.boxShadow = '-2px 0 5px rgba(0, 0, 0, 0.2)';
-    sidebar.style.padding = '20px';
-    sidebar.style.overflowY = 'auto';
-    sidebar.style.zIndex = '1000';
-    document.body.appendChild(sidebar);
+  showPlaceCard(point: Point) {
+    this.isInfoCardOpen = false; // Cierra la tarjeta primero
+    setTimeout(() => {
+      this.selectedPlace = point;
+      this.isInfoCardOpen = true;
+    }, 10); // Breve retraso para que Angular detecte el cambio
   }
 
-  // Mostrar el contenido en el panel
-  sidebar.innerHTML = `
-    <button style="float: right; background: none; border: none; font-size: 18px; cursor: pointer;">&times;</button>
-    <h2>Información Detallada</h2>
-    <p>${content}</p>
-  `;
-
-  // Agregar evento para cerrar el panel
-  const closeButton = sidebar.querySelector('button');
-  closeButton?.addEventListener('click', () => {
-    sidebar.remove();
-  });
 }
 
 

@@ -1,0 +1,19 @@
+<div class="edit-subcategory-container">
+  <h2>Editar Categoría</h2>
+  
+  <div class="form-group">
+    <input type="text" 
+           [(ngModel)]="subcategoryName" 
+           class="form-control"
+           placeholder="Nombre de la categoría">
+  </div>
+
+  <div class="dialog-actions">
+    <button class="cancel-btn" (click)="onCancel()">Cancelar</button>
+    <button class="save-btn" 
+            (click)="onSave()"
+            [disabled]="!subcategoryName.trim()">
+      Guardar
+    </button>
+  </div>
+</div>

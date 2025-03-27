@@ -1,11 +1,13 @@
 <div class="container" [class.reading-mode]="isReadingMode">
   <!-- Botón de retroceso -->
+
   <button 
     class="back-button"
     (click)="goBack()"
     title="Volver atrás">
     <i class="pi pi-arrow-left"></i>
     <span class="back-text">Regresar</span>
+
   </button>
 
   <!-- Loading spinner -->
@@ -32,6 +34,7 @@
           <i class="pi pi-flag"></i>
           {{ newsItem.pais ? newsItem.pais.toUpperCase() : '' }}
         </span>
+
         <span *ngIf="newsItem.manualCreation" class="manual-tag">
           <i class="pi pi-pencil"></i>
           Noticia interna
@@ -42,6 +45,7 @@
     <div class="news-image-container">
       <div class="news-image">
         <img [src]="getImageUrl()" [alt]="newsItem.title"
+
              (error)="handleImageError($event)"
              [class.default-image]="!newsItem.mainImage && !newsItem.featuredImage && (!newsItem.additionalImages || newsItem.additionalImages.length === 0)">
       </div>
@@ -77,6 +81,7 @@
 
       <div class="news-content">
         <div *ngIf="newsItem.summary" class="summary">
+
           <div class="ai-badge" *ngIf="!newsItem.manualCreation">
             <i class="pi pi-bolt"></i>IA
           </div>
@@ -122,6 +127,7 @@
 </div>
 
 <!-- Botón modo lectura -->
+
 <!-- <button class="reading-mode-toggle" (click)="toggleReadingMode()" [title]="isReadingMode ? 'Modo normal' : 'Modo lectura'">
   <i class="pi" [class.pi-eye]="!isReadingMode" [class.pi-eye-slash]="isReadingMode"></i>
 </button> -->

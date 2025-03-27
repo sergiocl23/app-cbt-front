@@ -46,6 +46,8 @@
     </p-toolbar>
   </div>
   <div class="container" style="padding-top: 90px;">
+    <pre>{{user() | json }}</pre>
+    <button (click)="onLogout()">Cerrar Sesión</button>
     <router-outlet />
   </div>
 </div>

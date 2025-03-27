@@ -12,6 +12,8 @@ import { DirectionsResponse, Route } from '../interfaces/directions.interface';
 import { PlacesNominatim } from '../interfaces/placesNominatim.interface';
 import { SearchResultItem } from '../interfaces/searchResultItem.interface';
 
+import mapboxgl from 'mapbox-gl';
+
 @Injectable({providedIn: 'root'})
 export class MapService {
 
@@ -25,6 +27,7 @@ export class MapService {
 
   public isLoadingPlaces: boolean = false;
   public places: PlacesNominatim[] = [];
+  // public places: SearchResultItem[] = [];
 
   get isUserLocationReady(): boolean {
     return !!this.userLocation;
@@ -58,7 +61,7 @@ export class MapService {
     this.getUserLocation();
   }
 
-  public async getUserLocation(): Promise<[number, number]>{
+  getUserLocation(): Promise<[number, number]>{
     return new Promise( (resolve, reject ) => {
       if (isPlatformBrowser(this.platformId)){
         navigator.geolocation.getCurrentPosition(
@@ -77,13 +80,40 @@ export class MapService {
     } );
   }
 
-  getPoints():Observable<Points>{
+  getRoutePoints():Observable<Points>{
 
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${this.token}`
     })
 
-    return this.http.get<Points>(`${ this.baseUrlStrapi }/api/points?populate=*`, { headers });
+    return this.http.get<Points>(`${ this.baseUrlStrapi }/api/points?populate=*&pagination[page]=1&pagination[pageSize]=500&filters[id_categories][$eq]=1`, { headers });
+  }
+
+  getSecondRoutePoints():Observable<Points>{
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.token}`
+    })
+
+    return this.http.get<Points>(`${ this.baseUrlStrapi }/api/points?populate=*&pagination[page]=1&pagination[pageSize]=500&filters[id_categories][$eq]=7`, { headers });
+  }
+
+  getThirdRoutePoints():Observable<Points>{
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.token}`
+    })
+
+    return this.http.get<Points>(`${ this.baseUrlStrapi }/api/points?populate=*&pagination[page]=1&pagination[pageSize]=500&filters[id_categories][$eq]=8`, { headers });
+  }
+
+  getAllMapPoints():Observable<Points>{
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.token}`
+    })
+
+    return this.http.get<Points>(`${ this.baseUrlStrapi }/api/points?limit=1&populate=*&pagination[page]=1&pagination[pageSize]=500`, { headers });
   }
 
   getPlacesByQuery( query: string = '' ){
@@ -94,6 +124,7 @@ export class MapService {
     }
 
     this.isLoadingPlaces = true;
+
     /*
     forkJoin({
       mapbox: this.http.get<PlacesResponse>(`https://api.mapbox.com/search/geocode/v6/forward?q=${ query }&proximity=${ this.userLocation?.join(',') }&language=es&limit=5&access_token=${ this.mapBoxKey }`).pipe(catchError(() => of({ features: [] }))),
@@ -149,10 +180,12 @@ export class MapService {
 
 
   getRouteBetweenPoints( start: [number, number], end: [number, number]){
+    // this.isLoadingPlaces = true;
     this.http.get<DirectionsResponse>(`https://api.mapbox.com/directions/v5/mapbox/driving/${ start.join(',') };${ end.join(',') }?alternatives=false&geometries=geojson&language=es&overview=full&steps=false&access_token=${ this.mapBoxKey }`)
       .subscribe( resp => {
         // console.log(`https://api.mapbox.com/directions/v5/mapbox/driving/${ start.join(',') };${ end.join(',') }?alternatives=false&geometries=geojson&language=es&overview=full&steps=false&access_token=${ this.mapBoxKey }`);
         // console.log(resp);
+        // this.isLoadingPlaces = false;
         this.drawPolyline(resp.routes[0]);
       });
   }
@@ -212,11 +245,84 @@ export class MapService {
        'line-join': 'round'
       },
       paint: {
-        'line-color': 'black',
-        'line-width': 3
+        'line-color': '#2ecc71',
+        'line-width': 8
       }
     })
 
+    const iconId = `circle-point-my-location`;
+    const iconUrl = 'assets/images/icons/my-location.png'
+    const map = this.map;
+
+    //Elimina cualquier marcador previo con el mismo ID
+    if (map.getLayer(iconId)) {
+      map.removeLayer(iconId);
+    }
+    if (map.getSource(iconId)) {
+      map.removeSource(iconId);
+    }
+
+    if (!map.hasImage(iconId)) {
+      map.loadImage(iconUrl, (error, image) => {
+        if (error) throw error;
+
+        // Agregar la imagen con un identificador único
+        map.addImage(iconId, image!);
+
+        // Agregar el punto al mapa con su icono correspondiente
+        this.addPointToMap(map, this.userLocation!, iconId, 'Mi ubicación');
+      })
+    }
+    else{
+      // Si la imagen ya está cargada, solo agrega el punto con su icono
+      this.addPointToMap(map, this.userLocation!, iconId, 'Mi ubicación');
+    }
+
+  }
+
+  addPointToMap(map: mapboxgl.Map, coordinates: [number, number], iconId: string, txtPopup: string) {
+
+    map.addLayer({
+      id: iconId,
+      type: 'symbol',
+      source: {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: coordinates
+          },
+          properties: {}
+        }
+      },
+      layout: {
+        'icon-image': iconId, // Usa el ID único del icono
+        'icon-size': 0.07,
+        'icon-allow-overlap': true
+      }
+    });
+
+    // Crear y asociar popup
+    const popup = new mapboxgl.Popup({ offset: 25 })
+      .setHTML(`
+        <div>
+          <strong>${txtPopup}</strong>
+        </div>
+      `)
+      .setMaxWidth('300px');
+
+      map.on('click', iconId, () => {
+        popup.setLngLat(coordinates).addTo(map);
+      });
+
+    map.on('mouseenter', iconId, () => {
+      map.getCanvas().style.cursor = 'pointer';
+    });
+
+    map.on('mouseleave', iconId, () => {
+      map.getCanvas().style.cursor = '';
+    });
   }
 
   deletePlaces() {

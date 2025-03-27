@@ -1,0 +1,94 @@
+<div class="edit-topic-container">
+  <h2>Editar Tópico</h2>
+  
+  <div class="form-group">
+    <label for="subcategory">Categoría</label>
+    <select 
+      id="subcategory"
+      [(ngModel)]="editedTopic.subcategoryId"
+      class="form-control">
+      <option value="">Seleccione una categoría</option>
+      <option *ngFor="let subcategory of subcategories" 
+              [value]="subcategory.id">
+        {{ subcategory.name }}
+      </option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <input type="text" 
+           id="title" 
+           [(ngModel)]="editedTopic.name" 
+           class="form-control"
+           placeholder="Título">
+  </div>
+
+  <div class="state-toggles">
+    <div class="state-toggle">
+      <div class="toggle-header">
+        <i class="fas fa-lock"></i>
+        <div class="toggle-text">
+          <span class="toggle-title">Tópico cerrado</span>
+          <span class="toggle-description">Si está marcado, no se permitirán nuevas respuestas</span>
+        </div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" [(ngModel)]="editedTopic.closed">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="state-toggle">
+      <div class="toggle-header">
+        <i class="fas fa-thumbtack"></i>
+        <div class="toggle-text">
+          <span class="toggle-title">Tópico fijado</span>
+          <span class="toggle-description">Si está marcado, el tópico aparecerá al inicio de la lista</span>
+        </div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" [(ngModel)]="editedTopic.pinned">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+  
+  <div class="form-group">
+    <div class="editor-header">
+      <label for="body">Contenido</label>
+      <button class="btn-preview" (click)="togglePreview()">
+        {{ showPreview ? 'Editar' : 'Vista previa' }}
+      </button>
+    </div>
+
+    <div class="editor-container">
+      <textarea *ngIf="!showPreview"
+                id="body" 
+                [(ngModel)]="editedTopic.body" 
+                (ngModelChange)="updatePreview()"
+                class="form-control"
+                rows="10"
+                placeholder="Escriba aquí usando Markdown para dar formato al texto..."></textarea>
+      
+      <div *ngIf="showPreview" class="markdown-preview markdown-body" [innerHTML]="previewContent"></div>
+    </div>
+
+    <div class="markdown-help">
+      <small>
+        Formato soportado: 
+        <code># Título</code>,
+        <code>**negrita**</code>,
+        <code>*cursiva*</code>,
+        <code>- lista</code>,
+        <code>[enlace](url)</code>
+      </small>
+    </div>
+  </div>
+  
+  <div class="dialog-actions">
+    <button class="cancel-btn" (click)="onCancel()">Cancelar</button>
+    <button class="save-btn" (click)="onSave()" [disabled]="!editedTopic.name.trim() || !editedTopic.body.trim()">
+      Guardar
+    </button>
+  </div>
+</div>

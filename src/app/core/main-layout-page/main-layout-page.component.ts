@@ -1,4 +1,4 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, computed, inject, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -9,6 +9,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { FormsModule } from '@angular/forms';
 
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 @Component({
   selector: 'app-main-layout-page',
@@ -32,6 +33,9 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 export class MainLayoutPageComponent{
   public isSidebarOpen = true;
   static sidebarState: boolean = true;
+
+  authService = inject(AuthService);
+  public user = computed(() => this.authService.user());
 
   isBrowser!: boolean;
 
@@ -59,6 +63,10 @@ export class MainLayoutPageComponent{
 
   closeSidebar() {
     this.isSidebarOpen = false;
+  }
+
+  onLogout(){
+    this.authService.logout();
   }
 
   get mainContentClass() {

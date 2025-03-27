@@ -23,12 +23,14 @@ import { environments } from '@environments/environments';
             </div>
             <div class="news-content">
               <h4>{{item.title}}</h4>
+
               <p class="snippet" *ngIf="item.snippet">{{item.snippet}}</p>
               <div class="news-meta">
                 <span class="source">
                   <i class="pi pi-link"></i>
                   {{item.source}}
                 </span>
+
                 <span class="date" [title]="item.date | date:'full':'GMT-3':'es'">
                   <i class="pi pi-calendar"></i>
                   {{item.date | date:'dd MMM, yyyy HH:mm':'GMT-3':'es'}}
@@ -168,6 +170,7 @@ import { environments } from '@environments/environments';
     .link-icon {
       font-size: 1rem;
       opacity: 0.7;
+
       align-self: flex-start;
       margin-top: 0.2rem;
     }
