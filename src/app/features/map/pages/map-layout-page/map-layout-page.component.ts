@@ -55,6 +55,9 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      if (this.map) {
+        this.map.remove(); // Elimina el mapa al destruir el componente
+      }
       // Corregir
       setTimeout(() => {
         this.map = new Map({

@@ -5,14 +5,14 @@
       <div class="user-info-container flex align-items-center justify-content-between py-3 flex-shrink-0 px-2">
         <div class="user-info flex align-items-center">
           <div class="initials-username flex align-items-center justify-content-center">
-            SC
+            {{ initials }}
           </div>
           <div class="username-container ml-2" [ngClass]="{ 'hidden': !isOpen }">
-            <div class="username">Sergio Cerda Lozano</div>
-            <div class="user-type">Administrador</div>
+            <div class="username">{{ name }} {{ lastName }}</div>
+            <div class="user-type">{{ role }}</div>
           </div>
         </div>
-        <span [ngClass]="{ 'hidden': !isOpen }" class="pi pi-sign-out logout"></span>
+        <span [ngClass]="{ 'hidden': !isOpen }" class="pi pi-sign-out logout" (click)="onLogout()"></span>
       </div>
       <!-- <p-divider type="solid"></p-divider> -->
       <div class="overflow-y-auto pt-2">

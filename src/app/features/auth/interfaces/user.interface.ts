@@ -11,6 +11,8 @@ export interface User {
   publishedAt:   Date;
   locale:        null;
   role:          Role;
+  name:          string;
+  lastName:      string;
 }
 
 export interface Role {
