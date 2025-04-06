@@ -181,7 +181,13 @@
 
           <!-- Grid de noticias -->
           <div class="news-grid" [class.hidden]="isCardsLoading">
-            <article *ngFor="let news of displayedNews" class="news-card" (click)="navigateToNews(news)" [@fadeInOut]>
+            <!-- Mensaje de diagnóstico para verificar si hay datos -->
+            <div *ngIf="displayedNews.length === 0 && !isCardsLoading" class="diagnostic-message">
+              <p>No hay noticias disponibles para mostrar en la página {{ currentPage }}.</p>
+            </div>
+            
+            <!-- Articles -->
+            <article *ngFor="let news of displayedNews; trackBy: trackByNewsId" class="news-card" (click)="navigateToNews(news)">
               <div class="card-image">
                 <img [src]="getImageUrl(news)" [alt]="news.title"
                      [class.default-image]="!news.mainImage"
@@ -240,11 +246,15 @@
           </div>
           
           <!-- Paginador -->
-          <div class="paginator-container" *ngIf="displayedNews.length > 0 && !isCardsLoading">
+          <div class="paginator-container" *ngIf="totalPages > 1 && !isCardsLoading">
             <p-paginator 
               [rows]="pageSize" 
               [totalRecords]="totalRecords" 
-              (onPageChange)="onPageChange($event)">
+              [first]="(currentPage-1) * pageSize"
+              (onPageChange)="onPageChange($event)"
+              [showJumpToPageDropdown]="false"
+              [showPageLinks]="true"
+              [alwaysShow]="false">
             </p-paginator>
           </div>
         </div>
@@ -258,7 +268,7 @@
     <div class="sidebar-box sidebar-interest">
       <h3 class="sidebar-title">Podría interesarte</h3>
       <div class="interest-cards">
-        <div *ngFor="let news of minimalNews" class="interest-card" (click)="openSourceUrl(news)">
+        <div *ngFor="let news of displayedMinimalNews; trackBy: trackByNewsId" class="interest-card" (click)="openSourceUrl(news)" [@interestCardAnimation]>
           <div class="interest-image" *ngIf="news.mainImage">
             <img [src]="getImageUrl(news)" [alt]="news.title">
           </div>
@@ -274,6 +284,9 @@
             </span>
           </div>
         </div>
+        <div *ngIf="displayedMinimalNews.length === 0 && !isLoading" class="no-interest-news">
+            <p>No hay noticias relacionadas en este momento.</p>
+        </div>
       </div>
     </div>
 
@@ -281,23 +294,31 @@
     <div class="sidebar-box subscribe-module">
       <h3 class="sidebar-title">Suscríbete</h3>
       <div class="subscribe-container">
-        <p>Recibe las últimas noticias en tu correo electrónico</p>
-        <form class="subscribe-form">
-          <input type="email" class="email-input" placeholder="Tu correo electrónico">
-          
-          <!-- NUEVAS OPCIONES DE FRECUENCIA -->
-          <div class="frequency-options">
-            <div class="frequency-option">
-              <input type="radio" id="daily" name="frequency" value="daily" checked>
-              <label for="daily">Diario</label>
-            </div>
-            <div class="frequency-option">
-              <input type="radio" id="weekly" name="frequency" value="weekly">
-              <label for="weekly">Semanal</label>
-            </div>
+        <p>Recibe las últimas noticias en tu correo electrónico.</p>
+        <form class="subscribe-form" [formGroup]="subscribeForm" (ngSubmit)="onSubscribe()">
+          <!-- Campo de email -->
+          <input 
+            type="email" 
+            class="email-input" 
+            placeholder="Tu correo electrónico"
+            formControlName="email"
+            [ngClass]="{'ng-invalid ng-dirty': emailControl?.invalid && (emailControl?.dirty || emailControl?.touched)}"
+          >
+          <div *ngIf="emailControl?.invalid && (emailControl?.dirty || emailControl?.touched)" class="error-message">
+            <small *ngIf="emailControl?.errors?.['required']">El correo es requerido</small>
+            <small *ngIf="emailControl?.errors?.['email']">Formato de correo inválido</small>
           </div>
           
-          <button type="submit" class="subscribe-button">Suscribirse</button>
+          <div class="frequency-options">
+            <p class="frequency-info">Los newsletters se enviarán semanalmente.</p>
+          </div>
+          
+          <button 
+            type="submit" 
+            class="subscribe-button"
+            [disabled]="subscribeForm.invalid || isSubscribing">
+            {{ isSubscribing ? 'Enviando...' : 'Suscribirse' }}
+          </button>
         </form>
       </div>
     </div>
@@ -316,4 +337,46 @@
       </div>
     </div>
   </aside>
-</div> 
+
+  <!-- Agregar el componente Toast para mostrar mensajes -->
+  <p-toast position="top-right"></p-toast>
+</div>
+
+<!-- Formulario de suscripción simplificado -->
+<div class="newsletter-section">
+  <div class="newsletter-container">
+    <h4 class="newsletter-title">Suscríbete al newsletter</h4>
+    <p class="newsletter-description">Recibe las últimas noticias del Corredor Bioceánico directamente en tu correo.</p>
+    
+    <form [formGroup]="subscribeForm" (ngSubmit)="onSubscribe()" class="subscribe-form">
+      <div class="email-input-container">
+        <input 
+          pInputText 
+          type="email" 
+          formControlName="email" 
+          placeholder="Ingresa tu correo electrónico" 
+          class="email-input" 
+          [ngClass]="{'ng-invalid ng-dirty': subscribeForm.get('email')?.invalid && subscribeForm.get('email')?.touched}"
+        />
+        <div *ngIf="subscribeForm.get('email')?.invalid && subscribeForm.get('email')?.touched" class="error-message">
+          <small *ngIf="subscribeForm.get('email')?.errors?.['required']">Email es requerido</small>
+          <small *ngIf="subscribeForm.get('email')?.errors?.['email']">Formato de email inválido</small>
+        </div>
+      </div>
+      
+      <button 
+        pButton 
+        type="submit" 
+        label="Suscribirse" 
+        icon="pi pi-envelope" 
+        [disabled]="subscribeForm.invalid || isSubscribing"
+        [loading]="isSubscribing"
+        class="subscribe-button"
+      ></button>
+    </form>
+    
+    <p class="privacy-notice">Recibirás actualizaciones semanales. Puedes cancelar tu suscripción en cualquier momento.</p>
+  </div>
+</div>
+
+<p-toast></p-toast> 
