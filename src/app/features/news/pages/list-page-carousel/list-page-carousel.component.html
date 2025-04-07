@@ -342,41 +342,5 @@
   <p-toast position="top-right"></p-toast>
 </div>
 
-<!-- Formulario de suscripción simplificado -->
-<div class="newsletter-section">
-  <div class="newsletter-container">
-    <h4 class="newsletter-title">Suscríbete al newsletter</h4>
-    <p class="newsletter-description">Recibe las últimas noticias del Corredor Bioceánico directamente en tu correo.</p>
-    
-    <form [formGroup]="subscribeForm" (ngSubmit)="onSubscribe()" class="subscribe-form">
-      <div class="email-input-container">
-        <input 
-          pInputText 
-          type="email" 
-          formControlName="email" 
-          placeholder="Ingresa tu correo electrónico" 
-          class="email-input" 
-          [ngClass]="{'ng-invalid ng-dirty': subscribeForm.get('email')?.invalid && subscribeForm.get('email')?.touched}"
-        />
-        <div *ngIf="subscribeForm.get('email')?.invalid && subscribeForm.get('email')?.touched" class="error-message">
-          <small *ngIf="subscribeForm.get('email')?.errors?.['required']">Email es requerido</small>
-          <small *ngIf="subscribeForm.get('email')?.errors?.['email']">Formato de email inválido</small>
-        </div>
-      </div>
-      
-      <button 
-        pButton 
-        type="submit" 
-        label="Suscribirse" 
-        icon="pi pi-envelope" 
-        [disabled]="subscribeForm.invalid || isSubscribing"
-        [loading]="isSubscribing"
-        class="subscribe-button"
-      ></button>
-    </form>
-    
-    <p class="privacy-notice">Recibirás actualizaciones semanales. Puedes cancelar tu suscripción en cualquier momento.</p>
-  </div>
-</div>
 
 <p-toast></p-toast> 
