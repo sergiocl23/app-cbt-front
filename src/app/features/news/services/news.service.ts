@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, map, catchError } from 'rxjs';
+import { Observable, map, catchError, throwError } from 'rxjs';
 import { News, NewsItem } from '../interfaces/news.interface';
 import { environments } from '@environments/environments';
 
@@ -374,6 +374,26 @@ export class NewsService {
         console.error('[ERROR SERVICE] Error al obtener tags de noticias:', error);
         // Devolver un array vacío en caso de error
         return [];
+      })
+    );
+  }
+
+  /**
+   * Añade un nuevo suscriptor al newsletter con solo correo electrónico
+   * @param email El correo electrónico del suscriptor
+   * @returns Observable con la respuesta del backend
+   */
+  addSubscriber(email: string): Observable<any> {
+    const url = `${this.baseUrlStrapi}/api/subscribers/subscribe`;
+    
+    return this.http.post(url, { 
+      email 
+    }, {
+      headers: this.headers
+    }).pipe(
+      catchError(error => {
+        console.error('[ERROR] Error al suscribir:', error);
+        return throwError(() => error);
       })
     );
   }
