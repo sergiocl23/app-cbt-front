@@ -42,7 +42,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'home',
+        redirectTo: 'news',
         // redirectTo: 'map',
         pathMatch: 'full'
       },

@@ -1,46 +1,48 @@
 .forum-container {
     display: flex;
     min-height: calc(100vh - 64px);
-    padding: 30px;
+    padding: 1rem;
     background-color: #ecf0f1;
     gap: 20px;
     position: relative;
   }
-  
+
   .forum-container.sidebar-open {
     padding-left: 268px; /* Expanded sidebar width */
   }
-  
+
   .forum-sidebar {
     width: 270px;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    margin-right: 20px;
+    /* margin-right: 20px; */
     position: sticky;
     top: 30px;
     height: calc(100vh - 94px);
     overflow-y: auto;
+    box-shadow: 0px 1px 3px #888888;
   }
-  
+
   .forum-content {
     flex: 1;
     padding: 20px;
     background-color: white;
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-right: 15px;
+    box-shadow: 0px 1px 3px #888888;
+    /* margin-right: 15px; */
   }
-  
+
   /* Rest of your existing CSS remains the same */
-  
+
   .subcategories-list {
     list-style: none;
     padding: 0;
     margin: 0 0 15px 0;
   }
-  
+
   .subcategory-item {
     display: flex;
     justify-content: space-between;
@@ -52,24 +54,24 @@
     transition: all 0.2s ease;
     color: #4a5568;
   }
-  
+
   .subcategory-item:hover {
     background-color: #f8f9fa;
   }
-  
+
   .subcategory-item.active {
     background-color: #ebf7fc;
     color: #36A9E1;
     font-weight: 500;
   }
-  
+
   .subcategory-content {
     display: flex;
     align-items: center;
     gap: 10px;
     flex: 1;
   }
-  
+
   .subcategory-item .delete-btn {
     visibility: hidden;
     background: transparent;
@@ -79,15 +81,15 @@
     cursor: pointer;
     margin-left: 8px;
   }
-  
+
   .subcategory-item .delete-btn:hover {
     color: #c82333;
   }
-  
+
   .subcategory-item:hover .delete-btn {
     visibility: visible;
   }
-  
+
   .topics-header {
     display: flex;
     justify-content: space-between;
@@ -96,7 +98,7 @@
     padding-bottom: 10px;
     border-bottom: 1px solid #e0e0e0;
   }
-  
+
   .new-topic-btn {
     padding: 8px 16px;
     background-color: #36A9E1;
@@ -106,11 +108,11 @@
     cursor: pointer;
     transition: background-color 0.2s;
   }
-  
+
   .new-topic-btn:hover {
     background-color: #2196D3;
   }
-  
+
   .topic-item {
     display: flex;
     padding: 1rem;
@@ -119,7 +121,7 @@
     border: 1px solid #e9ecef;
     transition: all 0.2s ease;
   }
-  
+
   .topic-status {
     display: flex;
     flex-direction: column;
@@ -128,65 +130,65 @@
     margin-right: 1rem;
     min-width: 24px;
   }
-  
+
   /* Pinned topic styles */
   .pinned-topic {
     background-color: #f8f9fa;
     border-left: 3px solid #36A9E1;
   }
-  
+
   /* Closed topic styles */
   .closed-topic {
     background-color: #f8f9fa;
     border-left: 3px solid #dc3545;
   }
-  
+
   /* Combined state - pinned and closed */
   .pinned-topic.closed-topic {
     background-color: #f8f9fa;
     border-left: 3px solid #6c757d;
   }
-  
+
   /* Icon styles */
   .pin-icon {
     color: #36A9E1;
     transform: rotate(45deg);
   }
-  
+
   .lock-icon {
     color: #dc3545;
   }
-  
+
   /* When both icons are present */
   .topic-status:has(.pin-icon, .lock-icon) {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
   }
-  
+
   .topic-content {
     flex: 1;
   }
-  
+
   .topic-title {
     margin: 0;
     font-size: 1.1rem;
     color: #2c3e50;
   }
-  
+
   .topic-preview {
     margin: 0.5rem 0 0;
     font-size: 0.9rem;
     color: #6c757d;
   }
-  
+
   /* Hover effects */
   .topic-item:hover {
     background-color: #f1f3f5;
     cursor: pointer;
     transform: translateX(2px);
   }
-  
+
   .topic-meta {
     display: flex;
     gap: 15px;
@@ -259,7 +261,7 @@
 
       &.edit-btn {
         color: #36A9E1;  /* Blue by default */
-        
+
         &:hover {
           background-color: #ebf7fc;
         }
@@ -267,7 +269,7 @@
 
       &.delete-btn {
         color: #dc3545;  /* Red by default */
-        
+
         &:hover {
           background-color: #fee2e2;
         }
@@ -374,7 +376,7 @@
     margin-bottom: 20px;
     padding-bottom: 15px;
     border-bottom: 1px solid #e0e0e0;
-    
+
     &:first-child {
       margin-bottom: 0;
     }

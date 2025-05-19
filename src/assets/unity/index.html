@@ -20,7 +20,7 @@
       <div id="unity-footer">
         <div id="unity-webgl-logo"></div>
         <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">My project (5)</div>
+        <div id="unity-build-title">Simulador 0.23</div>
       </div>
     </div>
     <script>
@@ -57,11 +57,11 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/CorredorVersionGorePrueba01.loader.js";
+      var loaderUrl = buildUrl + "/M3.loader.js";
       var config = {
-        dataUrl: buildUrl + "/CorredorVersionGorePrueba01.data",
-        frameworkUrl: buildUrl + "/CorredorVersionGorePrueba01.framework.js",
-        codeUrl: buildUrl + "/CorredorVersionGorePrueba01.wasm",
+        dataUrl: buildUrl + "/M3.data",
+        frameworkUrl: buildUrl + "/M3.framework.js",
+        codeUrl: buildUrl + "/M3.wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "My project (5)",
@@ -94,7 +94,7 @@
       } else {
         // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
 
-        canvas.style.width = "1580px";
+        canvas.style.width = "1280px";
         canvas.style.height = "720px";
       }
 
@@ -118,5 +118,18 @@
       document.body.appendChild(script);
 
     </script>
+
+<script type="text/javascript">
+  function downloadFile(filename, content) {
+  const blob = new Blob([content], { type: 'text/csv' }); // Crear archivo Blob
+  const link = document.createElement('a'); // Crear enlace para descargar
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link); // Añadir el enlace al documento
+  link.click(); // Simular clic para iniciar la descarga
+  document.body.removeChild(link); // Eliminar enlace después de descargar
+}
+
+</script>
   </body>
 </html>

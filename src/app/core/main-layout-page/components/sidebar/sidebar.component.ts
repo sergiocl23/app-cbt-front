@@ -24,14 +24,14 @@ export class SidebarComponent {
   authService = inject(AuthService);
   public user = computed(() => this.authService.user());
 
-  public name = this.user()!.name;
-  public lastName = this.user()!.lastName;
-  public role = this.user()?.role?.name;
-  public initials = (this.name[0] + this.lastName[0]).toUpperCase();
+  // public name = this.user()!.name;
+  // public lastName = this.user()!.lastName;
+  // public role = this.user()?.role?.name;
+  // public initials = (this.name[0] + this.lastName[0]).toUpperCase();
 
   public sidebarItems = [
     { label: 'Genericas', show: false, sections: [
-      { label: 'Inicio', icon: 'home', url: 'home'},
+      // { label: 'Inicio', icon: 'home', url: 'home'},
       { label: 'Portal de Noticias', icon: 'newspaper', url: 'news/carousel'},
       // { label: 'Catálogo de Empresas', icon: 'store', url: 'a'},
       { label: 'Mapa Interactivo', icon: 'map', url: 'map'},
