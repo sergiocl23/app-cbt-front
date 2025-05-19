@@ -20,8 +20,6 @@ export class AuthService {
 
   private http = inject(HttpClient);
 
-  // checkStatusResource = rxResource()
-
   authStatus = computed(() => {
     if (this._authStatus() === 'checking') return 'checking';
 

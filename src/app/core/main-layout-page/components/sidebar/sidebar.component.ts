@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, EventEmitter, inject, Input, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 @Component({
   selector: 'sidebar',
@@ -20,9 +21,17 @@ export class SidebarComponent {
   @Input() isOpen: boolean = false; // Recibe el estado desde el componente padre
   @Output() close = new EventEmitter<void>(); // Emite cuando el sidebar se cierra
 
+  authService = inject(AuthService);
+  public user = computed(() => this.authService.user());
+
+  // public name = this.user()!.name;
+  // public lastName = this.user()!.lastName;
+  // public role = this.user()?.role?.name;
+  // public initials = (this.name[0] + this.lastName[0]).toUpperCase();
+
   public sidebarItems = [
     { label: 'Genericas', show: false, sections: [
-      { label: 'Inicio', icon: 'home', url: 'home'},
+      // { label: 'Inicio', icon: 'home', url: 'home'},
       { label: 'Portal de Noticias', icon: 'newspaper', url: 'news/carousel'},
       // { label: 'Catálogo de Empresas', icon: 'store', url: 'a'},
       { label: 'Mapa Interactivo', icon: 'map', url: 'map'},
@@ -57,6 +66,10 @@ export class SidebarComponent {
     //   { label: 'Corredor Bioceánico', icon: 'local_shipping', url: 'a'},
     // ]},
   ];
+
+  onLogout(){
+    this.authService.logout();
+  }
 
   onClose() {
     this.close.emit(); // Emite evento de cierre
