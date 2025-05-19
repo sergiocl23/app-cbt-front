@@ -55,13 +55,18 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
+      if (this.map) {
+        this.map.remove(); // Elimina el mapa al destruir el componente
+      }
       // Corregir
       setTimeout(() => {
         this.map = new Map({
           container: 'map',
           style: 'mapbox://styles/mapbox/streets-v12',
-          center: [-57.99705313935333, -21.520013511251367],
-          zoom: 5.4,
+          // center: [-57.99705313935333, -21.520013511251367] //Inicio,
+          // center: [-70.14104651801337, -20.230079552384115], //Iquique
+          center: [-70.09705313935333, -20.25013511251367], //
+          zoom: 12,
           // pitch: 50
         })
 
@@ -73,7 +78,7 @@ export class MapLayoutPageComponent implements AfterViewInit, OnDestroy, OnInit{
         this.loadThirdRoute();
       }, 200);
       setTimeout(() => {
-        this.loadSecondaryRoute();
+        // this.loadSecondaryRoute();
       }, 300);
       setTimeout(() => {
         this.loadPrimaryRoute();

@@ -65,10 +65,6 @@ export class MainLayoutPageComponent{
     this.isSidebarOpen = false;
   }
 
-  onLogout(){
-    this.authService.logout();
-  }
-
   get mainContentClass() {
     // return '';
     return this.isSidebarOpen ? 'sidebar-open' : '';

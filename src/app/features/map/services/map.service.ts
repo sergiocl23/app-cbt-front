@@ -64,17 +64,22 @@ export class MapService {
   getUserLocation(): Promise<[number, number]>{
     return new Promise( (resolve, reject ) => {
       if (isPlatformBrowser(this.platformId)){
-        navigator.geolocation.getCurrentPosition(
-          ( { coords } ) => {
-            this.userLocation = [coords.longitude, coords.latitude];
-            resolve(this.userLocation);
-          },
-          ( err ) => {
-            alert('No se pudo obtener la geolocalizción');
-            console.log(err);
-            reject();
-          }
-        );
+
+        this.userLocation = [-70.152416, -20.214138];
+        resolve(this.userLocation);
+
+        // navigator.geolocation.getCurrentPosition(
+        //   ( { coords } ) => {
+        //     this.userLocation = [coords.longitude, coords.latitude];
+        //     resolve(this.userLocation);
+        //   },
+        //   ( err ) => {
+        //     alert('No se pudo obtener la geolocalizción');
+        //     console.log(err);
+        //     reject();
+        //   }
+        // );
+
       }
 
     } );
@@ -113,7 +118,7 @@ export class MapService {
       'Authorization': `Bearer ${this.token}`
     })
 
-    return this.http.get<Points>(`${ this.baseUrlStrapi }/api/points?limit=1&populate=*&pagination[page]=1&pagination[pageSize]=500`, { headers });
+    return this.http.get<Points>(`${ this.baseUrlStrapi }/api/points?limit=1&populate=*&pagination[page]=1&pagination[pageSize]=500&filters[visible][$eq]=1`, { headers });
   }
 
   getPlacesByQuery( query: string = '' ){

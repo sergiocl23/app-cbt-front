@@ -55,14 +55,12 @@ export class LoginPageComponent implements OnInit{
 
     const { email = '', password = ''} = this.loginForm.value;
 
-    // console.log({email, password});
-
     this.authService.login(email!, password!).subscribe((isAuthenticated) => {
 
-      if( isAuthenticated ){
-        this.router.navigateByUrl('/');
-        return;
-      }
+      // if( isAuthenticated ){
+      //   this.router.navigateByUrl('/');
+      //   return;
+      // }
 
       this.hasError.set(true);
       setTimeout(() => {

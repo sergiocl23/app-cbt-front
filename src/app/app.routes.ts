@@ -9,7 +9,7 @@ import { isNotAuthenticatedGuard } from './features/auth/guards/is-not-authentic
 export const routes: Routes = [
   {
     path: '',
-    canActivate: [ isAuthenticatedGuard ],
+    // canActivate: [ isAuthenticatedGuard ],
     component: MainLayoutPageComponent,
     children: [
       {
@@ -42,7 +42,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'home',
+        redirectTo: 'news',
         // redirectTo: 'map',
         pathMatch: 'full'
       },
@@ -51,7 +51,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     component: AuthLayoutPageComponent,
-    canActivate: [ isNotAuthenticatedGuard ],
+    // canActivate: [ isNotAuthenticatedGuard ],
     loadChildren: () => import('./features/auth/auth.routes').then( r => r.routes)
   },
   {
