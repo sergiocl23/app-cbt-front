@@ -261,7 +261,8 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
 
     // Inicializar el formulario de suscripción solo con email
     this.subscribeForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email, Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
+      frequency: ['weekly'] // Valor por defecto
     });
   }
 
@@ -1141,49 +1142,53 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
    * Maneja el envío del formulario de suscripción
    */
   onSubscribe() {
+    this.subscribeForm.markAllAsTouched();
     if (this.subscribeForm.invalid) {
-      // Marcar campos como tocados para mostrar errores
-      Object.keys(this.subscribeForm.controls).forEach(key => {
-        const control = this.subscribeForm.get(key);
-        control?.markAsTouched();
+      this.messageService.add({ 
+        severity: 'warn', 
+        summary: 'Formulario inválido', 
+        detail: 'Por favor, ingrese un correo electrónico válido.',
+        life: 4000
       });
       return;
     }
 
     this.isSubscribing = true;
-    const email = this.subscribeForm.get('email')?.value;
+    const email = this.emailControl?.value;
+    const frequency = this.subscribeForm.get('frequency')?.value;
 
-    this.newsService.addSubscriber(email)
-      .subscribe({
-        next: (response) => {
-          this.isSubscribing = false;
-          this.subscribeForm.reset();
-          
-          // Mostrar mensaje de éxito
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Suscripción exitosa',
-            detail: '¡Gracias por suscribirte al newsletter del Corredor Bioceánico!'
-          });
-        },
-        error: (error) => {
-          this.isSubscribing = false;
-          
-          // Manejar mensajes de error específicos
-          let errorMsg = 'Error al procesar la suscripción. Intente nuevamente.';
-          
-          if (error.error?.message === 'Email ya registrado y activo') {
-            errorMsg = 'Este correo ya está suscrito al newsletter.';
-          } else if (error.error?.message?.includes('email')) {
-            errorMsg = 'Por favor ingrese un correo electrónico válido.';
-          }
-          
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: errorMsg
-          });
+    this.newsService.addSubscriber(email, frequency).subscribe({
+      next: (response) => {
+        this.isSubscribing = false;
+        console.log('[COMPONENT] Respuesta de suscripción:', response);
+        this.messageService.add({ 
+          severity: 'success', 
+          summary: 'Suscripción Exitosa', 
+          detail: '¡Gracias por suscribirte a nuestro newsletter!',
+          life: 5000 
+        });
+        this.subscribeForm.reset({ email: '', frequency: 'daily' }); // Resetea el formulario
+      },
+      error: (error) => {
+        this.isSubscribing = false;
+        console.error('[COMPONENT] Error al suscribir:', error);
+        let detailMessage = 'Ocurrió un error al procesar tu solicitud. Por favor, inténtalo de nuevo más tarde.';
+        // Personalizar mensaje si el backend devuelve un error específico
+        if (error?.error?.error?.message) {
+          detailMessage = error.error.error.message;
+        } else if (typeof error?.error === 'string') {
+          detailMessage = error.error;
+        } else if (error.message) {
+            detailMessage = error.message; // Para errores como "reCAPTCHA not ready"
         }
-      });
+
+        this.messageService.add({ 
+          severity: 'error', 
+          summary: 'Error de Suscripción', 
+          detail: detailMessage,
+          life: 6000 
+        });
+      }
+    });
   }
 }
