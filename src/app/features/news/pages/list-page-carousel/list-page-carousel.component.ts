@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, PLATFORM_ID, Inject } from '@angular/core
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule, FormGroup, FormControl, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { animate, state, style, transition, trigger, query, stagger } from '@angular/animations';
+import { animate, state, style, transition, trigger} from '@angular/animations';
 import { interval, Subscription, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { registerLocaleData } from '@angular/common';
@@ -13,8 +13,6 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepickerIntl } from '@angular/material/datepicker';
-import { environments } from '@environments/environments';
-
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
@@ -23,15 +21,15 @@ import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { CarouselModule } from 'primeng/carousel';
-import { LatestNewsCardComponent } from '../../components/latest-news-card/latest-news-card.component';
 import { PaginatorModule } from 'primeng/paginator';
 import { NewsSkeletonComponent } from '../../components/news-skeleton/news-skeleton.component';
 import { GoogleNewsWidgetModule } from '../../components/google-news-widget/google-news-widget.module';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ClickOutsideDirective } from '../../../../shared/directives/click-outside.directive';
 
 import { NewsService } from '../../services/news.service';
-import { NewsItem, MediaItem } from '../../interfaces/news.interface';
+import { NewsItem } from '../../interfaces/news.interface';
 
 // Registrar el locale español
 registerLocaleData(localeEs, 'es');
@@ -60,7 +58,8 @@ registerLocaleData(localeEs, 'es');
     PaginatorModule,
     CarouselModule,
     GoogleNewsWidgetModule,
-    ToastModule
+    ToastModule,
+    ClickOutsideDirective
   ],
   providers: [MessageService],
   templateUrl: './list-page-carousel.component.html',
@@ -70,14 +69,18 @@ registerLocaleData(localeEs, 'es');
       state('true', style({
         maxHeight: '800px',
         opacity: 1,
-        visibility: 'visible'
+        visibility: 'visible',
+        transform: 'translateY(0)',
+        marginTop: '8px'
       })),
       state('false', style({
         maxHeight: '0',
         opacity: 0,
-        visibility: 'hidden'
+        visibility: 'hidden',
+        transform: 'translateY(-10px)',
+        marginTop: '0px'
       })),
-      transition('true <=> false', animate('400ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
+      transition('true <=> false', animate('500ms cubic-bezier(0.35, 0, 0.25, 1)'))
     ]),
     trigger('fadeInOut', [
       transition(':enter', [
@@ -276,7 +279,6 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       debounceTime(500), // Espera 500ms después del último input
       distinctUntilChanged() // Solo emite si el valor cambia
     ).subscribe(query => {
-      this.searchQuery = query;
       this.applyFilters();
     });
 
@@ -414,7 +416,10 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
   private buildQueryParams(fetchSize: number = this.pageSize) { 
     const filters: any = { relevanceScore: { $null: true } };
     if (this.selectedCountry?.name) { filters.pais = this.selectedCountry.name.toLowerCase(); }
-    if (this.selectedTags?.length > 0) { filters.tags = { nombre: { $in: this.selectedTags.map(tag => tag.name) } }; }
+    console.log('[DEBUG COMPONENT] Contenido de this.selectedCategories en buildQueryParams:', JSON.stringify(this.selectedCategories));
+    if (this.selectedCategories?.length > 0) { 
+        filters.tags = { nombre: { $in: this.selectedCategories } }; 
+    }
     if (this.dateStart || this.dateEnd) {
       filters.articleDate = {};
       
@@ -862,40 +867,65 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
 
   // Métodos para manejar los filtros
   toggleSearchExpand() {
-    this.isSearchExpanded = !this.isSearchExpanded;
-    
-    // Si tenemos consulta y estamos cerrando, limpiar la búsqueda
-    if (!this.isSearchExpanded && this.searchQuery) {
+    if (this.isSearchExpanded && this.searchQuery) { // Si se hizo clic en 'X' (expandido con consulta)
       this.searchQuery = '';
-      this.applyFilters();
+      this.searchSubject.next(''); // Actualizar para aplicar filtros sin consulta
+      this.isSearchExpanded = false; // Colapsar
+    } else { // Comportamiento normal de toggle: expandir o colapsar si está vacío
+      this.isSearchExpanded = !this.isSearchExpanded;
     }
+  }
+
+  handleSearchBlur() {
+    // Colapsar la barra de búsqueda si pierde el foco y está vacía.
+    // Usar un pequeño retraso para evitar que se cierre si el blur fue causado por un clic en el botón 'X'.
+    setTimeout(() => {
+      if (!this.searchQuery && this.isSearchExpanded) {
+        this.isSearchExpanded = false;
+      }
+    }, 150);
   }
 
   toggleDateFilter() {
-    this.isDateFilterExpanded = !this.isDateFilterExpanded;
+    const openingDateFilter = !this.isDateFilterExpanded;
+    this.isDateFilterExpanded = openingDateFilter;
+    if (openingDateFilter) {
+      this.isCategoryFilterExpanded = false; // Cerrar filtro de categorías
+    }
+  }
+
+  // NUEVO: Método para cerrar el filtro de fecha si está abierto
+  closeDateFilter(): void {
+    if (this.isDateFilterExpanded) {
+      this.isDateFilterExpanded = false;
+    }
   }
 
   toggleCategoryFilter() {
-    this.isCategoryFilterExpanded = !this.isCategoryFilterExpanded;
+    const openingCategoryFilter = !this.isCategoryFilterExpanded;
+    this.isCategoryFilterExpanded = openingCategoryFilter;
+    if (openingCategoryFilter) {
+      this.isDateFilterExpanded = false; // Cerrar filtro de fecha
+    }
+  }
+
+  // NUEVO: Método para cerrar el filtro de categorías si está abierto
+  closeCategoryFilter(): void {
+    if (this.isCategoryFilterExpanded) {
+      this.isCategoryFilterExpanded = false;
+    }
   }
 
   // Actualizar el método onSearch para recibir un parámetro de evento
-  onSearch(event?: Event): void {
-    console.log('[DEBUG] Ejecutando búsqueda con:', this.searchQuery);
+  onSearch(event?: Event): void { // Llamado con Enter en el input de búsqueda
+    console.log('[DEBUG] Ejecutando búsqueda con (Enter):', this.searchQuery);
+    // El valor ya está en this.searchQuery debido a [(ngModel)]
+    this.applyFilters(); // Aplicar filtros inmediatamente
     
-    // Obtener el valor del input si se proporciona un evento
-    if (event && event.target) {
-      const target = event.target as HTMLInputElement;
-      this.searchQuery = target.value;
-    }
-    
-    // Ejecutar búsqueda inmediatamente
-    this.applyFilters();
-    
-    // Si la barra está expandida y no hay texto, colapsar
-    if (this.isSearchExpanded && !this.searchQuery) {
-      this.isSearchExpanded = false;
-    }
+    // Si la barra está expandida y no hay texto, colapsar (esto podría ser redundante si handleSearchBlur funciona bien)
+    // if (this.isSearchExpanded && !this.searchQuery) {
+    //   this.isSearchExpanded = false;
+    // }
   }
 
   // Método para manejar cambios en el input de búsqueda (búsqueda automática)
@@ -919,10 +949,13 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
     
     // Aplicar filtros
     this.applyFilters();
+    // No cerramos el panel de fecha aquí, el usuario puede estar seleccionando un rango.
   }
 
   onCategoryChange() {
     this.applyFilters();
+    // Cerrar el panel de categorías después de una selección
+    this.isCategoryFilterExpanded = false;
   }
 
   // Renombrar resetFilters a clearFilters para ser consistente con el HTML

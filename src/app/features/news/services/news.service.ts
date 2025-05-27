@@ -101,15 +101,21 @@ export class NewsService {
       console.log('[DEBUG SERVICE] Aplicando filtro por país:', params.filters.pais);
     }
 
-    // Filtro de tags
-    if (params.filters?.tags?.nombre?.$in?.length > 0) {
-      params.filters.tags.nombre.$in.forEach((tag: string, index: number) => {
-        queryParams = queryParams.set(
-          `filters[$and][${index}][tags][nombre][$eq]`, 
-          tag
-        );
-      });
-      console.log('[DEBUG SERVICE] Aplicando filtros por tags:', params.filters.tags.nombre.$in);
+    // Filtro de tags MODIFICADO
+    if (params.filters?.tags?.nombre?.$in && Array.isArray(params.filters.tags.nombre.$in) && params.filters.tags.nombre.$in.length > 0) {
+      const tagsToFilter = params.filters.tags.nombre.$in;
+      
+      if (tagsToFilter.length === 1) {
+        // Si hay un solo tag, usar $eq
+        queryParams = queryParams.set('filters[tags][nombre][$eq]', tagsToFilter[0]);
+        console.log('[DEBUG SERVICE] Aplicando filtro por un solo tag (nombre):', tagsToFilter[0]);
+      } else {
+        // Si hay múltiples tags, usar $in y construir los parámetros indexados
+        tagsToFilter.forEach((tag: string, index: number) => {
+          queryParams = queryParams.set(`filters[tags][nombre][$in][${index}]`, tag);
+        });
+        console.log('[DEBUG SERVICE] Aplicando filtros por múltiples tags (nombre):', tagsToFilter);
+      }
     }
 
     // Filtro de búsqueda de texto

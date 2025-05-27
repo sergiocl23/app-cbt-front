@@ -1,14 +1,4 @@
 <div class="container" [class.reading-mode]="isReadingMode">
-  <!-- Botón de retroceso -->
-
-  <button 
-    class="back-button"
-    (click)="goBack()"
-    title="Volver atrás">
-    <i class="pi pi-arrow-left"></i>
-    <span class="back-text">Regresar</span>
-
-  </button>
 
   <!-- Loading spinner -->
   <div *ngIf="isLoading" class="loading-spinner">

@@ -94,10 +94,11 @@
               <input type="text" class="search-input" 
                      placeholder="Buscar noticias..." 
                      [(ngModel)]="searchQuery"
-                     (input)="onSearchInput()"
-                     (keyup.enter)="onSearch($event)">
+                     (input)="onSearchInput()" 
+                     (keyup.enter)="onSearch($event)"
+                     (blur)="handleSearchBlur()">
               <button class="search-toggle" aria-label="Buscar" 
-                      (click)="isSearchExpanded ? onSearch($event) : toggleSearchExpand()">
+                      (click)="toggleSearchExpand()">
                 <i class="pi" [ngClass]="{'pi-search': !isSearchExpanded || !searchQuery, 'pi-times': isSearchExpanded && searchQuery}"></i>
                 <span class="filter-indicator" *ngIf="searchQuery && !isSearchExpanded"></span>
               </button>
@@ -105,28 +106,29 @@
 
             <!-- Filtro de fecha colapsable -->
             <div class="date-filter" [class.expanded]="isDateFilterExpanded">
-              <button type="button" class="date-toggle" aria-label="Filtrar por fecha" (click)="toggleDateFilter()">
+              <button type="button" class="date-toggle" aria-label="Filtrar por fecha" (click)="toggleDateFilter(); $event.stopPropagation()">
                 <i class="pi pi-calendar"></i>
                 <span class="filter-indicator" *ngIf="dateStart || dateEnd"></span>
               </button>
-              <div class="date-range">
+              <div class="date-range" [@slideInOut]="isDateFilterExpanded" 
+                   appClickOutside (clickOutside)="closeDateFilter()">
                 <p-calendar
                   [(ngModel)]="dateStart"
                   [showIcon]="false"
                   dateFormat="dd/mm/yy"
-                  placeholder="Desde"
+                  placeholder="Fecha inicial"
                   [showButtonBar]="true"
                   (onSelect)="onDateChange()"
                   [style]="{'width': '120px'}"
                   [minDate]="desdeMinDate"
                   [maxDate]="dateEnd || hastaMaxDate"
                 ></p-calendar>
-                <span class="date-range-separator">a</span>
+                <span class="date-range-separator">hasta</span>
                 <p-calendar
                   [(ngModel)]="dateEnd"
                   [showIcon]="false"
                   dateFormat="dd/mm/yy"
-                  placeholder="Hasta"
+                  placeholder="Fecha final"
                   [showButtonBar]="true"
                   (onSelect)="onDateChange()"
                   [style]="{'width': '120px'}"
@@ -142,20 +144,22 @@
 
             <!-- Selector de categorías colapsable -->
             <div class="category-filter" [class.expanded]="isCategoryFilterExpanded">
-              <button type="button" class="category-toggle" aria-label="Filtrar por categoría" (click)="toggleCategoryFilter()">
+              <button type="button" class="category-toggle" aria-label="Filtrar por categoría" (click)="toggleCategoryFilter(); $event.stopPropagation()">
                 <i class="pi pi-tags"></i>
                 <span class="filter-indicator" *ngIf="selectedCategories?.length"></span>
               </button>
-              <div class="category-panel">
+              <div class="category-panel" [@slideInOut]="isCategoryFilterExpanded" 
+                   appClickOutside (clickOutside)="closeCategoryFilter()">
                 <p-multiSelect 
                   [options]="categories" 
                   [(ngModel)]="selectedCategories" 
                   optionLabel="label"
                   optionValue="value"
-                  placeholder="Seleccionar categorías"
+                  placeholder="Seleccionar temáticas"
                   [showToggleAll]="true"
                   [showHeader]="true"
                   [appendTo]="'body'"
+                  styleClass="category-filter-multiselect"
                   (onChange)="onCategoryChange()">
                   <ng-template pTemplate="header">
                     <div class="multiselect-header">
@@ -290,6 +294,20 @@
       </div>
     </div>
 
+    <!-- MÓDULO DE REDES SOCIALES -->
+    <div class="sidebar-box social-module">
+      <h3 class="sidebar-title">Síguenos</h3>
+      <div class="social-container">
+        <div class="social-icons">
+          <a href="#" class="social-icon"><i class="pi pi-facebook"></i></a>
+          <a href="#" class="social-icon"><i class="pi pi-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="pi pi-linkedin"></i></a>
+          <a href="#" class="social-icon"><i class="pi pi-instagram"></i></a>
+          <a href="#" class="social-icon"><i class="pi pi-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+
     <!-- SECCIÓN DE SUSCRIPCIÓN -->
     <div class="sidebar-box subscribe-module">
       <h3 class="sidebar-title">Suscríbete</h3>
@@ -320,20 +338,6 @@
             {{ isSubscribing ? 'Enviando...' : 'Suscribirse' }}
           </button>
         </form>
-      </div>
-    </div>
-
-    <!-- MÓDULO DE REDES SOCIALES -->
-    <div class="sidebar-box social-module">
-      <h3 class="sidebar-title">Síguenos</h3>
-      <div class="social-container">
-        <div class="social-icons">
-          <a href="#" class="social-icon"><i class="pi pi-facebook"></i></a>
-          <a href="#" class="social-icon"><i class="pi pi-twitter"></i></a>
-          <a href="#" class="social-icon"><i class="pi pi-linkedin"></i></a>
-          <a href="#" class="social-icon"><i class="pi pi-instagram"></i></a>
-          <a href="#" class="social-icon"><i class="pi pi-youtube"></i></a>
-        </div>
       </div>
     </div>
   </aside>
