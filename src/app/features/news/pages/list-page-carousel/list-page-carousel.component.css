@@ -1,4 +1,3 @@
-/* ===== ESTILOS BÁSICOS ===== */
 body {
   background: #ffffff;
   margin: 0;
@@ -7,13 +6,12 @@ body {
 }
 
 .news-container {
-  display: grid; /* Volver a Grid */
-  /* background-color: #ffffff; */ /* Eliminado: Fondo blanco */
-  grid-template-columns: 1fr 350px; /* Definir columnas: contenido flexible y sidebar fija */
-  grid-template-rows: auto 1fr; /* Definir filas: header auto, resto flexible */
+  display: grid; 
+  grid-template-columns: 1fr 350px;
+  grid-template-rows: auto 1fr;
   grid-template-areas:
     "header header"
-    "content sidebar"; /* Definir las áreas del layout */
+    "content sidebar";
   gap: 1.5rem;
   max-width: 1800px;
   margin: 0 auto;
@@ -22,14 +20,12 @@ body {
 }
 
 .news-content {
-  grid-area: content; /* Asignar al área 'content' */
-  flex-grow: 1; /* No necesario para grid, pero no daña */
-  padding: 0; /* Modificado: Eliminar padding superior e inferior */
-  /* background-color: #f9f9f9; */ /* Eliminado: Fondo claro */
-  margin: 0; /* Modificado: Eliminar margen superior */
+  grid-area: content; 
+  flex-grow: 1; 
+  padding: 0;
+  margin: 0;
 }
 
-/* ===== ENCABEZADO DEL PORTAL ===== */
 .news-header {
   background: #202445;
   padding: 0.8rem 1.3rem;
@@ -63,17 +59,16 @@ body {
   border-radius: 18px;
 }
 
-/* ===== ESTILOS DEL CARRUSEL ===== */
 .carousel-container {
   position: relative;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   width: 100%;
-  height: 550px;
-  margin-bottom: 15px;
+  aspect-ratio: 19 / 9; 
+  margin-bottom: 40px;
   overflow: hidden;
   transition: transform 0.3s ease;
-  background-color: #000; /* Fondo negro para evitar espacios en blanco */
+  background-color: #000;
 }
 
 .carousel-container:hover {
@@ -98,7 +93,7 @@ body {
     rgba(0, 0, 0, 0.1) 100%
   );
   z-index: 2;
-  pointer-events: none; /* Permitir clics a través del overlay */
+  pointer-events: none;       
 }
 
 .carousel-item {
@@ -121,6 +116,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center bottom;
   transition: transform 0.5s ease;
 }
 
@@ -130,19 +126,23 @@ body {
 
 .carousel-content {
   position: absolute;
-  bottom: 23%; /* Posición elevada */
+  bottom: 8rem;
   left: 0;
   width: 100%;
   color: white;
-  padding: 1rem;
+  padding: 1.5rem 1.5rem 2rem;
   z-index: 3;
   background: linear-gradient(
     0deg,
-    rgba(0, 0, 0, 0.8) 0%,
-    rgba(0, 0, 0, 0.7) 50%,
-    rgba(0, 0, 0, 0.5) 80%,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.75) 25%,
+    rgba(0, 0, 0, 0.6) 50%,
     rgba(0, 0, 0, 0) 100%
   );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  box-sizing: border-box;
 }
 
 .carousel-content h2 {
@@ -214,18 +214,10 @@ body {
 }
 
 .carousel-content .pais {
-  display: none; /* Ocultar el elemento del país */
+  display: none;
 }
 
-/* ===== CONTROLES DEL CARRUSEL ===== */
-:host ::ng-deep .p-carousel {
-  width: 100%;
-  height: 100%;
-  border: none !important;
-  background-color: transparent !important;
-  overflow: hidden;
-}
-
+:host ::ng-deep .p-carousel,
 :host ::ng-deep .p-carousel .p-carousel-content,
 :host ::ng-deep .p-carousel .p-carousel-container,
 :host ::ng-deep .p-carousel .p-carousel-items-container,
@@ -235,6 +227,10 @@ body {
   height: 100%;
   border: none !important;
   background: transparent !important;
+}
+
+:host ::ng-deep .p-carousel {
+  overflow: hidden;
 }
 
 :host ::ng-deep .p-carousel .p-carousel-indicators {
@@ -296,437 +292,65 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-/* ===== MEDIA QUERIES ===== */
+
 @media (max-width: 1200px) {
-  .carousel-container {
-    height: 450px;
-  }
 
   .carousel-content {
-    bottom: 25%;
-    padding: 1.5rem;
+    padding: 1.5rem 1.5rem 3.7rem; 
   }
 
-  .carousel-content h2 {
-    font-size: 1.3rem;
-  }
 }
 
 @media (max-width: 992px) {
-  .carousel-container {
-    height: 400px;
-  }
 
   .carousel-content {
-    bottom: 20%;
-    padding: 1.2rem;
+    padding: 1.2rem 1.2rem 3.6rem;
   }
 
-  .carousel-content h2 {
-    font-size: 1.2rem;
-  }
-
-  .carousel-content .summary {
-    font-size: 0.8rem;
-  }
 }
 
 @media (max-width: 768px) {
-  .news-container {
-    grid-template-columns: 1fr;
-  }
-
-  .carousel-container {
-    height: 350px;
-  }
-
   .carousel-content {
-    bottom: 15%;
-    padding: 1rem;
-  }
-
-  .carousel-content h2 {
-    font-size: 1.1rem;
+    padding: 1rem 1rem 3.5rem;
   }
 }
 
 @media (max-width: 576px) {
-  .carousel-container {
-    height: 300px;
-  }
-
   .carousel-content {
-    bottom: 10%;
-    padding: 0.8rem;
-  }
-
-  .carousel-content h2 {
-  font-size: 1rem;
-  }
-
-  .carousel-content .summary {
-    display: none;
+    padding: 0.8rem 0.8rem 3.4rem;
   }
 }
 
-:host ::ng-deep .p-carousel .p-carousel-indicators .p-carousel-indicator.p-highlight button {
-  background-color: white !important;
-}
-
-/* Estilos para el título - REDUCIDO TAMAÑO AÚN MÁS */
-.carousel-content h2 {
-  font-size: 1.5rem; /* Reducido de 1.8rem a 1.5rem */
-  margin-bottom: 0.5rem; /* Reducido margen inferior */
-  font-weight: 700;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
-  line-height: 1.2;
-  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
-  color: white;
-}
-
-/* Estilos para el resumen - REDUCIDO TAMAÑO AÚN MÁS */
-.carousel-content .summary {
-  font-size: 0.9rem; /* Reducido de 1rem a 0.9rem */
-  margin-bottom: 0.6rem; /* Reducido margen inferior */
-  line-height: 1.3; /* Reducida altura de línea */
-  max-height: 3.5rem;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* Reducido a 2 líneas */
-  -webkit-box-orient: vertical;
-  text-overflow: ellipsis;
-  opacity: 1;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-}
-
-/* Estilos para la fecha - REDUCIDO TAMAÑO AÚN MÁS */
-.carousel-content .date {
-  font-size: 0.8rem; /* Reducido de 0.9rem a 0.8rem */
-  margin-bottom: 0.4rem; /* Reducido margen inferior */
-  display: flex;
-  align-items: center;
-  opacity: 1;
-  background: rgba(54, 169, 225, 0.3);
-  padding: 0.2rem 0.5rem; /* Reducido padding */
-  border-radius: 4px;
-  display: inline-flex;
-  margin-right: 0.8rem;
-}
-
-/* Estilos para las etiquetas - REDUCIDO TAMAÑO */
-.carousel-content .news-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem; /* Reducido espacio entre etiquetas */
-  margin-top: 0.8rem; /* Reducido margen superior */
-}
-
-.carousel-content .tag {
-  background-color: rgba(255, 220, 0, 0.25);
-  color: white;
-  font-size: 0.75rem; /* Reducido tamaño */
-  padding: 0.25rem 0.5rem; /* Reducido padding */
-  border-radius: 4px;
-  border: 1px solid rgba(255, 220, 0, 0.5);
-  transition: all 0.3s ease;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* Estilos para la información del autor - REDUCIDO TAMAÑO */
-.carousel-content .meta-info {
-  display: flex;
-  margin-top: 0.6rem; /* Reducido margen superior */
-  padding-top: 0.6rem; /* Reducido padding superior */
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.carousel-content .author {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.6rem; /* Reducido padding */
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 2rem;
-  font-size: 0.8rem; /* Reducido tamaño */
-  color: white;
-  transition: all 0.3s ease;
-}
-
-/* Estilos para los controles de navegación - MEJORADO */
-:host ::ng-deep .p-carousel .p-carousel-indicators {
-  position: absolute;
-  bottom: 1.5rem;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 4;
-}
-
-:host ::ng-deep .p-carousel .p-carousel-indicators .p-carousel-indicator button {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.4);
-  border: none !important;
-  margin: 0 5px;
-  transition: all 0.3s ease;
-}
-
-:host ::ng-deep .p-carousel .p-carousel-indicators .p-carousel-indicator.p-highlight button {
-  background-color: white !important;
-  transform: scale(1.2);
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
-}
-
-:host ::ng-deep .p-carousel .p-carousel-indicators .p-carousel-indicator button:hover {
-  background-color: rgba(255, 255, 255, 0.7);
-  transform: scale(1.1);
-}
-
-:host ::ng-deep .p-carousel .p-carousel-prev,
-:host ::ng-deep .p-carousel .p-carousel-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 4;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.3s ease;
-  opacity: 0.7;
-  border: none !important;
-}
-
-:host ::ng-deep .p-carousel .p-carousel-prev {
-  left: 1.5rem;
-}
-
-:host ::ng-deep .p-carousel .p-carousel-next {
-  right: 1.5rem;
-}
-
-:host ::ng-deep .p-carousel .p-carousel-prev:hover,
-:host ::ng-deep .p-carousel .p-carousel-next:hover {
-  background-color: rgba(0, 0, 0, 0.7);
-  transform: translateY(-50%) scale(1.1);
-  opacity: 1;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
-
-/* Estilos para el país - MEJORADO */
-.carousel-content .pais {
-  display: none; /* Ocultar el elemento del país */
-}
-
-.carousel-content .pais i {
-  margin-right: 0.5rem;
-  color: #A79964;
-}
-
-/* Estilos para las etiquetas - MEJORADO */
-.carousel-content .news-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 1.2rem;
-}
-
-.carousel-content .tag {
-  background-color: rgba(255, 220, 0, 0.25); /* Más visible */
-  color: white;
-  font-size: 0.9rem; /* Aumentado */
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 220, 0, 0.5); /* Borde más visible */
-  transition: all 0.3s ease;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Añadida sombra de texto */
-}
-
-.carousel-content .tag:hover {
-  background-color: rgba(255, 220, 0, 0.35);
-  transform: translateY(-2px);
-}
-
-/* Estilos para la información del autor - MEJORADO */
-.carousel-content .meta-info {
-  display: flex;
-  margin-top: 1.2rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.carousel-content .author {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background-color: rgba(0, 0, 0, 0.6);
-  border-radius: 2rem;
-  font-size: 0.95rem;
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.carousel-content .author:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-  transform: translateY(-2px);
-}
-
-.carousel-content .author i {
-  margin-right: 0.5rem;
-  color: #36A9E1;
-}
-
-/* Media queries para responsividad - MEJORADO */
-@media (max-width: 1200px) {
-  .carousel-container {
-    height: 450px;
-  }
-
-  .carousel-content {
-    padding: 2rem 2.5rem;
-  }
-
-  .carousel-content h2 {
-    font-size: 1.8rem;
-  }
-}
-
-@media (max-width: 992px) {
-  .carousel-container {
-    height: 400px;
-  }
-
-  .carousel-content {
-    padding: 1.8rem 2rem;
-  }
-
-  .carousel-content h2 {
-    font-size: 1.6rem;
-  }
-
-  .carousel-content .summary {
-    font-size: 1rem;
-    -webkit-line-clamp: 2;
-    max-height: 3rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .carousel-container {
-    height: 350px;
-  }
-
-  .carousel-content {
-    padding: 1.5rem;
-  }
-
-  .carousel-content h2 {
-    font-size: 1.4rem;
-    margin-bottom: 0.8rem;
-  }
-
-  .carousel-content .summary {
-    font-size: 0.95rem;
-    margin-bottom: 0.8rem;
-  }
-
-  :host ::ng-deep .p-carousel .p-carousel-prev,
-  :host ::ng-deep .p-carousel .p-carousel-next {
-    width: 35px;
-    height: 35px;
-  }
-
-  :host ::ng-deep .p-carousel .p-carousel-prev {
-    left: 1rem;
-  }
-
-  :host ::ng-deep .p-carousel .p-carousel-next {
-    right: 1rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .carousel-container {
-    height: 300px;
-  }
-
-  .carousel-content {
-    padding: 1.2rem;
-  }
-
-  .carousel-content h2 {
-    font-size: 1.2rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .carousel-content .summary {
-    display: none;
-  }
-
-  .carousel-content .news-tags {
-    margin-top: 0.8rem;
-    gap: 0.4rem;
-  }
-
-  .carousel-content .tag {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-  }
-
-  .carousel-content .meta-info {
-    margin-top: 0.8rem;
-    padding-top: 0.8rem;
-  }
-
-  .carousel-content .author {
-    padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-  }
-
-  :host ::ng-deep .p-carousel .p-carousel-prev,
-  :host ::ng-deep .p-carousel .p-carousel-next {
-    width: 30px;
-    height: 30px;
-  }
-}
-
-/* Ajustes específicos para niveles de zoom reducidos */
 @media screen and (max-resolution: 0.9dppx) {
   .carousel-content {
-    padding-bottom: 3rem;
+    padding: 1.5rem 1.5rem 3.7rem;
   }
 }
 
 @media screen and (max-resolution: 0.8dppx) {
   .carousel-content {
-    padding-bottom: 4rem;
+    padding: 1.5rem 1.5rem 4.0rem;
   }
 }
 
 @media screen and (max-resolution: 0.7dppx) {
   .carousel-content {
-    padding-bottom: 5rem;
+    padding: 1.5rem 1.5rem 4.3rem;
   }
 }
 
 @media screen and (max-resolution: 0.6dppx) {
   .carousel-content {
-    padding-bottom: 6rem;
+    padding: 1.5rem 1.5rem 4.5rem;
   }
 }
 
 @media screen and (max-resolution: 0.5dppx) {
   .carousel-content {
-    padding-bottom: 7rem;
+    padding: 1.5rem 1.5rem 4.7rem;
   }
 }
 
-/* Ajustes adicionales para eliminar todos los bordes blancos del carrusel */
 :host ::ng-deep .p-carousel {
   border: none !important;
   background-color: transparent !important;
@@ -741,7 +365,6 @@ body {
   background-color: white !important;
 }
 
-/* Corregir la posición de la fecha en tarjetas de noticias */
 .news-card .card-content .date {
   position: absolute;
   top: -26px;
@@ -756,7 +379,6 @@ body {
   -webkit-backdrop-filter: blur(4px);
 }
 
-/* Asegurar que el indicador +N esté bien estilizado */
 .news-grid .news-tags .extra-tag {
   background: #A79964;
   color: white;
@@ -771,7 +393,6 @@ body {
   transition: all 0.3s ease;
 }
 
-/* Añadir separador antes del autor */
 .meta-info {
   display: flex;
   align-items: center;
@@ -782,7 +403,6 @@ body {
   color: #666;
 }
 
-/* Estilo del autor */
 .author {
   display: flex;
   align-items: center;
@@ -796,7 +416,6 @@ body {
   font-size: 1rem;
 }
 
-/* Restaurar y ajustar la imagen de la tarjeta */
 .card-image {
   position: relative;
   width: 100%;
@@ -821,13 +440,12 @@ body {
   transform: scale(1.05);
 }
 
-/* Restaurar estilos para los elementos del carrusel */
 .carousel-item {
   position: relative;
-  overflow: hidden; /* Cambiado de visible a hidden */
+  overflow: hidden;
   height: 100%;
   width: 100%;
-  background-color: transparent; /* Cambiado de #000 a transparent */
+  background-color: transparent;
 }
 
 .carousel-caption {
@@ -881,7 +499,6 @@ body {
   transform: translateY(-5px);
 }
 
-/* Estilos para las categorías */
 .filter-container {
   margin: 0 0 1.2rem;
   background: white;
@@ -913,7 +530,7 @@ body {
 }
 
 .filter-title::before {
-  content: '\e90f'; /* Ícono de filtro */
+  content: '\e90f';
   font-family: 'primeicons';
   color: #36A9E1;
   font-size: 1rem;
@@ -950,12 +567,11 @@ body {
 }
 
 .filter-btn.reset::before {
-  content: '\e90b'; /* Ícono de reset */
+  content: '\e90b';
   font-family: 'primeicons';
   font-size: 0.8rem;
 }
 
-/* Categorías como filtros - RESTAURADO */
 .news-categories {
   display: flex;
   flex-wrap: wrap;
@@ -1010,7 +626,6 @@ body {
   background: #36A9E1;
 }
 
-/* Colores específicos para categorías */
 .category-item[data-category="tecnologia"]::before { background: #4CAF50; }
 .category-item[data-category="economia"]::before { background: #FF9800; }
 .category-item[data-category="comercio"]::before { background: #F44336; }
@@ -1049,7 +664,6 @@ body {
   border-color: rgba(96, 125, 139, 0.3);
 }
 
-/* Responsive para filtros */
 @media (max-width: 768px) {
   .filter-container {
     padding: 0.7rem;
@@ -1086,40 +700,43 @@ body {
   }
 }
 
-/* Nuevo grupo de filtros - MEJORADO */
 .filters-group {
   display: flex;
   align-items: center;
-  gap: 12px; /* Aumentar el espacio entre elementos */
+  gap: 15px;
   margin-top: 12px;
   margin-bottom: 16px;
   flex-wrap: wrap;
   position: relative;
-  z-index: 20; /* Aumentar para asegurar que está sobre otros elementos */
+  z-index: 20;
+  background-color: rgba(32, 36, 69, 0.03);
+  padding: 12px 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(32, 36, 69, 0.08);
+  box-shadow: 0 2px 8px rgba(32, 36, 69, 0.05);
 }
 
-/* Estilos para el contenedor de búsqueda */
 .search-container {
   position: relative;
   overflow: hidden;
   width: 42px;
   height: 42px;
   border-radius: 21px;
-  background: #f8f9fa;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(32, 36, 69, 0.15);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: flex;
   align-items: center;
   border: 1px solid #e0e0e0;
 }
 
 .search-container.expanded {
-  width: 250px;
+  width: 280px;
   background: white;
-  border-color: #cfd8dc;
+  border-color: #A79964;
+  box-shadow: 0 3px 10px rgba(167, 153, 100, 0.2);
 }
 
-/* Estilo mejorado para el input de búsqueda */
 .search-input {
   flex: 1;
   border: none;
@@ -1128,10 +745,16 @@ body {
   height: 100%;
   padding: 0 15px;
   font-size: 14px;
-  color: #37474f;
+  color: #202445;
   opacity: 0;
   width: 0;
-  transition: all 0.3s 0.1s ease;
+  transition: all 0.4s 0.1s ease;
+  font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
+}
+
+.search-input::placeholder {
+  color: #8a8a8a;
+  font-style: italic;
 }
 
 .search-container.expanded .search-input {
@@ -1139,7 +762,6 @@ body {
   width: calc(100% - 42px);
 }
 
-/* Arreglar el botón de búsqueda/lupa */
 .search-toggle {
   position: absolute;
   right: 0;
@@ -1154,18 +776,17 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #37474f;
+  color: #202445;
   transition: all 0.3s ease;
   padding: 0;
   z-index: 2;
 }
 
 .search-toggle:hover {
-  color: #2196f3;
-  background-color: rgba(33, 150, 243, 0.08);
+  color: #A79964;
+  background-color: rgba(167, 153, 100, 0.08);
 }
 
-/* Mejorar los botones de filtro de fecha y categoría */
 .date-filter, .category-filter {
   position: relative;
   height: 42px;
@@ -1176,54 +797,108 @@ body {
   width: 42px;
   height: 42px;
   border: 1px solid #e0e0e0;
-  background: #f8f9fa;
+  background: #fff;
   border-radius: 21px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.35, 0, 0.25, 1);
+  box-shadow: 0 2px 6px rgba(32, 36, 69, 0.15);
   position: relative;
-  color: #37474f;
+  color: #202445;
 }
 
 .date-toggle:hover, .category-toggle:hover {
   background: #ffffff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  color: #2196f3;
+  box-shadow: 0 3px 10px rgba(167, 153, 100, 0.25);
+  color: #A79964;
+  transform: translateY(-2px);
+  border-color: #A79964;
 }
 
-/* Destacar botones cuando están expandidos */
 .date-filter.expanded .date-toggle,
 .category-filter.expanded .category-toggle {
-  background: #e3f2fd;
-  color: #1976d2;
-  border-color: #bbdefb;
+  background: rgba(167, 153, 100, 0.15);
+  color: #A79964;
+  border-color: #A79964;
+  box-shadow: 0 2px 8px rgba(167, 153, 100, 0.3);
 }
 
-/* Estilos para la sección de calendario expandida */
 .date-range {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   right: 0;
-  background: white;
-  padding: 1rem;
+  background: #ffffff;
+  padding: 1.25rem;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
   z-index: 1000;
-  border: 1px solid #e0e0e0;
-  min-width: 280px;
+  border: 1px solid #e0e7ef;
+  min-width: 320px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out, visibility 0.25s ease-out;
 }
 
 .date-filter.expanded .date-range {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
-/* Panel de categorías similar al panel de fechas */
+:host ::ng-deep .date-range .p-calendar .p-inputtext {
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.875rem;
+  color: #374151;
+  width: 120px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+:host ::ng-deep .date-range .p-calendar .p-inputtext:hover {
+  border-color: #A79964;
+}
+
+:host ::ng-deep .date-range .p-calendar .p-inputtext:focus {
+  border-color: #36A9E1;
+  box-shadow: 0 0 0 2px rgba(54, 169, 225, 0.2);
+  outline: none;
+}
+
+.date-range .date-range-separator {
+  font-size: 0.875rem;
+  color: #6B7280;
+  margin: 0 0.25rem;
+}
+
+.clear-dates-btn {
+  background: transparent;
+  border: none;
+  color: #EF4444;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.clear-dates-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #D92626;
+}
+
+.clear-dates-btn i {
+  font-size: 1rem;
+}
+
 .category-panel {
   position: absolute;
   top: calc(100% + 8px);
@@ -1231,18 +906,12 @@ body {
   background: white;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: none;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
   z-index: 1000;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #d1d9e0;
   min-width: 280px;
 }
 
-.category-filter.expanded .category-panel {
-  display: block;
-}
-
-/* Indicador de filtro activo */
 .filter-indicator {
   position: absolute;
   top: 8px;
@@ -1254,7 +923,6 @@ body {
   display: block;
 }
 
-/* Estilos para el multiselect de categorías */
 :host ::ng-deep .p-multiselect {
   width: 100%;
   border-color: #e0e0e0;
@@ -1279,7 +947,6 @@ body {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Botón para resetear filtros */
 .reset-filters {
   height: 42px;
   width: 42px;
@@ -1300,7 +967,6 @@ body {
   box-shadow: 0 3px 8px rgba(0,0,0,0.3);
 }
 
-/* Modificar para dispositivos móviles */
 @media (max-width: 768px) {
   .filters-group {
     justify-content: flex-start;
@@ -1335,7 +1001,6 @@ body {
   }
 }
 
-/* Ajustar el título de sección en vista responsive */
 @media (max-width: 768px) {
   .section-title {
     font-size: 1.3rem;
@@ -1344,7 +1009,6 @@ body {
   }
 }
 
-/* Botón para restablecer filtros */
 .reset-filters {
   width: 38px;
   height: 38px;
@@ -1359,54 +1023,14 @@ body {
   transition: all 0.3s ease;
   flex-shrink: 0;
   box-shadow: 0 1px 4px rgba(244, 67, 54, 0.1);
-  margin-right: 0.6rem; /* Añadir margen a la derecha */
+  margin-right: 0.6rem;
 }
 
-.reset-filters:hover {
-  background: rgba(244, 67, 54, 0.2);
-  transform: scale(1.05);
-  box-shadow: 0 3px 8px rgba(244, 67, 54, 0.2);
+.clear-dates-btn:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #C0392B;
 }
 
-.reset-filters i {
-  font-size: 1rem;
-}
-
-.search-container:focus-within ~ .reset-filters {
-  transform: scale(0.95);
-  opacity: 0.8;
-}
-
-/* Mostrar animación cuando se aplican filtros */
-@keyframes pulseFilters {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-.filters-group:has(.reset-filters) {
-  border: 1px solid rgba(54, 169, 225, 0.3);
-  box-shadow: 0 3px 15px rgba(54, 169, 225, 0.1);
-}
-
-/* Añadir indicadores de filtros activos */
-.date-filter.active .date-toggle,
-.category-filter.active .category-toggle {
-  background: rgba(54, 169, 225, 0.15);
-  box-shadow: inset 0 0 5px rgba(54, 169, 225, 0.1);
-}
-
-/* Ajustes responsive para el botón de reset */
-@media (max-width: 768px) {
-  .reset-filters {
-    order: 2;
-  position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-  }
-}
-
-/* Estilos para el encabezado del MultiSelect */
 :host ::ng-deep .multiselect-header {
   padding: 8px 12px;
   font-weight: 500;
@@ -1415,7 +1039,6 @@ body {
   background-color: rgba(54, 169, 225, 0.05);
 }
 
-/* Ajustar estilos del componente MultiSelect */
 :host ::ng-deep .p-multiselect {
   min-width: 180px !important;
 }
@@ -1432,7 +1055,6 @@ body {
   cursor: pointer;
 }
 
-/* Mejorar visibilidad del calendario */
 .date-input::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 0.7;
@@ -1446,7 +1068,6 @@ body {
   background: transparent;
 }
 
-/* Corregir estilos para la barra de búsqueda */
 .search-container:focus-within {
   max-width: 300px;
   box-shadow: 0 2px 12px rgba(54, 169, 225, 0.2);
@@ -1454,16 +1075,14 @@ body {
   z-index: 10;
 }
 
-/* Mejorar márgenes del grupo de filtros */
 .filters-group {
   margin-left: auto;
   margin-top: 0.5rem;
 }
 
-/* Nuevo header para el Corredor Bioceánico */
 .bioceanic-header {
-  grid-area: header; /* Asignar al área 'header' */
-  width: 100%; /* Asegurar ancho completo dentro de su área */
+  grid-area: header;
+  width: 100%;
   background: linear-gradient(135deg, #202445 0%, #2c3161 100%);
   color: white;
   padding: 0.75rem 1.5rem;
@@ -1546,20 +1165,19 @@ body {
 }
 
 .country-time:first-child::before {
-  content: '\e94f'; /* Mantenemos el código actual */
+  content: '\e94f';
   font-family: 'primeicons';
   position: absolute;
-  left: -30px; /* Movido más a la izquierda */
+  left: -30px;
   top: 50%;
   transform: translateY(-50%);
   color: #36A9E1;
-  font-size: 1.4rem; /* Aumentado el tamaño */
-  text-shadow: 0 0 5px rgba(54, 169, 225, 0.4); /* Añadido efecto de brillo */
+  font-size: 1.4rem;
+  text-shadow: 0 0 5px rgba(54, 169, 225, 0.4);
 }
 
-/* Ajuste para la primera casilla de país para darle más espacio al icono */
 .country-time:first-child {
-  margin-left: 12px; /* Añadir espacio para compensar la posición del icono */
+  margin-left: 12px;
 }
 
 .country-time:hover {
@@ -1580,18 +1198,17 @@ body {
   color: #36A9E1;
 }
 
-/* Mejorar el responsive para que el contenido no se tape */
 @media (max-width: 1200px) {
   .carousel-content {
     padding: 1rem 1.5rem 1.5rem;
-    bottom: 70px; /* Ajustado para pantallas más pequeñas */
+    bottom: 70px;
   }
 }
 
 @media (max-width: 992px) {
   .carousel-content {
     padding: 0.75rem 1.25rem 1.25rem;
-    bottom: 60px; /* Ajustado para pantallas más pequeñas */
+    bottom: 60px;
   }
 
   .carousel-content h2 {
@@ -1602,7 +1219,7 @@ body {
 @media (max-width: 768px) {
   .carousel-content {
     padding: 0.75rem 1rem 1rem;
-    bottom: 40px; /* Ajustado para pantallas más pequeñas */
+    bottom: 40px;
   }
 
   .carousel-content h2 {
@@ -1618,7 +1235,7 @@ body {
 
 @media (max-width: 576px) {
   .carousel-content {
-    bottom: 30px; /* Ajustado para pantallas más pequeñas */
+    bottom: 30px;
     padding: 1rem 1.5rem;
   }
 
@@ -1630,7 +1247,7 @@ body {
 
 @media (max-width: 480px) {
   .carousel-content {
-    bottom: 20px; /* Ajustado para pantallas más pequeñas */
+    bottom: 20px;
   }
 
   .carousel-content h2 {
@@ -1659,70 +1276,33 @@ body {
   }
 }
 
-/* Para asegurar visibilidad en distintos zooms */
 @media (min-width: 1200px) {
   .carousel-content {
     padding-bottom: 2rem;
-    padding-top: 1.5rem; /* Añadido para dar más espacio arriba */
+    padding-top: 1.5rem;
   }
 }
 
-/* Ajustes según el zoom del navegador (solución para escalado) */
 @media (min-width: 1200px) and (max-width: 1400px) {
   @media (min-resolution: 0.99dppx) and (max-resolution: 1.01dppx) {
-    /* Ajustes para zoom 100% */
-    .carousel-container {
-      height: 900px; /* Aumentado para dar más espacio */
-    }
-
     .carousel-content {
-      bottom: 30%; /* Subido un poco más para mejorar visibilidad */
-      padding: 2rem 3.5rem; /* Reducido padding */
-    }
-
-    .carousel-content h2 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .carousel-content .summary {
-      font-size: 0.85rem;
-      margin-bottom: 0.5rem;
-      -webkit-line-clamp: 2;
-      max-height: 2.4rem;
+      padding: 2rem 3.5rem 4.3rem;
     }
   }
 
   @media (min-resolution: 0.89dppx) and (max-resolution: 0.91dppx) {
-    /* Ajustes para zoom 90% */
-    .carousel-container {
-      height: 500px;
-    }
     .carousel-content {
-      bottom: 70px;
-    }
-
-    .carousel-content h2 {
-      font-size: 1.8rem;
+      padding: 1.5rem 1.5rem 4.0rem;
     }
   }
 
   @media (min-resolution: 0.79dppx) and (max-resolution: 0.81dppx) {
-    /* Ajustes para zoom 80% */
-    .carousel-container {
-      height: 450px;
-    }
     .carousel-content {
-      bottom: 60px;
-    }
-
-    .carousel-content h2 {
-      font-size: 1.7rem;
+      padding: 1.2rem 1.2rem 3.7rem;
     }
   }
 }
 
-/* Acercar secciones al header */
 .bioceanic-header {
   margin-bottom: 0.35rem;
 }
@@ -1734,11 +1314,9 @@ body {
 }
 
 .featured-section {
-  margin-bottom: -2rem; /* Modificado: Eliminar margen inferior */
-  margin-top: 0;
+  margin-bottom: -2rem;
 }
 
-/* Ajustar la fuente de "Última actualización" */
 .featured-label {
   font-size: 1.5rem;
   color: #202445;
@@ -1752,7 +1330,6 @@ body {
   line-height: 1.4;
 }
 
-/* Aplicar la misma fuente a todos los títulos y elementos importantes */
 h1, h2, h3, h4, h5, h6,
 .section-title,
 .featured-label,
@@ -1763,9 +1340,8 @@ h1, h2, h3, h4, h5, h6,
   font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
 }
 
-/* Mejorar la visualización del país en el carrusel */
 .carousel-content .pais {
-  display: none; /* Ocultar el elemento del país */
+  display: none;
 }
 
 .carousel-content .pais i {
@@ -1773,7 +1349,6 @@ h1, h2, h3, h4, h5, h6,
   color: #A79964;
 }
 
-/* Estilos mejorados para el grid de noticias */
 .news-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1927,6 +1502,12 @@ h1, h2, h3, h4, h5, h6,
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
+.news-card .extra-tag:hover .extra-tags-tooltip {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+}
+
 .news-card .meta-info {
   display: flex;
   align-items: center;
@@ -1950,11 +1531,9 @@ h1, h2, h3, h4, h5, h6,
   font-size: 1rem;
 }
 
-/* Estilos para el sidebar y "Podría interesarte" */
 .news-sidebar {
-  grid-area: sidebar; /* Asignar al área 'sidebar' */
-  /* Asegurar que la barra lateral tenga el ancho correcto (probablemente ya lo tiene) */
-  width: 350px; /* Confirmar o ajustar si es necesario */
+  grid-area: sidebar;
+  width: 350px;
   padding: 0;
   background: transparent;
   border-radius: 8px;
@@ -1963,27 +1542,9 @@ h1, h2, h3, h4, h5, h6,
   height: fit-content;
   align-self: flex-start;
   transition: top 0.3s ease;
-  max-height: calc(100vh - 4rem);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #36A9E1 #f0f0f0;
   z-index: 10;
   margin-top: 0;
   padding-top: 0;
-}
-
-.news-sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.news-sidebar::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 10px;
-}
-
-.news-sidebar::-webkit-scrollbar-thumb {
-  background-color: #36A9E1;
-  border-radius: 10px;
 }
 
 .sidebar-box {
@@ -2022,14 +1583,13 @@ h1, h2, h3, h4, h5, h6,
   background: #A79964;
 }
 
-/* Podría interesarte */
 .interest-cards {
   display: flex;
   flex-direction: column;
   gap: 15px;
   position: relative;
   overflow: hidden;
-  min-height: 400px; /* Añadido: Altura mínima para 4 tarjetas y gaps */
+  min-height: 400px;
 }
 
 .interest-card {
@@ -2091,7 +1651,6 @@ h1, h2, h3, h4, h5, h6,
   font-size: 0.7rem;
 }
 
-/* Formulario de suscripción */
 .subscribe-container {
   display: flex;
   flex-direction: column;
@@ -2169,7 +1728,6 @@ h1, h2, h3, h4, h5, h6,
   box-shadow: 0 4px 12px rgba(54, 169, 225, 0.3);
 }
 
-/* Módulo de redes sociales */
 .social-container {
   display: flex;
   flex-direction: column;
@@ -2197,23 +1755,23 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .social-icon:nth-child(1) {
-  background: #1877f2; /* Facebook */
+  background: #1877f2;
 }
 
 .social-icon:nth-child(2) {
-  background: #1da1f2; /* Twitter */
+  background: #1da1f2;
 }
 
 .social-icon:nth-child(3) {
-  background: #0a66c2; /* LinkedIn */
+  background: #0a66c2;
 }
 
 .social-icon:nth-child(4) {
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); /* Instagram */
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
 }
 
 .social-icon:nth-child(5) {
-  background: #ff0000; /* YouTube */
+  background: #ff0000;
 }
 
 .social-icon:hover {
@@ -2221,7 +1779,6 @@ h1, h2, h3, h4, h5, h6,
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Estilos para la paginación */
 .pagination-container {
   display: flex;
   justify-content: center;
@@ -2243,12 +1800,11 @@ h1, h2, h3, h4, h5, h6,
 }
 
 
-/* Cabecera de noticias */
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem; /* Reducir margen inferior si es necesario */
+  margin-bottom: 1rem;
   padding-bottom: 0.8rem;
   border-bottom: 2px solid #f0f0f0;
 }
@@ -2273,26 +1829,59 @@ h1, h2, h3, h4, h5, h6,
   border-radius: 2px;
 }
 
-/* Tooltip para etiquetas extras */
 .extra-tags-tooltip {
   position: absolute;
-  bottom: 120%;
-  left: 0;
-  background: white;
-  padding: 0.8rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  min-width: 150px;
-  display: none;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: #FFF8DC;
+  color: #333333;
+  padding: 0.75rem;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  z-index: 110;
+  min-width: 180px;
+  max-width: 300px;
+  display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 12px;
-  max-width: 250px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  gap: 0.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out, visibility 0.25s ease-in-out;
+  border: none;
 }
 
-/* Estilos para la fuente en el sidebar */
+.news-card .extra-tag:hover .extra-tags-tooltip {
+  display: flex;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+
+.extra-tags-tooltip .tag {
+  background-color: #A79964;
+  color: #ffffff;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid #806F3D;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  white-space: normal;
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.extra-tags-tooltip .tag:hover {
+  background-color: #c0b283;
+  border-color: #A79964;
+  color: #202445;
+}
+
 .source-domain {
   display: block;
   font-size: 0.8rem;
@@ -2300,7 +1889,6 @@ h1, h2, h3, h4, h5, h6,
   margin-top: 4px;
 }
 
-/* Indicador de filtro activo */
 .filter-indicator {
   position: absolute;
   top: -2px;
@@ -2310,7 +1898,6 @@ h1, h2, h3, h4, h5, h6,
   line-height: 1;
 }
 
-/* Botón para limpiar fechas */
 .clear-dates-btn {
   background: none;
   border: none;
@@ -2326,25 +1913,21 @@ h1, h2, h3, h4, h5, h6,
   color: #FF5722;
 }
 
-/* Estilo para asegurar que el botón toggle tiene posición relativa */
 .date-toggle, .category-toggle, .search-toggle {
   position: relative;
 }
 
-/* Estilos para el contenedor de resultados con skeleton */
 .news-results-container {
   position: relative;
   min-height: 400px;
   transition: opacity 0.3s ease;
 }
 
-/* Estilo para cuando se está cargando las tarjetas */
 .news-results-container.isCardsLoading .news-grid {
   opacity: 0;
   pointer-events: none;
 }
 
-/* Mostrar skeleton en la posición correcta */
 .news-results-container .cards-skeleton {
   position: absolute;
   top: 0;
@@ -2353,7 +1936,6 @@ h1, h2, h3, h4, h5, h6,
   z-index: 5;
 }
 
-/* Grid de tarjetas de noticias */
 .news-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -2361,14 +1943,12 @@ h1, h2, h3, h4, h5, h6,
   transition: opacity 0.3s ease;
 }
 
-/* Clase para ocultar elementos durante la carga */
 .hidden {
   display: none;
   opacity: 0;
   transition: opacity 0.3s ease, display 0s 0.3s;
 }
 
-/* Animaciones para transición suave */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
@@ -2379,13 +1959,11 @@ h1, h2, h3, h4, h5, h6,
   to { opacity: 0; transform: translateY(10px); }
 }
 
-/* Aplicar animación a las tarjetas individuales */
 .news-card {
   animation: fadeIn 0.3s ease forwards;
   transition: all 0.3s ease;
 }
 
-/* Ajustar el contenedor del paginador */
 .paginator-container {
   margin-top: 2rem;
   display: flex;
@@ -2393,183 +1971,320 @@ h1, h2, h3, h4, h5, h6,
   transition: opacity 0.3s ease;
 }
 
-/* Estilos para la sección de calendario expandida */
 .date-range {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 10px);
   right: 0;
-  background: white;
-  padding: 1rem;
+  background: #ffffff;
+  padding: 1.25rem;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
   z-index: 1000;
-  margin-top: 10px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e0e7ef;
+  min-width: 280px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out, visibility 0.25s ease-out;
 }
 
-.date-filter.expanded .date-range {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+.category-filter.expanded .category-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
-.date-range-separator {
-  padding: 0 8px;
-  color: #546e7a;
+:host ::ng-deep .category-panel .p-multiselect {
+  width: 100%;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px !important;
+  font-size: 0.875rem;
+  color: #374151;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Mejorar el botón para limpiar fechas */
-.clear-dates-btn {
-  background: transparent;
-  border: none;
-  color: #f44336;
-  cursor: pointer;
-  height: 32px;
-  width: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s ease;
+:host ::ng-deep .category-panel .p-multiselect:not(.p-disabled):hover {
+  border-color: #A79964 !important;
 }
 
-.clear-dates-btn:hover {
-  background: rgba(244, 67, 54, 0.1);
+:host ::ng-deep .category-panel .p-multiselect.p-multiselect-focus {
+  border-color: #36A9E1 !important;
+  box-shadow: 0 0 0 2px rgba(54, 169, 225, 0.2) !important;
 }
 
-/* Estilos para el multiselect de categorías */
-:host ::ng-deep .p-multiselect {
-  min-width: 200px;
-  border-color: #e0e0e0;
-  border-radius: 4px;
-  font-size: 14px;
+:host ::ng-deep .category-panel .p-multiselect .p-multiselect-label {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.875rem;
 }
 
-:host ::ng-deep .p-multiselect:not(.p-disabled).p-focus {
-  border-color: #2196f3;
-  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.25);
-}
-
-:host ::ng-deep .p-multiselect-panel .p-multiselect-header {
-  background: #f5f5f5;
-  color: #37474f;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 10px;
-}
-
-:host ::ng-deep .multiselect-header {
-  font-weight: 500;
-  font-size: 15px;
-}
-
-:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
-  background: rgba(33, 150, 243, 0.12);
-  color: #0d47a1;
+:host ::ng-deep .category-panel .p-multiselect .p-multiselect-trigger {
+  color: #6B7280;
 }
 
 :host ::ng-deep .p-multiselect-panel {
+  border-radius: 8px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #d1d9e0 !important;
+  background: #ffffff !important;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-header {
+  background: rgba(32, 36, 69, 0.03);
+  color: #202445;
+  border-bottom: 1px solid #A79964;
+  padding: 0.85rem 1.25rem;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-header .p-checkbox {
+  margin-right: 0.6rem;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-header .p-checkbox .p-checkbox-box {
+  border-color: #A79964;
+  background: #fff;
+}
+:host ::ng-deep .p-multiselect-panel .p-multiselect-header .p-checkbox .p-checkbox-box:hover {
+  border-color: #806F3D;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-header .p-checkbox .p-checkbox-box.p-highlight {
+  background-color: #A79964;
+  border-color: #A79964;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-header .p-checkbox .p-checkbox-box.p-highlight .p-checkbox-icon {
+  color: white;
+}
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-header .p-multiselect-filter-container .p-inputtext {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d9e0;
   border-radius: 4px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+:host ::ng-deep .p-multiselect-panel .p-multiselect-header .p-multiselect-filter-container .p-inputtext:focus {
+  border-color: #A79964;
+  box-shadow: 0 0 0 1px #A79964;
 }
 
-:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item:not(.p-highlight):not(.p-disabled):hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: #455a64;
+
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+  padding: 0.75rem 1.25rem;
+  color: #333333;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item:last-child {
+  border-bottom: none;
 }
 
-/* Mejorar el estilo del calendario */
-:host ::ng-deep .p-calendar .p-inputtext {
-  padding: 8px 12px;
-  font-size: 14px;
-  height: 38px;
-  border-radius: 4px;
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item:hover {
+  background-color: rgba(167, 153, 100, 0.08);
+  color: #806F3D;
 }
 
-:host ::ng-deep .p-calendar .p-inputtext:focus {
-  border-color: #2196f3;
-  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.25);
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight {
+  background-color: #A79964;
+  color: white;
+  font-weight: 500;
 }
 
-:host ::ng-deep .p-calendar-w-btn .p-datepicker-trigger {
-  background: #f5f5f5;
-  border-color: #e0e0e0;
-  color: #455a64;
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item .p-checkbox {
+  margin-right: 0.6rem;
 }
 
-:host ::ng-deep .p-calendar-w-btn .p-datepicker-trigger:hover {
-  background: #e0e0e0;
-  border-color: #cfd8dc;
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item .p-checkbox .p-checkbox-box {
+  border: 1px solid #cccccc;
+  transition: border-color 0.2s ease;
 }
 
-:host ::ng-deep .p-datepicker {
-  border-radius: 4px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item:hover .p-checkbox .p-checkbox-box {
+  border-color: #A79964;
 }
 
-:host ::ng-deep .p-datepicker .p-datepicker-header {
-  background: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight .p-checkbox .p-checkbox-box {
+  background-color: white;
+  border-color: #806F3D;
 }
 
-:host ::ng-deep .p-datepicker table td > span.p-highlight {
-  background: #2196f3;
-  color: #ffffff;
+:host ::ng-deep .p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight .p-checkbox .p-checkbox-icon {
+  color: #A79964;
 }
 
-/* Estilos específicos para dispositivos móviles */
-@media (max-width: 576px) {
-  .search-container.expanded {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1100;
-    height: 60px;
-    border-radius: 0;
-    padding: 0 15px;
-  }
+.reset-filters {
+  height: 42px;
+  width: 42px;
+  border: none;
+  background: #f44336;
+  color: white;
+  border-radius: 21px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
 
-  .date-range {
-    position: fixed;
-    left: 0;
-    right: 0;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 0;
-    margin-top: 0;
-    flex-direction: column;
-    align-items: stretch;
-  }
+.reset-filters:hover {
+  background: #d32f2f;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
 
-  .date-filter.expanded .date-range {
-    flex-direction: column;
+@media (max-width: 768px) {
+  .filters-group {
+    justify-content: flex-start;
     gap: 10px;
   }
 
-  .date-range-separator {
-    text-align: center;
+  .search-container {
+    width: 38px;
+    height: 38px;
+  }
+
+  .search-container.expanded {
+    width: calc(100% - 20px);
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 20;
+  }
+
+  .search-toggle, .date-toggle, .category-toggle {
+    width: 38px;
+    height: 38px;
+  }
+
+  .date-filter, .category-filter, .reset-filters {
+    height: 38px;
+  }
+
+  .date-range, .category-panel {
+    right: -50px;
+    min-width: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.3rem;
+    min-width: auto;
     width: 100%;
   }
+}
 
-  :host ::ng-deep .p-multiselect-panel {
-    width: 100vw !important;
-    max-width: 100vw !important;
-    left: 0 !important;
-  }
+.reset-filters {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(244, 67, 54, 0.1);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #F44336;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(244, 67, 54, 0.1);
+  margin-right: 0.6rem;
+}
 
-  .clear-dates-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+.reset-filters:hover {
+  background: rgba(244, 67, 54, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(244, 67, 54, 0.2);
+}
+
+.reset-filters i {
+  font-size: 1rem;
+}
+
+.search-container:focus-within ~ .reset-filters {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+@keyframes pulseFilters {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.filters-group:has(.reset-filters) {
+  border: 1px solid rgba(54, 169, 225, 0.3);
+  box-shadow: 0 3px 15px rgba(54, 169, 225, 0.1);
+}
+
+.date-filter.active .date-toggle,
+.category-filter.active .category-toggle {
+  background: rgba(54, 169, 225, 0.15);
+  box-shadow: inset 0 0 5px rgba(54, 169, 225, 0.1);
+}
+
+@media (max-width: 768px) {
+  .reset-filters {
+    order: 2;
+  position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
   }
+}
+
+:host ::ng-deep .multiselect-header {
+  padding: 8px 12px;
+  font-weight: 500;
+  color: #36A9E1;
+  border-bottom: 1px solid rgba(54, 169, 225, 0.1);
+  background-color: rgba(54, 169, 225, 0.05);
+}
+
+:host ::ng-deep .p-multiselect {
+  min-width: 180px !important;
+}
+
+:host ::ng-deep .p-multiselect-label-container {
+  cursor: pointer;
+}
+
+:host ::ng-deep .p-multiselect .p-multiselect-label {
+  padding: 0.4rem 0.8rem;
+}
+
+:host ::ng-deep .p-multiselect-trigger {
+  cursor: pointer;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.search-container:focus-within {
+  max-width: 300px;
+  box-shadow: 0 2px 12px rgba(54, 169, 225, 0.2);
+  border-color: rgba(54, 169, 225, 0.4);
+  z-index: 10;
+}
+
+.filters-group {
+  margin-left: auto;
+  margin-top: 0.5rem;
 }
 
 .remaining-news {
-  margin-top: 0; /* Asegurar que no haya margen superior */
+  margin-top: 0;
 }
 
-/* Mensajes de diagnóstico */
 .diagnostic-message, .pagination-debug {
   color: #666;
   font-size: 0.8rem;
@@ -2579,7 +2294,6 @@ h1, h2, h3, h4, h5, h6,
   background-color: rgba(52, 152, 219, 0.1);
 }
 
-/* Asegurar que la noticia-grid tenga altura mínima y no se colapse */
 .news-grid {
   min-height: 200px;
   display: grid;
@@ -2588,14 +2302,12 @@ h1, h2, h3, h4, h5, h6,
   margin-bottom: 1.5rem;
 }
 
-/* Evitar que la clase .hidden realmente oculte la grid */
 .news-grid.hidden {
-  display: grid; /* Sobreescribir posible 'display: none' */
-  visibility: visible !important; /* Asegurar que siga visible */
-  opacity: 0.5; /* Mostrar semi-transparente para indicar carga */
+  display: grid;
+  visibility: visible !important;
+  opacity: 0.5;
 }
 
-/* Tarjeta de noticia */
 .news-card {
   display: flex;
   flex-direction: column;
@@ -2608,7 +2320,6 @@ h1, h2, h3, h4, h5, h6,
   cursor: pointer;
 }
 
-/* Estilos para el formulario de suscripción */
 .subscribe-form {
   display: flex;
   flex-direction: column;
@@ -2625,7 +2336,7 @@ h1, h2, h3, h4, h5, h6,
 
 .email-input.ng-invalid.ng-touched, 
 .email-input.ng-invalid.ng-dirty {
-  border-color: #f44336; /* Borde rojo para campos inválidos */
+  border-color: #f44336;
 }
 
 .error-message {
@@ -2662,7 +2373,6 @@ h1, h2, h3, h4, h5, h6,
   cursor: not-allowed;
 }
 
-/* Estilos específicos para el dropdown de PrimeNG */
 :host ::ng-deep .p-dropdown {
   width: 100%;
   margin-bottom: 10px;
@@ -2670,6 +2380,10 @@ h1, h2, h3, h4, h5, h6,
 
 :host ::ng-deep .p-dropdown-label {
   padding: 10px;
+}
+
+:host ::ng-deep .p-multiselect-panel {
+  z-index: 1001;
 }
 
 

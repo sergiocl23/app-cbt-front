@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, map, catchError, throwError } from 'rxjs';
+import { Observable, map, catchError, throwError, from, switchMap } from 'rxjs';
 import { News, NewsItem } from '../interfaces/news.interface';
 import { environments } from '@environments/environments';
 
@@ -49,7 +49,7 @@ interface StrapiResponse {
   };
 }
 
-
+declare const grecaptcha: any;
 
 @Injectable({
   providedIn: 'root'
@@ -58,10 +58,14 @@ export class NewsService {
   private baseUrlStrapi = environments.baseUrlStrapi;
   private token: string = environments.strapiToken;
   private headers: HttpHeaders;
+  private postHeaders: HttpHeaders;
 
   constructor(private http: HttpClient) {
     this.headers = new HttpHeaders({
       'Authorization': `Bearer ${this.token}`
+    });
+    this.postHeaders = new HttpHeaders({
+      'Content-Type': 'application/json'
     });
   }
 
@@ -101,15 +105,21 @@ export class NewsService {
       console.log('[DEBUG SERVICE] Aplicando filtro por país:', params.filters.pais);
     }
 
-    // Filtro de tags
-    if (params.filters?.tags?.nombre?.$in?.length > 0) {
-      params.filters.tags.nombre.$in.forEach((tag: string, index: number) => {
-        queryParams = queryParams.set(
-          `filters[$and][${index}][tags][nombre][$eq]`, 
-          tag
-        );
-      });
-      console.log('[DEBUG SERVICE] Aplicando filtros por tags:', params.filters.tags.nombre.$in);
+    // Filtro de tags MODIFICADO
+    if (params.filters?.tags?.nombre?.$in && Array.isArray(params.filters.tags.nombre.$in) && params.filters.tags.nombre.$in.length > 0) {
+      const tagsToFilter = params.filters.tags.nombre.$in;
+      
+      if (tagsToFilter.length === 1) {
+        // Si hay un solo tag, usar $eq
+        queryParams = queryParams.set('filters[tags][nombre][$eq]', tagsToFilter[0]);
+        console.log('[DEBUG SERVICE] Aplicando filtro por un solo tag (nombre):', tagsToFilter[0]);
+      } else {
+        // Si hay múltiples tags, usar $in y construir los parámetros indexados
+        tagsToFilter.forEach((tag: string, index: number) => {
+          queryParams = queryParams.set(`filters[tags][nombre][$in][${index}]`, tag);
+        });
+        console.log('[DEBUG SERVICE] Aplicando filtros por múltiples tags (nombre):', tagsToFilter);
+      }
     }
 
     // Filtro de búsqueda de texto
@@ -383,16 +393,45 @@ export class NewsService {
    * @param email El correo electrónico del suscriptor
    * @returns Observable con la respuesta del backend
    */
-  addSubscriber(email: string): Observable<any> {
-    const url = `${this.baseUrlStrapi}/api/subscribers/subscribe`;
-    
-    return this.http.post(url, { 
-      email 
-    }, {
-      headers: this.headers
-    }).pipe(
+  addSubscriber(email: string, frequency: string): Observable<any> {
+    return from(
+      new Promise<string>((resolve, reject) => {
+        if (typeof grecaptcha === 'undefined' || !grecaptcha.ready || !grecaptcha.execute) {
+          console.error('[SERVICE] reCAPTCHA no está listo o no está definido.');
+          reject(new Error('reCAPTCHA not ready'));
+          return;
+        }
+        grecaptcha.ready(() => {
+          grecaptcha.execute('6LdNX0orAAAAAP9MEpwH0cPifQrEHv-a__mqKRJY', { action: 'submit_newsletter_subscription' })
+            .then((recaptchaToken: string) => {
+              if (!recaptchaToken) {
+                console.error('[SERVICE] Token reCAPTCHA vacío recibido.');
+                reject(new Error('Empty reCAPTCHA token'));
+                return;
+              }
+              console.log('[SERVICE] Token reCAPTCHA obtenido:', recaptchaToken);
+              resolve(recaptchaToken);
+            })
+            .catch((error: any) => {
+              console.error('[SERVICE] Error al obtener token reCAPTCHA:', error);
+              reject(error);
+            });
+        });
+      })
+    ).pipe(
+      switchMap((recaptchaToken: string) => {
+        const body = { email, recaptchaToken, frequency };
+        console.log('[SERVICE] Enviando a backend para suscribir:', body);
+        return this.http.post(`${this.baseUrlStrapi}/api/subscribers/subscribe`, body, {
+          headers: this.postHeaders
+        });
+      }),
+      map(response => {
+        console.log('[SERVICE] Suscripción exitosa:', response);
+        return response;
+      }),
       catchError(error => {
-        console.error('[ERROR] Error al suscribir:', error);
+        console.error('[SERVICE] Error en la suscripción con reCAPTCHA:', error);
         return throwError(() => error);
       })
     );
