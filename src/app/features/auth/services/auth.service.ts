@@ -3,15 +3,16 @@ import { User } from '../interfaces/user.interface';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environments } from '@environments/environments';
 import { AuthResponse } from '../interfaces/auth-response.interface';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, of, switchMap, tap } from 'rxjs';
 import { CheckTokenResponse } from '../interfaces/check-token-response.interface';
 import { isPlatformBrowser } from '@angular/common';
 
 type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated'
-const baseUrlStrapi: string = environments.baseUrlStrapi;
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
+  private baseUrlStrapi: string = environments.baseUrlStrapi;
+  private strapiToken: string = environments.strapiToken;
 
   private _authStatus = signal<AuthStatus>('checking')
   private _user = signal<User|null>(null);
@@ -42,12 +43,62 @@ export class AuthService {
   }
 
   login( email: string, password: string):Observable<boolean>{
-    return this.http.post<AuthResponse>(`${ baseUrlStrapi }/api/auth/local`, {
+    return this.http.post<AuthResponse>(`${ this.baseUrlStrapi }/api/auth/local`, {
       identifier: email,
       password: password
     }).pipe(
-      map( resp => this.handleAuthSuccess(resp.user, resp.jwt)),
-      catchError((error)=> this.handleAuthError())
+      // map( resp => this.handleAuthSuccess(resp.user, resp.jwt)),
+      // catchError((error)=> this.handleAuthError())
+      switchMap(resp => {
+      const token = resp.jwt;
+      localStorage.setItem('token', token);
+
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      });
+
+      // Hace la segunda petición para obtener el user con el rol
+      return this.http.get<CheckTokenResponse>(`${this.baseUrlStrapi}/api/users/me?populate=role`, { headers })
+        .pipe(
+          map(userResp => this.handleAuthSuccess(userResp, token))
+        );
+    }),
+    catchError(() => this.handleAuthError())
+    );
+  }
+
+  register(name: string, lastname: string, lastname2: string, institution: string, email: string, password: string): Observable<boolean> {
+    return this.http.post<AuthResponse>(`${this.baseUrlStrapi}/api/auth/local/register`, {
+      username: email,
+      email: email,
+      password: password,
+    }).pipe(
+      switchMap(resp => {
+        const jwt = resp.jwt;
+        const userId = resp.user.id;
+
+        localStorage.setItem('token', jwt);
+
+        const updateHeaders = new HttpHeaders({
+          'Authorization': `Bearer ${this.strapiToken}`
+        });
+
+        const updateData = {
+          name: name,
+          lastName: lastname,
+          lastName2: lastname2,
+          institution: institution,
+          confirmed: false
+        };
+
+      return this.http.put(`${this.baseUrlStrapi}/api/users/${userId}`, updateData, { headers: updateHeaders }).pipe(
+          map(() => {
+            // No autenticamos al usuario aún
+            return true;
+          })
+        );
+      }),
+      catchError(() => this.handleAuthError())
     );
   }
 
@@ -62,7 +113,7 @@ export class AuthService {
       'Authorization': `Bearer ${token}`
     })
 
-    return this.http.get<CheckTokenResponse>(`${ baseUrlStrapi }/api/users/me?populate=role`, { headers })
+    return this.http.get<CheckTokenResponse>(`${ this.baseUrlStrapi }/api/users/me?populate=role`, { headers })
       .pipe(
         map( resp => this.handleAuthSuccess(resp, token)),
         catchError((error)=> this.handleAuthError())
@@ -77,6 +128,10 @@ export class AuthService {
   }
 
   private handleAuthSuccess(user: User, token: string): boolean {
+    if (!user.confirmed) {
+     // No permitir autenticación si el usuario no ha confirmado su email
+      return false;
+    }
     this._user.set(user);
     this._authStatus.set('authenticated');
     this._token.set(token);

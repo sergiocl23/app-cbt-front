@@ -1,7 +1,7 @@
 <!-- <p>map-layout-page works!</p> -->
-<div class="container mx-3 container-map">
+<div class="container container-map">
   <div class="grid h-full">
-    <div class="col-12 h-full">
+    <div class="col-12 h-full pb-0">
       <app-loading [message]="message" *ngIf="!isUserLocationReady && !isRoutePointsReady; else mapReady"></app-loading>
       <ng-template #mapReady>
         <div id="map">

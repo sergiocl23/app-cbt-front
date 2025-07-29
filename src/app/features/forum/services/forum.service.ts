@@ -12,6 +12,7 @@ import { EditTopicComponent } from '../../../features/forum/components/edit-topi
 import { EditPostComponent } from '../../../features/forum/components/edit-post/edit-post.component';
 import { CreateSubcategoryComponent } from '../../../features/forum/components/create-subcategory/create-subcategory.component';
 import { EditSubcategoryComponent } from '../../../features/forum/components/edit-subcategory/edit-subcategory.component';
+import { User } from '../../auth/interfaces/user.interface';
 
 
 @Injectable({
@@ -40,7 +41,7 @@ export class ForumService {
     console.log('Fetching all topics...'); // Debug log
     return this.http.get<StrapiResponse<Topic>>(
       `${this.baseUrl}/api/topics`,
-      { 
+      {
         headers: this.getHeaders(),
         params: new HttpParams()
           .set('populate', '*')
@@ -61,7 +62,7 @@ export class ForumService {
   getTopicsBySubcategory(subcategoryId: number): Observable<Topic[]> {
     return this.http.get<StrapiResponse<Topic>>(
       `${this.baseUrl}/api/topics`,
-      { 
+      {
         headers: this.getHeaders(),
         params: new HttpParams()
           .set('filters[subcategory][id][$eq]', subcategoryId.toString())
@@ -81,18 +82,19 @@ export class ForumService {
 
   getTopicWithPosts(id: number): Observable<Topic[]> {
     return this.http.get<StrapiResponse<Topic>>(
-      `${this.baseUrl}/api/topics`,
-      { 
+      // `${this.baseUrl}/api/topics`,
+      `${this.baseUrl}/api/topics?filters[id][$eq]=${id.toString()}&populate[posts][populate][users_permissions_user]=*&populate[posts][populate][post][populate][users_permissions_user]=*&populate[posts][populate][posts][populate][users_permissions_user]=*&populate[posts][populate][images]=*&populate[users_permissions_user]=*&populate[images]=*`,
+      {
         headers: this.getHeaders(),
-        params: {
-          'filters[id][$eq]': id.toString(),
-          'populate[posts][populate][users_permissions_user]': '*',
-          'populate[posts][populate][post]': '*',
-          'populate[posts][populate][posts]': '*',
-          'populate[posts][populate][images]': '*',
-          'populate[users_permissions_user]': '*',
-          'populate[images]': '*'
-        }
+        // params: {
+        //   'filters[id][$eq]': id.toString(),
+        //   'populate[posts][populate][users_permissions_user]': '*',
+        //   'populate[posts][populate][post][users_permissions_user]': '*',
+        //   'populate[posts][populate][posts][users_permissions_user]': '*',
+        //   'populate[posts][populate][images]': '*',
+        //   'populate[users_permissions_user]': '*',
+        //   'populate[images]': '*'
+        // }
       }
     ).pipe(
       map(normalizeResponse),
@@ -102,21 +104,22 @@ export class ForumService {
       })
     );
   }
-  
 
-  createPost(topic: Topic, body: string, replyTo?: Post | null, images: Media[] = []): Observable<Post> {
+
+  createPost(topic: Topic, body: string, user: User, replyTo?: Post | null, images: Media[] = []): Observable<Post> {
     const data = {
       data: {
         body,
         topic: topic.id,
         post: replyTo?.id,
-        images: images.map(img => img.id)
+        images: images.map(img => img.id),
+        users_permissions_user: user.id
       }
     };
 
     console.log('Creating post with data:', data);
     return this.http.post<StrapiResponse<Post>>(
-      `${this.baseUrl}/api/posts`, 
+      `${this.baseUrl}/api/posts`,
       data,
       { headers: this.getHeaders() }
     ).pipe(
@@ -129,13 +132,13 @@ export class ForumService {
     );
   }
 
-  createTopic(topicData: { 
-    title: string; 
-    body: string; 
-    subcategoryId: string; 
+  createTopic(topicData: {
+    title: string;
+    body: string;
+    subcategoryId: string;
     closed: boolean;
     pinned: boolean;
-  }): Observable<StrapiResponse<Topic>> {
+  }, user: User,): Observable<StrapiResponse<Topic>> {
     return this.http.post<StrapiResponse<Topic>>(
       `${this.baseUrl}/api/topics`,
       {
@@ -145,7 +148,8 @@ export class ForumService {
           subcategory: topicData.subcategoryId,
           closed: topicData.closed,
           pinned: topicData.pinned,
-          publishedAt: new Date().toISOString()
+          publishedAt: new Date().toISOString(),
+          users_permissions_user: user.id
         }
       },
       { headers: this.getHeaders() }
@@ -164,7 +168,7 @@ export class ForumService {
 
   deleteTopic(topicId: number): Observable<any> {
     console.log(`Attempting to delete topic with ID: ${topicId}`);
-  
+
     return this.http.delete(
       `${this.baseUrl}/api/topics/${topicId}`,
       { headers: this.getHeaders() }
@@ -178,7 +182,7 @@ export class ForumService {
       })
     );
   }
-  
+
 
   confirmAndDeleteTopic(topicId: number, topicName: string): Observable<boolean> {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
@@ -250,15 +254,15 @@ export class ForumService {
     );
   }
 
-  updateTopic(topicId: number, updates: { 
-    name: string; 
-    body: string; 
+  updateTopic(topicId: number, updates: {
+    name: string;
+    body: string;
     closed: boolean;
     pinned: boolean;
     subcategory: number;
   }): Observable<any> {
     console.log('Updating topic with data:', updates);
-    
+
     return this.http.put(
       `${this.baseUrl}/api/topics/${topicId}`,
       {
@@ -306,7 +310,7 @@ export class ForumService {
 
   updatePost(post: Post): Observable<any> {
     console.log(`Updating post ${post.id} with:`, post);
-    
+
     return this.http.put(
       `${this.baseUrl}/api/posts/${post.id}`,
       {
@@ -373,7 +377,7 @@ export class ForumService {
           name,
           categoryId: generalCategory.id
         });
-        
+
         return this.http.post<StrapiResponse<Subcategory>>(
           `${this.baseUrl}/api/subcategories`,
           {
@@ -456,7 +460,7 @@ export class ForumService {
 
   updateSubcategory(subcategoryId: number, updates: { name: string }): Observable<any> {
     console.log(`Updating subcategory ${subcategoryId} with:`, updates);
-    
+
     return this.http.put(
       `${this.baseUrl}/api/subcategories/${subcategoryId}`,
       {
@@ -516,7 +520,7 @@ export class ForumService {
   getPost(postId: number): Observable<Post> {
     return this.http.get<StrapiResponse<Post>>(
       `${this.baseUrl}/api/posts/${postId}`,
-      { 
+      {
         headers: this.getHeaders(),
         params: {
           'populate[users_permissions_user]': '*',

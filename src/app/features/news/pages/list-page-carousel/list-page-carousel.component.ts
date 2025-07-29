@@ -47,7 +47,7 @@ registerLocaleData(localeEs, 'es');
     MatFormFieldModule,
     MatNativeDateModule,
     MatInputModule,
-    
+
     ButtonModule,
     InputTextModule,
     DropdownModule,
@@ -98,14 +98,14 @@ registerLocaleData(localeEs, 'es');
         animate('300ms 50ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
       ]),
       transition(':leave', [
-        style({ 
+        style({
           position: 'absolute',
           width: 'calc(100% - 2.5rem)',
           left: '1.25rem',
           right: '1.25rem',
           zIndex: 0
-        }), 
-        animate('50ms ease-in', style({ 
+        }),
+        animate('50ms ease-in', style({
           opacity: 0
         }))
       ])
@@ -203,11 +203,11 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
 
   // Marca si una imagen está siendo cargada actualmente
   private loadingImages: Set<number> = new Set();
-  
+
   // Nuevo Subject para manejar la búsqueda con debounce
   private searchSubject = new Subject<string>();
   private searchSubscription?: Subscription;
-  
+
   // Para formulario de suscripción
   subscribeForm: FormGroup;
   isSubscribing: boolean = false;
@@ -274,7 +274,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
     this.loadNews();
     this.loadMinimalNews();
     this.loadTags();
-    
+
     // Configurar el observable de búsqueda con debounce
     this.searchSubscription = this.searchSubject.pipe(
       debounceTime(500), // Espera 500ms después del último input
@@ -323,7 +323,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.newsService.getNews({
       page: 1,
-      pageSize: 3, 
+      pageSize: 3,
       sort: this.getSortCriteria(),
       filters: { relevanceScore: { $null: true } }
     }).subscribe({
@@ -332,16 +332,16 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
           const articles = this.mapArticles(response.data);
           this.latestNews = articles[0] || null;
           this.secondaryNews = articles.slice(1, 3);
-          this.carouselNews = articles; 
-          
+          this.carouselNews = articles;
+
           const featuredIds = articles.map(article => article.id);
-          
+
           this.currentPage = 1; // Asegurar que empezamos en pág 1
           // Llamar a loadPreviousNews pasando los IDs a excluir para la carga inicial de Pág 1
-          this.loadPreviousNews(featuredIds); 
+          this.loadPreviousNews(featuredIds);
         } else {
           console.error('[ERROR] Formato de respuesta inválido para noticias destacadas:', response);
-          this.isLoading = false; 
+          this.isLoading = false;
           this.loadPreviousNews(); // Intentar cargar pág 1 sin exclusión si fallan las destacadas
         }
       },
@@ -355,13 +355,13 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
 
   private loadPreviousNews(excludeIdsFromPage1: number[] = []) {
     // Determinar cuántas noticias pedir a la API
-    const fetchSize = (this.currentPage === 1 && excludeIdsFromPage1.length > 0) 
-                      ? this.pageSize + excludeIdsFromPage1.length 
+    const fetchSize = (this.currentPage === 1 && excludeIdsFromPage1.length > 0)
+                      ? this.pageSize + excludeIdsFromPage1.length
                       : this.pageSize;
-                      
+
     const params = this.buildQueryParams(fetchSize); // Pedir el tamaño calculado
     this.isCardsLoading = true;
-    this.displayedNews = []; 
+    this.displayedNews = [];
 
     console.log(`Cargando Pág ${this.currentPage}. Pidiendo ${fetchSize} noticias.`);
 
@@ -377,53 +377,53 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
               articles = articles.filter(article => !excludeIdsFromPage1.includes(article.id));
               console.log(`Filtrados ${excludeIdsFromPage1.length} IDs de ${originalCount}. Quedan ${articles.length}.`);
               // Tomar solo hasta pageSize (12) después de filtrar
-              articles = articles.slice(0, this.pageSize); 
+              articles = articles.slice(0, this.pageSize);
               console.log(`Tomando las primeras ${this.pageSize}. Final: ${articles.length}.`);
           }
 
-          this.previousNews = [...articles]; 
-          
+          this.previousNews = [...articles];
+
           setTimeout(() => {
-            this.displayedNews = [...this.previousNews]; 
+            this.displayedNews = [...this.previousNews];
             console.log(`UI actualizada con ${this.displayedNews.length} noticias en página ${this.currentPage}`);
           }, 0);
-            
+
           this.totalRecords = response.meta?.pagination?.total || 0;
           this.totalPages = response.meta?.pagination?.pageCount || Math.ceil(this.totalRecords / this.pageSize);
           console.log(`Paginación: Total Records: ${this.totalRecords}, Total Pages: ${this.totalPages}`);
-          
+
         } else {
           console.error(`[ERROR] Respuesta inválida para página ${this.currentPage}:`, response);
-          this.previousNews = []; 
+          this.previousNews = [];
           this.displayedNews = [];
           this.totalRecords = 0;
           this.totalPages = 0;
         }
         this.isCardsLoading = false;
-        if(this.isLoading) this.isLoading = false; 
+        if(this.isLoading) this.isLoading = false;
       },
       error: (error) => {
         console.error(`[ERROR] Error cargando página ${this.currentPage}:`, error);
-        this.previousNews = []; 
+        this.previousNews = [];
         this.displayedNews = [];
         this.totalRecords = 0;
         this.totalPages = 0;
         this.isCardsLoading = false;
-        if(this.isLoading) this.isLoading = false; 
+        if(this.isLoading) this.isLoading = false;
       }
     });
   }
 
-  private buildQueryParams(fetchSize: number = this.pageSize) { 
+  private buildQueryParams(fetchSize: number = this.pageSize) {
     const filters: any = { relevanceScore: { $null: true } };
     if (this.selectedCountry?.name) { filters.pais = this.selectedCountry.name.toLowerCase(); }
     console.log('[DEBUG COMPONENT] Contenido de this.selectedCategories en buildQueryParams:', JSON.stringify(this.selectedCategories));
-    if (this.selectedCategories?.length > 0) { 
-        filters.tags = { nombre: { $in: this.selectedCategories } }; 
+    if (this.selectedCategories?.length > 0) {
+        filters.tags = { nombre: { $in: this.selectedCategories } };
     }
     if (this.dateStart || this.dateEnd) {
       filters.articleDate = {};
-      
+
       if (this.dateStart) {
         const startDate = new Date(this.dateStart);
         const startUTC = new Date(Date.UTC(
@@ -436,7 +436,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         console.log('[DEBUG] Filtro fecha inicio (local):', startDate.toString());
         console.log('[DEBUG] Filtro fecha inicio (UTC):', startUTC.toISOString());
       }
-      
+
       if (this.dateEnd) {
         const endDate = new Date(this.dateEnd);
         const endUTC = new Date(Date.UTC(
@@ -469,7 +469,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
 
   private formatDateForQuery(date: Date): string {
     if (!date) return '';
-    
+
     // Ajustar a UTC manteniendo la fecha local
     const adjustedDate = new Date(
       Date.UTC(
@@ -481,7 +481,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         0   // Segundos UTC
       )
     );
-    
+
     return adjustedDate.toISOString();
   }
 
@@ -491,30 +491,30 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       this.latestNews?.id,
       ...this.secondaryNews.map(news => news.id)
     ].filter((id): id is number => typeof id === 'number');
-    
+
     // Llamar a loadPreviousNews pasando los IDs a excluir explícitamente para Pág 1
     console.log("Aplicando filtros, cargando Pág 1 excluyendo IDs:", featuredIds);
-    this.loadPreviousNews(featuredIds); 
+    this.loadPreviousNews(featuredIds);
   }
 
   // Método auxiliar para extraer la URL de imagen del objeto MediaItem de Strapi 5
   private extractMediaUrl(mediaItem: any): string | null {
     if (!mediaItem) return null;
-    
+
     // Verificar si es un objeto directo con URL
     if (typeof mediaItem === 'object' && mediaItem.url) {
       return mediaItem.url;
     }
-    
+
     // Verificar si tiene la estructura data.attributes común en Strapi 5
     if (mediaItem.data && mediaItem.data.attributes) {
       const attrs = mediaItem.data.attributes;
-      
+
       // Intentar obtener la URL directamente
       if (attrs.url) {
         return attrs.url;
       }
-      
+
       // Intentar obtener formatos de imagen si están disponibles
       if (attrs.formats) {
         // Preferir formato mediano, pequeño, miniatura o cualquiera disponible en ese orden
@@ -524,7 +524,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     // Verificar si es un array, como suele ser con additionalImages
     if (Array.isArray(mediaItem.data)) {
       // Tomar el primer elemento si existe
@@ -534,7 +534,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         if (attrs.url) {
           return attrs.url;
         }
-        
+
         // Intentar obtener formatos de imagen
         if (attrs.formats) {
           const format = attrs.formats.medium || attrs.formats.small || attrs.formats.thumbnail;
@@ -544,7 +544,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     return null;
   }
 
@@ -562,12 +562,12 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         }
         return featuredImage.url;
       }
-      
+
       // Si no está en caché, cargar los datos completos de la noticia
       if (!this.isLoadingImage(newsItem.id)) {
         this.loadNewsImages(newsItem.id);
       }
-      
+
       // Si tiene featuredImage, intentar extraer la URL
       if (newsItem.featuredImage) {
         const mediaUrl = this.extractMediaUrl(newsItem.featuredImage);
@@ -575,10 +575,10 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
           return mediaUrl;
         }
       }
-      
+
       return 'assets/images/CBioceanicoTarapacafondo_blanco.png';
     }
-    
+
     // Para noticias con imágenes en formato MEDIA
     if (newsItem?.featuredImage) {
       const mediaUrl = this.extractMediaUrl(newsItem.featuredImage);
@@ -586,10 +586,10 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         return mediaUrl;
       }
     }
-    
+
     // Si no hay featuredImage, continuar con la lógica actual
     const url = newsItem?.mainImage || newsItem?.images?.[0];
-    
+
     if (url && this.isValidUrl(url) && !url.includes('default')) {
       if (typeof window === 'undefined' || typeof Image === 'undefined') {
         return url;
@@ -598,7 +598,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       if (this.imageCache.hasOwnProperty(url)) {
         return this.imageCache[url] ? url : 'assets/images/CBioceanicoTarapacafondo_blanco.png';
       }
-      
+
       const img = new Image();
       img.onload = () => {
         this.imageCache[url] = true;
@@ -607,10 +607,10 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         this.imageCache[url] = false;
       };
       img.src = url;
-      
+
       return 'assets/images/CBioceanicoTarapacafondo_blanco.png';
     }
-    
+
     return 'assets/images/CBioceanicoTarapacafondo_blanco.png';
   }
 
@@ -663,7 +663,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       }
       return featuredImage.url;
     }
-    
+
     // Para noticias con imágenes en formato MEDIA
     if (newsItem?.featuredImage) {
       const mediaUrl = this.extractMediaUrl(newsItem.featuredImage);
@@ -671,7 +671,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         return mediaUrl;
       }
     }
-    
+
     // Para noticias con mainImage o images en formato string
     return newsItem?.images?.[0] || newsItem?.mainImage || 'assets/images/default-news.jpg';
   }
@@ -702,19 +702,19 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         });
       }
     }
-    
+
     // Para noticias con imágenes en formato MEDIA
     if (newsItem?.additionalImages && newsItem.additionalImages.length > 0) {
       // Extraer URLs de cada imagen adicional
       const mediaUrls = newsItem.additionalImages
         .map(img => this.extractMediaUrl(img))
         .filter((url): url is string => !!url); // Filtrar valores nulos
-      
+
       if (mediaUrls.length > 0) {
         return mediaUrls;
       }
     }
-    
+
     // Para noticias con imágenes en formato de array de strings
     return newsItem?.images || [];
   }
@@ -724,12 +724,12 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
     const requestedPage = event.page + 1;
     if (this.currentPage === requestedPage) {
       console.log(`Paginador intentó recargar la página actual (${this.currentPage}). Ignorando.`);
-      return; 
+      return;
     }
     this.currentPage = requestedPage;
     console.log(`Cambiando a página ${this.currentPage} desde paginador.`);
     // Al cambiar de página, NO pasamos IDs a excluir.
-    this.loadPreviousNews(); 
+    this.loadPreviousNews();
   }
 
   // Método que convierte la fecha recibida en un objeto Date válido
@@ -761,22 +761,22 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
   // Método auxiliar para mapear artículos
   private mapArticles(articles: any[]): NewsItem[] {
     if (!articles) return [];
-    
+
     const mappedArticles = articles.map(article => {
       // Determinar si estamos recibiendo datos en formato Strapi 5 (data/attributes)
       let processedArticle = article;
-      
+
       // Si tiene estructura data/attributes (formato Strapi v5)
       if (article.attributes) {
         processedArticle = article.attributes;
         processedArticle.id = article.id;
       }
-      
+
       // Detectar si es una noticia creada manualmente
       // Podría estar indicado por el campo manualCreation o por la ausencia de sourceUrl
-      const isManualCreation = processedArticle.manualCreation === true || 
+      const isManualCreation = processedArticle.manualCreation === true ||
                              (!processedArticle.sourceUrl && !processedArticle.mainImage);
-      
+
       // Procesar etiquetas que pueden venir en diferentes formatos
       let tags = [];
       if (Array.isArray(processedArticle.tags)) {
@@ -808,7 +808,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
           };
         });
       }
-      
+
       return {
         id: processedArticle.id,
         title: processedArticle.title || '',
@@ -827,13 +827,13 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         featuredImage: processedArticle.featuredImage || null,
         additionalImages: processedArticle.additionalImages || [],
         manualCreation: isManualCreation,
-        relevanceScore: processedArticle.relevanceScore !== undefined ? 
+        relevanceScore: processedArticle.relevanceScore !== undefined ?
                        Number(processedArticle.relevanceScore) : null
       };
     });
 
     // Simplemente devolver los artículos mapeados en el orden recibido
-    return mappedArticles; 
+    return mappedArticles;
   }
 
   // Marca si una imagen está siendo cargada actualmente
@@ -846,9 +846,9 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
     if (this.isLoadingImage(newsId)) {
       return; // Evitar cargar la misma noticia múltiples veces
     }
-    
+
     this.loadingImages.add(newsId);
-    
+
     this.newsService.getNewsComplete(newsId.toString()).subscribe({
       next: (newsData) => {
         // Guardar en caché
@@ -856,7 +856,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
           featuredImage: newsData.featuredImage,
           additionalImages: newsData.additionalImages || []
         };
-        
+
         this.loadingImages.delete(newsId);
       },
       error: (error) => {
@@ -922,7 +922,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
     console.log('[DEBUG] Ejecutando búsqueda con (Enter):', this.searchQuery);
     // El valor ya está en this.searchQuery debido a [(ngModel)]
     this.applyFilters(); // Aplicar filtros inmediatamente
-    
+
     // Si la barra está expandida y no hay texto, colapsar (esto podría ser redundante si handleSearchBlur funciona bien)
     // if (this.isSearchExpanded && !this.searchQuery) {
     //   this.isSearchExpanded = false;
@@ -943,11 +943,11 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
         start: this.dateStart,
         end: this.dateEnd
       });
-      
+
       console.log('[DEBUG] Fecha inicio seleccionada:', this.dateStart);
       console.log('[DEBUG] Fecha fin seleccionada:', this.dateEnd);
     }
-    
+
     // Aplicar filtros
     this.applyFilters();
     // No cerramos el panel de fecha aquí, el usuario puede estar seleccionando un rango.
@@ -971,7 +971,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       start: null,
       end: null
     });
-    
+
     // Recargar noticias con filtros eliminados
     this.isCardsLoading = true; // Solo activar carga para las tarjetas
     this.loadNews();
@@ -994,7 +994,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       this.navigateToNews(news);
     }
   }
-  
+
   // Método para cargar noticias con relevanceScore usando los IDs que sabemos que tienen valor
   loadMinimalNews() {
     // Enfoque más simple: buscar por tipo de artículo 'minimal'
@@ -1068,7 +1068,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
               nombre: tag.nombre
             };
           });
-          
+
           // También asignar los tags a categories con el formato label/value para el multiselect
           this.categories = tagsData.map(tag => {
             return {
@@ -1076,7 +1076,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
               value: tag.nombre
             };
           });
-          
+
           console.log('[DEBUG] Tags procesados:', this.tags.length);
           console.log('[DEBUG] Categorías para selector:', this.categories);
         } else {
@@ -1091,7 +1091,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   // Método auxiliar para establecer tags predeterminados
   private setDefaultTags(): void {
     this.tags = [
@@ -1100,7 +1100,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       { id: 3, name: 'Integración', nombre: 'integracion' },
       { id: 4, name: 'Gobierno', nombre: 'gobierno' },
     ];
-    
+
     // También establecer categorías para el selector
     this.categories = [
       { label: 'Infraestructura', value: 'infraestructura' },
@@ -1108,7 +1108,7 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       { label: 'Integración', value: 'integracion' },
       { label: 'Gobierno', value: 'gobierno' },
     ];
-    
+
     console.log('[DEBUG] Tags predeterminados establecidos:', this.tags.length);
     console.log('[DEBUG] Categorías predeterminadas:', this.categories);
   }
@@ -1117,13 +1117,13 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
   clearDates(): void {
     this.dateStart = null;
     this.dateEnd = null;
-    
+
     // Resetear también el FormGroup de fechas
     this.dateRange.setValue({
       start: null,
       end: null
     });
-    
+
     console.log('[DEBUG] Fechas limpiadas');
     this.applyFilters();
   }
@@ -1144,9 +1144,9 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
   onSubscribe() {
     this.subscribeForm.markAllAsTouched();
     if (this.subscribeForm.invalid) {
-      this.messageService.add({ 
-        severity: 'warn', 
-        summary: 'Formulario inválido', 
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Formulario inválido',
         detail: 'Por favor, ingrese un correo electrónico válido.',
         life: 4000
       });
@@ -1161,11 +1161,11 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.isSubscribing = false;
         console.log('[COMPONENT] Respuesta de suscripción:', response);
-        this.messageService.add({ 
-          severity: 'success', 
-          summary: 'Suscripción Exitosa', 
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Suscripción Exitosa',
           detail: '¡Gracias por suscribirte a nuestro newsletter!',
-          life: 5000 
+          life: 5000
         });
         this.subscribeForm.reset({ email: '', frequency: 'daily' }); // Resetea el formulario
       },
@@ -1182,11 +1182,11 @@ export class ListPageCarouselComponent implements OnInit, OnDestroy {
             detailMessage = error.message; // Para errores como "reCAPTCHA not ready"
         }
 
-        this.messageService.add({ 
-          severity: 'error', 
-          summary: 'Error de Suscripción', 
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error de Suscripción',
           detail: detailMessage,
-          life: 6000 
+          life: 6000
         });
       }
     });

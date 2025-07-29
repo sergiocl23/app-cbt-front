@@ -1,5 +1,59 @@
-<div class="grid p-3 m-0">
-  <div class="col-12 mt-5 md:col-4 md:col-offset-4 md:mt-8">
+<div class="header">
+  <p-toolbar [style]="{'height': '64px', 'box-shadow': '0px 1px 3px #888888'}">
+
+      <span class="spacer"></span>
+      <div class="logo-container">
+        <img class="logo" src="assets/images/logo/logo.png" alt="Logo" class="logo">
+        <img class="titulo" src="assets/images/logo/titulo.png" alt="Logo" class="titulo">
+      </div>
+      <span class="spacer"></span>
+  </p-toolbar>
+</div>
+<div class="grid p-3 m-0 form-container">
+  <!-- <div class="col-12 mt-5 md:col-4 md:col-offset-4 md:mt-8"> -->
+  <div class="col-12 md:col-4 md:col-offset-4">
     <router-outlet />
+    <!-- <div class="flex align-items-center justify-content-center h-full w-full">
+    </div> -->
   </div>
+</div>
+<div class="footer p-3">
+  <p-toolbar [style]="{'box-shadow': '0px 1px 3px #888888', 'height': 'auto', 'padding': '20px'}">
+    <div class="flex align-items-start justify-content-center w-full sponsors-container">
+
+      <div class="footer-group">
+        <p class="footer-title">Financia</p>
+        <div class="flex items-center justify-center logos-group">
+          <a href="https://www.goretarapaca.gov.cl/" target="_blank">
+            <img class="logo-footer" src="assets/images/footer/logo_gore_horizontal.png" alt="Logo-gore">
+          </a>
+          <a href="https://www.goretarapaca.gov.cl/consejo-regional-2/" target="_blank">
+            <img class="logo-footer" src="assets/images/footer/logo_core_horizontal.png" alt="Logo-core">
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-group">
+        <p class="footer-title">Ejecuta</p>
+        <div class="flex items-center justify-center logos-group">
+          <a href="https://www.unap.cl/" target="_blank">
+            <img class="logo-footer" src="assets/images/footer/logo_unap.png" alt="Logo-unap">
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-group">
+        <p class="footer-title">Colabora</p>
+        <div class="flex items-center justify-center logos-group">
+          <a href="https://epi.cl/" target="_blank">
+            <img class="logo-footer" src="assets/images/footer/logo_epi.png" alt="Logo-epi">
+          </a>
+          <a href="https://industriales.cl/sitio/" target="_blank">
+            <img class="logo-footer" src="assets/images/footer/logo_aii.png" alt="Logo-aii">
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </p-toolbar>
 </div>

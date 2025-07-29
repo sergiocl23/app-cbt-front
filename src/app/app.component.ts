@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 export class AppComponent {
 
   authService = inject(AuthService);
-    router = inject(Router)
+  router = inject(Router)
 
 
   public finshedAuthCheck = computed<boolean>(() => {
@@ -30,12 +30,12 @@ export class AppComponent {
         return;
 
         case 'authenticated':
-          // this.router.navigateByUrl('/');
+          this.router.navigateByUrl('/');
           return;
 
-        case 'not-authenticated':
-          // this.router.navigateByUrl('/auth/login');
-          return;
+        // case 'not-authenticated':
+        //   this.router.navigateByUrl('/auth/login');
+        //   return;
     }
   })
 

@@ -32,7 +32,7 @@
       <!-- Sección de noticias destacadas con carrusel -->
       <div class="featured-section">
         <h2 class="featured-label">Últimas actualizaciones</h2>
-        
+
         <!-- Carrusel de noticias destacadas -->
         <div class="carousel-container">
           <p-carousel [value]="carouselNews" [numVisible]="1" [numScroll]="1" [circular]="true"
@@ -44,7 +44,7 @@
                   <img [src]="getImageUrl(news)" [alt]="news.title">
                   <div class="carousel-overlay"></div>
                   <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
-                  <a *ngIf="news.sourceUrl" [href]="news.sourceUrl" 
+                  <a *ngIf="news.sourceUrl" [href]="news.sourceUrl"
                      class="source-url" target="_blank" (click)="$event.stopPropagation()">
                     <i class="pi pi-external-link"></i>
                     {{ getFormattedSourceUrl(news.sourceUrl) }}
@@ -86,18 +86,18 @@
       <div class="remaining-news">
         <div class="section-header">
           <h3 class="section-title">Noticias</h3>
-          
+
           <!-- Sección de filtros y búsqueda mejorada -->
           <div class="filters-group">
             <!-- Barra de búsqueda expandible -->
             <div class="search-container" [class.expanded]="isSearchExpanded">
-              <input type="text" class="search-input" 
-                     placeholder="Buscar noticias..." 
+              <input type="text" class="search-input"
+                     placeholder="Buscar noticias..."
                      [(ngModel)]="searchQuery"
-                     (input)="onSearchInput()" 
+                     (input)="onSearchInput()"
                      (keyup.enter)="onSearch($event)"
                      (blur)="handleSearchBlur()">
-              <button class="search-toggle" aria-label="Buscar" 
+              <button class="search-toggle" aria-label="Buscar"
                       (click)="toggleSearchExpand()">
                 <i class="pi" [ngClass]="{'pi-search': !isSearchExpanded || !searchQuery, 'pi-times': isSearchExpanded && searchQuery}"></i>
                 <span class="filter-indicator" *ngIf="searchQuery && !isSearchExpanded"></span>
@@ -110,7 +110,7 @@
                 <i class="pi pi-calendar"></i>
                 <span class="filter-indicator" *ngIf="dateStart || dateEnd"></span>
               </button>
-              <div class="date-range" [@slideInOut]="isDateFilterExpanded" 
+              <div class="date-range" [@slideInOut]="isDateFilterExpanded"
                    appClickOutside (clickOutside)="closeDateFilter()">
                 <p-calendar
                   [(ngModel)]="dateStart"
@@ -135,7 +135,7 @@
                   [minDate]="dateStart || desdeMinDate"
                   [maxDate]="hastaMaxDate"
                 ></p-calendar>
-                <button *ngIf="dateStart || dateEnd" class="clear-dates-btn" 
+                <button *ngIf="dateStart || dateEnd" class="clear-dates-btn"
                         (click)="clearDates()" aria-label="Limpiar fechas">
                   <i class="pi pi-times"></i>
                 </button>
@@ -148,11 +148,11 @@
                 <i class="pi pi-tags"></i>
                 <span class="filter-indicator" *ngIf="selectedCategories?.length"></span>
               </button>
-              <div class="category-panel" [@slideInOut]="isCategoryFilterExpanded" 
+              <div class="category-panel" [@slideInOut]="isCategoryFilterExpanded"
                    appClickOutside (clickOutside)="closeCategoryFilter()">
-                <p-multiSelect 
-                  [options]="categories" 
-                  [(ngModel)]="selectedCategories" 
+                <p-multiSelect
+                  [options]="categories"
+                  [(ngModel)]="selectedCategories"
                   optionLabel="label"
                   optionValue="value"
                   placeholder="Seleccionar temáticas"
@@ -177,7 +177,7 @@
             </button>
           </div>
         </div>
-        
+
         <!-- Contenedor para noticias con clase especial que cambia según isCardsLoading -->
         <div class="news-results-container" [class.isCardsLoading]="isCardsLoading">
           <!-- Skeleton loader específico para las tarjetas de noticias -->
@@ -189,7 +189,7 @@
             <div *ngIf="displayedNews.length === 0 && !isCardsLoading" class="diagnostic-message">
               <p>No hay noticias disponibles para mostrar en la página {{ currentPage }}.</p>
             </div>
-            
+
             <!-- Articles -->
             <article *ngFor="let news of displayedNews; trackBy: trackByNewsId" class="news-card" (click)="navigateToNews(news)">
               <div class="card-image">
@@ -197,7 +197,7 @@
                      [class.default-image]="!news.mainImage"
                      [class.manual-image]="news.manualCreation">
                 <span class="manual-badge" *ngIf="news.manualCreation">Noticia interna</span>
-                <a *ngIf="news.sourceUrl" [href]="news.sourceUrl" 
+                <a *ngIf="news.sourceUrl" [href]="news.sourceUrl"
                    class="source-url" target="_blank" (click)="$event.stopPropagation()">
                   <i class="pi pi-external-link"></i>
                   {{ getFormattedSourceUrl(news.sourceUrl) }}
@@ -216,7 +216,7 @@
                       <span class="tag" *ngFor="let tag of news.tags.slice(0, 2)">
                         {{ tag.name || tag.nombre }}
                       </span>
-                      
+
                       <!-- Mostrar más tags si hay más de 2 -->
                       <span *ngIf="news.tags.length > 2" class="extra-tag">
                         +{{ news.tags.length - 2 }}
@@ -236,7 +236,7 @@
               </div>
             </article>
           </div>
-          
+
           <!-- Mensaje cuando no hay resultados -->
           <div class="no-results" *ngIf="displayedNews.length === 0 && !isCardsLoading">
             <i class="pi pi-search" style="font-size: 3rem"></i>
@@ -248,12 +248,12 @@
             <p *ngIf="!(dateStart || dateEnd)">Prueba con otros filtros o términos de búsqueda</p>
             <button pButton label="Reiniciar filtros" icon="pi pi-filter-slash" (click)="clearFilters()"></button>
           </div>
-          
+
           <!-- Paginador -->
           <div class="paginator-container" *ngIf="totalPages > 1 && !isCardsLoading">
-            <p-paginator 
-              [rows]="pageSize" 
-              [totalRecords]="totalRecords" 
+            <p-paginator
+              [rows]="pageSize"
+              [totalRecords]="totalRecords"
               [first]="(currentPage-1) * pageSize"
               (onPageChange)="onPageChange($event)"
               [showJumpToPageDropdown]="false"
@@ -315,9 +315,9 @@
         <p>Recibe las últimas noticias en tu correo electrónico.</p>
         <form class="subscribe-form" [formGroup]="subscribeForm" (ngSubmit)="onSubscribe()">
           <!-- Campo de email -->
-          <input 
-            type="email" 
-            class="email-input" 
+          <input
+            type="email"
+            class="email-input"
             placeholder="Tu correo electrónico"
             formControlName="email"
             [ngClass]="{'ng-invalid ng-dirty': emailControl?.invalid && (emailControl?.dirty || emailControl?.touched)}"
@@ -326,13 +326,13 @@
             <small *ngIf="emailControl?.errors?.['required']">El correo es requerido</small>
             <small *ngIf="emailControl?.errors?.['email']">Formato de correo inválido</small>
           </div>
-          
+
           <div class="frequency-options">
-            <p class="frequency-info">Los newsletters se enviarán semanalmente.</p>
+            <p class="frequency-info">Los newsletters se enviarán semanalmente, los dias lunes.</p>
           </div>
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             class="subscribe-button"
             [disabled]="subscribeForm.invalid || isSubscribing">
             {{ isSubscribing ? 'Enviando...' : 'Suscribirse' }}
@@ -347,4 +347,4 @@
 </div>
 
 
-<p-toast></p-toast> 
+<p-toast></p-toast>

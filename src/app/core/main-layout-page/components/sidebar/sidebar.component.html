@@ -2,27 +2,37 @@
 <div class="custom-sidebar" [class.open]="isOpen">
   <div class="sidebar-container h-full" [class.open]="isOpen">
     <div class="flex flex-column h-full">
-      <div class="user-info-container flex align-items-center justify-content-between py-3 flex-shrink-0 px-2">
-        <div class="user-info flex align-items-center justify-content-center w-full">
-          <!-- <div class="initials-username flex align-items-center justify-content-center"> -->
-            <!-- {{ initials }} -->
-              <!-- SC -->
-          <!-- </div> -->
-          <!-- <div class="username-container ml-2" [ngClass]="{ 'hidden': !isOpen }"> -->
-            <!-- <div class="username">{{ name }} {{ lastName }}</div> -->
-            <!-- <div class="username">Sergio Cerda</div> -->
-            <!-- <div class="user-type">{{ role }}</div> -->
-            <!-- <div class="user-type">Administrador</div> -->
-          <!-- </div> -->
-           <div class="text-center" style="color: white; font-size: 20px; font-weight: 500;">
-              <span>
-                ¡BIENVENIDO!
+      <div class="user-info-container flex align-items-center justify-content-between pt-3 pb-2 flex-shrink-0 px-2">
+        <div class="user-info w-full">
+          <div class="flex align-items-center justify-content-between" *ngIf="initials; else loggedin">
+            <div class="flex align-items-center justify-content-start">
+              <div class="initials-username flex align-items-center justify-content-center" [ngClass]="name_color">
+                {{ initials }}
+              </div>
+              <div class="username-container ml-2" [ngClass]="{ 'hidden': !isOpen }">
+                <div class="username">{{ name }} {{ lastName }}</div>
+                <div class="user-type">{{ role }}</div>
+              </div>
+            </div>
+
+            <span [ngClass]="{ 'hidden': !isOpen }" class="pi pi-sign-out logout" (click)="onLogout()"></span>
+          </div>
+          <ng-template #loggedin>
+            <div class="flex flex-column align-items-center justify-content-center" style="color: white;">
+              <div class="welcome-container">
+                <span>
+                  ¡BIENVENIDO!
+                </span>
+              </div>
+              <span class="btn-login mt-2 mb-0 p-0" routerLink="/auth/login">
+                Iniciar sesión / Registrarse
               </span>
-           </div>
+            </div>
+          </ng-template>
+
         </div>
-        <!-- <span [ngClass]="{ 'hidden': !isOpen }" class="pi pi-sign-out logout" (click)="onLogout()"></span> -->
       </div>
-      <!-- <p-divider type="solid"></p-divider> -->
+
       <div class="overflow-y-auto pt-2">
         <ul class="menu-options-list list-none m-0 py-0 px-1">
           <li *ngFor="let item of sidebarItems">
@@ -44,10 +54,25 @@
                   <span class="ml-2 font-medium option-description" [ngClass]="{ 'hidden': !isOpen }">{{ sectionItem.label }}</span>
                 </a>
               </li>
+              <li class="border-round py-2">
+                <a pRipple
+                  class="menu-option flex align-items-center cursor-pointer px-2 py-2 border-round text-700 transition-duration-150 transition-colors p-ripple"
+                  href="https://sitio.corredor-bioceanico-tarapaca.cl/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style="text-decoration: none;"
+                  >
+                  <div class="option-icon flex align-items-center justify-content-center">
+                    <span class="material-icons">travel_explore</span>
+                  </div>
+                  <span class="ml-2 font-medium option-description" [ngClass]="{ 'hidden': !isOpen }">Sitio Web</span>
+                </a>
+              </li>
             </ul>
           </li>
         </ul>
       </div>
+      <!-- <p-divider type="solid"></p-divider> -->
     </div>
   </div>
 

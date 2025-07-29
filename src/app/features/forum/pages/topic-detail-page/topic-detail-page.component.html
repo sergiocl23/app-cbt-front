@@ -1,12 +1,16 @@
 <div class="topic-container" *ngIf="topic">
+  <div class="mb-3"><small><a routerLink="/forum">Volver</a></small></div>
   <div class="topic-header">
     <h2>{{ topic.name }}</h2>
   </div>
+  <!-- <div class="flex align-items-start justify-content-between">
+  </div> -->
 
   <!-- Topic content -->
   <div class="content-card topic-content">
     <div class="post-header">
-      <span class="author">{{ topic.users_permissions_user?.username || 'Anónimo' }}</span>
+      <span class="author">{{ topic.users_permissions_user?.name +' '+topic.users_permissions_user?.lastName+' - '+topic.users_permissions_user?.institution || 'Anónimo' }}</span>
+      <!-- <span class="author">{{ topic.users_permissions_user?.username || 'Anónimo' }}</span> -->
       <span class="date">Publicó {{ topic.createdAt | date:'MMM d, y, h:mm:ss a' }}</span>
     </div>
     <div class="markdown-body" [innerHTML]="formattedTopicContent"></div>
@@ -20,76 +24,95 @@
 
   <!-- Posts/Replies -->
   <div class="replies-section" *ngIf="topic.posts && topic.posts.length > 0">
-    <div class="content-card reply" 
+    <div class="content-card reply"
          *ngFor="let post of topic.posts"
          [id]="'post-' + post.id">
       <div class="post-header">
-        <span class="author">{{ post.users_permissions_user?.username || 'Anónimo' }}</span>
+        <span class="author">{{ post.users_permissions_user?.name +' '+post.users_permissions_user?.lastName+' - '+post.users_permissions_user?.institution || 'Anónimo' }}</span>
+        <!-- <span class="author">{{ post.users_permissions_user?.username || 'Anónimo' }}</span> -->
         <span class="date">Respondió {{ post.createdAt | date:'MMM d, y, h:mm:ss a' }}</span>
-        
+
         <!-- Changed reply_to to post -->
         <span *ngIf="post.post" class="reply-reference">
-          en respuesta a 
-          <a href="#post-{{post.post.id}}" 
+          en respuesta a
+          <a href="#post-{{post.post.id}}"
              (click)="scrollToPost($event, post.post.id)">
-            {{ post.post.users_permissions_user?.username || 'Anónimo' }}
+            <!-- {{ post.post.users_permissions_user?.username || 'Anónimo' }} -->
+            {{ post.post.users_permissions_user?.name +' '+post.post.users_permissions_user?.lastName || 'Anónimo' }}
           </a>
         </span>
-        
+
         <div class="post-actions">
           <!-- Add reply button -->
-          <button class="reply-btn" 
+          <button class="reply-btn" *ngIf="isLogged"
                   (click)="onReplyToPost(post)"
                   title="Responder a este mensaje">
             <i class="fas fa-reply"></i>
           </button>
           <!-- Existing edit/delete buttons -->
-          <button class="edit-btn" 
-                  (click)="onEditPost(post)"
-                  title="Editar respuesta">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button class="delete-btn" 
-                  *ngIf="canDeletePost(post)"
-                  (click)="onDeletePost(post)"
-                  title="Eliminar respuesta">
-            <i class="fas fa-trash"></i>
-          </button>
+           @if(canEdit(post)){
+             <button class="edit-btn"
+                     (click)="onEditPost(post)"
+                     title="Editar respuesta">
+               <i class="fas fa-edit"></i>
+             </button>
+             <button class="delete-btn"
+                     *ngIf="canDeletePost(post)"
+                     (click)="onDeletePost(post)"
+                     title="Eliminar respuesta">
+               <i class="fas fa-trash"></i>
+             </button>
+           }
         </div>
       </div>
-      
+
       <div class="markdown-body" [innerHTML]="getFormattedContent(post.id)"></div>
     </div>
   </div>
 
   <!-- Reply form -->
-  <div class="reply-form" *ngIf="!topic.closed">
-    <div class="editor-header">
-      <h3>
-        Tu respuesta
-        <span *ngIf="replyingTo" class="replying-to">
-          en respuesta a 
-          <a href="#post-{{replyingTo.id}}" 
-             (click)="scrollToPost($event, replyingTo.id)">
-            {{ replyingTo.users_permissions_user?.username || 'Anónimo' }}
-          </a>
-          <button class="clear-reply" (click)="clearReplyTo()">&times;</button>
+   <div *ngIf="isLogged; else notLogged">
+     <div class="reply-form" *ngIf="!topic.closed">
+       <div class="editor-header">
+         <h3>
+           Tu respuesta
+           <span *ngIf="replyingTo" class="replying-to">
+             en respuesta a
+             <a href="#post-{{replyingTo.id}}"
+                (click)="scrollToPost($event, replyingTo.id)">
+               <!-- {{ replyingTo.users_permissions_user?.username || 'Anónimo' }} -->
+               {{ replyingTo.users_permissions_user?.name +' '+replyingTo.users_permissions_user?.lastName || 'Anónimo' }}
+             </a>
+             <button class="clear-reply" (click)="clearReplyTo()">&times;</button>
+           </span>
+         </h3>
+       </div>
+
+       <div class="editor-container">
+         <app-markdown-editor
+           [(ngModel)]="newPostContent"
+           [placeholder]="'Escriba su respuesta aquí...'"
+           (imageUploaded)="onImageUploaded($event)">
+         </app-markdown-editor>
+       </div>
+
+       <button mat-raised-button
+               class="submit-button"
+               (click)="onSubmitPost()">
+         Enviar respuesta
+       </button>
+     </div>
+   </div>
+  <ng-template #notLogged>
+    <div class="flex flex-column align-items-center justify-content-center mt-5">
+      <div class="text-center" style="font-weight: 500;">
+        <span>
+          Para participar y comentar en el foro, por favor regístrate o inicia sesión en tu cuenta.
         </span>
-      </h3>
+      </div>
+      <span class="forum-btn-login mt-2 mb-0 p-0" routerLink="/auth/login">
+          Iniciar sesión / Registrarse
+      </span>
     </div>
-
-    <div class="editor-container">
-      <app-markdown-editor
-        [(ngModel)]="newPostContent"
-        [placeholder]="'Escriba su respuesta aquí...'"
-        (imageUploaded)="onImageUploaded($event)">
-      </app-markdown-editor>
-    </div>
-
-    <button mat-raised-button 
-            class="submit-button" 
-            (click)="onSubmitPost()">
-      Enviar respuesta
-    </button>
-  </div>
+  </ng-template>
 </div>

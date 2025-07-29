@@ -1,6 +1,6 @@
-import { Component, computed, inject, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, computed, inject, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -10,6 +10,9 @@ import { FormsModule } from '@angular/forms';
 
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
+import { MessagesModule } from 'primeng/messages';
+import { InputTextModule } from 'primeng/inputtext';
+import { Message } from 'primeng/api';
 
 @Component({
   selector: 'app-main-layout-page',
@@ -22,6 +25,9 @@ import { AuthService } from 'src/app/features/auth/services/auth.service';
     ToolbarModule,
     DropdownModule,
 
+    InputTextModule,
+    MessagesModule,
+
     FormsModule,
 
     SidebarComponent,
@@ -30,9 +36,11 @@ import { AuthService } from 'src/app/features/auth/services/auth.service';
   templateUrl: './main-layout-page.component.html',
   styleUrl: './main-layout-page.component.css'
 })
-export class MainLayoutPageComponent{
+export class MainLayoutPageComponent implements OnInit{
   public isSidebarOpen = true;
   static sidebarState: boolean = true;
+
+  public showVerificationMessage = false;
 
   authService = inject(AuthService);
   public user = computed(() => this.authService.user());
@@ -48,9 +56,33 @@ export class MainLayoutPageComponent{
 
   selectedLanguage = this.languages[0];
 
-  constructor(@Inject(PLATFORM_ID) private platformId: object) {
+  messages!: Message[];
+  successMessage!: Message[];
+
+  constructor(@Inject(PLATFORM_ID) private platformId: object, private route: ActivatedRoute) {
     this.isBrowser = isPlatformBrowser(this.platformId);
-}
+  }
+
+  ngOnInit(): void {
+    this.messages = [
+      {
+        severity: 'warn',
+        detail: 'La plataforma se encuentra actualmente en fase de pruebas. Agradecemos su comprensión mientras continuamos mejorando la plataforma.',
+        closable: false,
+        summary: 'ATENCIÓN',
+      },
+    ];
+
+    this.route.queryParamMap.subscribe(params => {
+      const verified = params.get('verified');
+      this.successMessage = [{
+        severity: 'success',
+        detail: '¡Tu correo ha sido verificado exitosamente!',
+        summary: 'ÉXITO',
+      }];
+      this.showVerificationMessage = verified === '1';
+    });
+  }
 
   changeLanguage() {
     console.log(`Idioma cambiado a: ${this.selectedLanguage.name}`);

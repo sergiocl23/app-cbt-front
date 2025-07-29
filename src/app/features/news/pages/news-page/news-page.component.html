@@ -88,7 +88,7 @@
             <p *ngIf="paragraph.trim()" class="content-paragraph">{{ paragraph }}</p>
           </ng-container>
         </div>
-        
+
         <!-- Imágenes adicionales para noticias manuales -->
         <div *ngIf="newsItem.additionalImages && newsItem.additionalImages.length > 1" class="additional-images">
           <h3>Imágenes adicionales</h3>
@@ -99,8 +99,8 @@
           </div>
         </div>
 
-        <a *ngIf="newsItem.sourceUrl" 
-           [href]="newsItem.sourceUrl" 
+        <a *ngIf="newsItem.sourceUrl"
+           [href]="newsItem.sourceUrl"
            target="_blank"
            class="source-link">
           <i class="pi pi-external-link"></i>

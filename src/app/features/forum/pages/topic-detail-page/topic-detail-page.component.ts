@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ViewChild, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ForumService } from '../../services/forum.service';
 import { Topic, Post, Media } from '../../interfaces/forum.interface';
 import { FormsModule } from '@angular/forms';
@@ -14,26 +14,30 @@ import { EditPostComponent } from '../../components/edit-post/edit-post.componen
 import { Marked } from 'marked';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MarkdownEditorComponent } from '../../components/markdown-editor/markdown-editor.component';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 @Component({
   selector: 'app-topic-detail',
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
+    CommonModule,
+    FormsModule,
     MatDialogModule,
     MatIconModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSnackBarModule, 
+    MatSnackBarModule,
     MarkdownEditorComponent,
+    RouterModule
   ],
   templateUrl: './topic-detail-page.component.html',
   styleUrls: ['./topic-detail-page.component.css'],
   encapsulation: ViewEncapsulation.None
 })
 export class TopicDetailComponent implements OnInit {
+  authService = inject(AuthService);
+
   topic!: Topic;
   formattedTopicContent!: SafeHtml;
   formattedPosts: { id: number; formattedContent: SafeHtml }[] = [];
@@ -41,7 +45,10 @@ export class TopicDetailComponent implements OnInit {
   showReplyPreview = false;
   replyPreview!: SafeHtml;
   replyingTo: Post | undefined = undefined;
-  
+
+  public currentUser = computed(() => this.authService.user());
+  public isLogged: boolean = (this.currentUser()) ? true : false;
+
   private marked = new Marked();
   @ViewChild(MarkdownEditorComponent) markdownEditor!: MarkdownEditorComponent;
 
@@ -66,6 +73,11 @@ export class TopicDetailComponent implements OnInit {
     });
   }
 
+  canEdit = (post: Post): boolean => {
+    const user = this.currentUser();
+    return user?.role?.id === 3 || user?.id === post.users_permissions_user?.id;
+  };
+
   async formatContent(content: string): Promise<SafeHtml> {
     this.marked.setOptions({
       breaks: true,
@@ -79,8 +91,9 @@ export class TopicDetailComponent implements OnInit {
     this.forumService.getTopicWithPosts(topicId).subscribe(async topics => {
       if (topics && topics.length > 0) {
         this.topic = topics[0];
+        console.log(topics);
         this.formattedTopicContent = await this.formatContent(this.topic.body);
-        
+
         if (this.topic.posts) {
           this.formattedPosts = await Promise.all(this.topic.posts.map(async post => ({
             id: post.id,
@@ -104,6 +117,7 @@ export class TopicDetailComponent implements OnInit {
       this.forumService.createPost(
         this.topic,
         content,
+        this.currentUser()!,
         this.replyingTo || undefined,  // Pass undefined if replyingTo is null
         images
       ).subscribe({
@@ -179,7 +193,7 @@ export class TopicDetailComponent implements OnInit {
 
   scrollToPost(event: Event, postId: number) {
     event.preventDefault();
-    
+
     // First ensure the post is loaded
     if (!this.referencedPosts.has(postId)) {
       this.forumService.getPost(postId).subscribe(post => {
@@ -194,11 +208,11 @@ export class TopicDetailComponent implements OnInit {
   private scrollToElement(postId: number) {
     const element = document.getElementById(`post-${postId}`);
     if (element) {
-      element.scrollIntoView({ 
+      element.scrollIntoView({
         behavior: 'smooth',
         block: 'center'
       });
-      
+
       // Add and remove highlight class
       element.classList.add('highlight-animation');
       setTimeout(() => {

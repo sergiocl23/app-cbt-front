@@ -1,5 +1,5 @@
 .topic-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -30,7 +30,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    
+
     i {
       color: #36A9E1;
       font-size: 14px;
@@ -117,7 +117,7 @@
 
     .edit-btn {
       color: #36A9E1;
-      
+
       &:hover {
         background-color: rgba(54, 169, 225, 0.1);
       }
@@ -125,7 +125,7 @@
 
     .delete-btn {
       color: #BE1622;
-      
+
       &:hover {
         background-color: rgba(190, 22, 34, 0.1);
       }
@@ -231,7 +231,7 @@
 }
 
 .submit-button {
-  background-color: #36A9E1 !important; 
+  background-color: #36A9E1 !important;
   color: white !important;
 }
 
@@ -292,7 +292,7 @@
 
 .reply-btn {
   color: #36A9E1;
-  
+
   &:hover {
     background-color: rgba(54, 169, 225, 0.1);
   }
@@ -312,7 +312,7 @@
   a {
     color: #36A9E1;
     text-decoration: none;
-    
+
     &:hover {
       text-decoration: underline;
     }
@@ -371,5 +371,12 @@
   animation: highlight-post 2s ease-out;
 }
 
+.forum-btn-login{
+  font-size: 13px;
+  cursor: pointer;
+}
 
+.forum-btn-login:hover{
+  text-decoration: underline;
+}
 

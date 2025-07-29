@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { ForumService } from '../../services/forum.service';
 import { Subcategory, Topic, StrapiResponse } from '../../interfaces/forum.interface';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 @Component({
   selector: 'app-new-topic',
@@ -15,6 +16,9 @@ import { marked } from 'marked';
   styleUrls: ['./new-topic.component.css']
 })
 export class NewTopicComponent implements OnInit {
+  authService = inject(AuthService);
+  public user = computed(() => this.authService.user());
+
   subcategories: Subcategory[] = [];
   newTopic = {
     title: '',
@@ -63,7 +67,7 @@ export class NewTopicComponent implements OnInit {
       return;
     }
 
-    this.forumService.createTopic(this.newTopic)
+    this.forumService.createTopic(this.newTopic, this.user()!)
       .subscribe({
         next: (response: StrapiResponse<Topic>) => {
           const topicId = Array.isArray(response.data) ? response.data[0].id : response.data.id;

@@ -55,7 +55,6 @@
 
 
 .initials-username{
-  background-color: #BE1622;
   color: white;
   padding: 9px 7px;
   border-radius: 50%;
@@ -63,6 +62,14 @@
   font-size: 18px;
   width: 36px;
   height: 36px;
+}
+
+.bg-red{
+  background-color: #BE1622;
+}
+
+.bg-green{
+  background-color: #009432;
 }
 
 .username-container{
@@ -97,4 +104,22 @@
   width: 100%;
   max-width: 29px;
   min-width: 29px;
+}
+
+.welcome-container{
+    font-size: 20px;
+    font-weight: 500;
+    background-color: white;
+    color: #202445;
+    padding: 9px;
+    border-radius: 10px;
+}
+
+.btn-login{
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.btn-login:hover{
+  text-decoration: underline;
 }

@@ -72,5 +72,11 @@ export interface Post {
 interface User {
   id: number;
   username: string;
+  email: string;
+  name: string;
+  lastName: string;
+  lastName2: string;
+  institution: string;
   // Add other user fields as needed
 }
+

@@ -1,0 +1,55 @@
+.header {
+  background-color: #ecf0f1;
+  padding: 16px;
+}
+
+.logo {
+  max-width: 100%;
+  width: auto;
+  height: 30px; /* Ajusta el tamaño según sea necesario */
+}
+
+.titulo {
+  max-width: 100%;
+  width: auto;
+  height: 30px;
+  margin: 0px 0px 0px 10px
+}
+
+.logo-footer {
+  max-width: 100%;
+  width: auto;
+  max-height: 80px; /* Ajusta el tamaño según sea necesario */
+}
+
+.footer-group {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  /* min-width: 200px; */
+}
+
+.footer-title {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #444;
+  font-size: 14px;
+}
+
+.logo-footer {
+  height: 70px;
+  /* max-width: 150px; */
+  /* object-fit: contain; */
+}
+.sponsors-container{
+  gap: 80px;
+}
+
+.logos-group{
+  gap: 50px;
+}
+
+.form-container{
+  height: auto;
+  min-height: calc( 100% - 273px);
+}

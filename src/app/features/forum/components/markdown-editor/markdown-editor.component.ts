@@ -54,7 +54,7 @@ export class MarkdownEditorComponent implements OnInit, OnDestroy, ControlValueA
 
   private async initializeEditor() {
     const EasyMDE = (await import('easymde')).default;
-    
+
     if (this.editorElement) {
       this.editor = new EasyMDE({
         element: this.editorElement.nativeElement,
@@ -108,12 +108,12 @@ export class MarkdownEditorComponent implements OnInit, OnDestroy, ControlValueA
             className: "fa fa-link",
             title: "Crear enlace"
           },
-          {
-            name: "image",
-            action: (editor) => this.handleImageUpload(editor),
-            className: "fa fa-image",
-            title: "Insertar imagen"
-          },
+          // {
+          //   name: "image",
+          //   action: (editor) => this.handleImageUpload(editor),
+          //   className: "fa fa-image",
+          //   title: "Insertar imagen"
+          // },
           "|",
           {
             name: "preview",
@@ -143,17 +143,17 @@ export class MarkdownEditorComponent implements OnInit, OnDestroy, ControlValueA
     fileInput.onchange = (e: Event) => {
       const target = e.target as HTMLInputElement;
       const file = target.files?.[0];
-      
+
       if (file) {
         const tempUrl = URL.createObjectURL(file);
         const imageMarkdown = `![${file.name}](${tempUrl})`;
-        
-        this.tempImages.push({ 
-          file, 
+
+        this.tempImages.push({
+          file,
           tempUrl,
-          markdown: imageMarkdown 
+          markdown: imageMarkdown
         });
-        
+
         editor.codemirror.replaceSelection(imageMarkdown);
         document.body.removeChild(fileInput);
       }

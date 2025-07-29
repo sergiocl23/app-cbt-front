@@ -51,7 +51,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     component: AuthLayoutPageComponent,
-    // canActivate: [ isNotAuthenticatedGuard ],
+    canActivate: [ isNotAuthenticatedGuard ],
     loadChildren: () => import('./features/auth/auth.routes').then( r => r.routes)
   },
   {

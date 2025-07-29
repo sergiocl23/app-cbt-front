@@ -1,26 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { MatDialogModule } from '@angular/material/dialog';
 import { Subcategory, Topic, StrapiResponse } from '../../interfaces/forum.interface';
 import { ForumService } from '../../services/forum.service';
 import { tap } from 'rxjs/operators';
+import { AuthService } from 'src/app/features/auth/services/auth.service';
 
 @Component({
   selector: 'app-forum-layout-page',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
+    CommonModule,
+    RouterModule,
     MatDialogModule
   ],
   templateUrl: './forum-layout-page.component.html',
   styleUrls: ['./forum-layout-page.component.css']
 })
 export class ForumLayoutPageComponent implements OnInit {
+  authService = inject(AuthService);
+
   subcategories: Subcategory[] = [];
   topics: Topic[] = [];
   selectedSubcategory: Subcategory | null = null;
+
+  public user = computed(() => this.authService.user());
+
+  public hasAccess: boolean = (this.user()?.role?.id==3) ? true : false;
 
   constructor(
     private forumService: ForumService,
@@ -67,7 +74,7 @@ export class ForumLayoutPageComponent implements OnInit {
       // Primero ordenar por estado de pin
       if (a.pinned && !b.pinned) return -1;
       if (!a.pinned && b.pinned) return 1;
-      
+
       // Si el estado de pin es el mismo (ambos están fijados), ordenar por fecha de creación (más reciente primero)
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
@@ -95,14 +102,14 @@ export class ForumLayoutPageComponent implements OnInit {
 
   onDeleteTopic(event: Event, topic: Topic) {
     event.stopPropagation(); // Prevent navigation to topic detail
-    
+
     this.forumService.confirmAndDeleteTopic(topic.id, topic.name)
       .subscribe({
         next: (deleted) => {
           if (deleted) {
             // Remove the deleted topic from the local array
             this.topics = this.topics.filter(t => t.id !== topic.id);
-            
+
             // Optionally, refresh the full list
             if (this.selectedSubcategory) {
               this.selectSubcategory(this.selectedSubcategory);
@@ -117,14 +124,14 @@ export class ForumLayoutPageComponent implements OnInit {
 
   onEditTopic(event: Event, topic: Topic) {
     event.stopPropagation();
-    
+
     this.forumService.openEditTopicDialog(topic)
       .subscribe({
         next: (updated) => {
           if (updated) {
             // Force reload all data
             this.loadTopics();
-            
+
             // Also update the specific topic in the current array
             const index = this.topics.findIndex(t => t.id === topic.id);
             if (index !== -1) {
@@ -142,9 +149,9 @@ export class ForumLayoutPageComponent implements OnInit {
       .replace(/[#*\[\]`_]/g, '') // Remove markdown symbols
       .replace(/\s+/g, ' ')       // Normalize whitespace
       .trim();
-    
-    return plainText.length <= maxLength 
-      ? plainText 
+
+    return plainText.length <= maxLength
+      ? plainText
       : plainText.substring(0, maxLength) + '...';
   }
 
@@ -159,7 +166,7 @@ export class ForumLayoutPageComponent implements OnInit {
 
   async onDeleteSubcategory(event: Event, subcategory: Subcategory) {
     event.stopPropagation(); // Prevent triggering the selectSubcategory
-    
+
     this.forumService.confirmAndDeleteSubcategory(subcategory.id, subcategory.name)
       .pipe(
         tap(deleted => {
@@ -178,7 +185,7 @@ export class ForumLayoutPageComponent implements OnInit {
 
   onEditSubcategory(event: Event, subcategory: Subcategory): void {
     event.stopPropagation();
-    
+
     this.forumService.openEditSubcategoryDialog(subcategory)
       .pipe(
         tap(updated => {

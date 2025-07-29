@@ -57,10 +57,10 @@ export class LoginPageComponent implements OnInit{
 
     this.authService.login(email!, password!).subscribe((isAuthenticated) => {
 
-      // if( isAuthenticated ){
-      //   this.router.navigateByUrl('/');
-      //   return;
-      // }
+      if( isAuthenticated ){
+        this.router.navigateByUrl('/');
+        return;
+      }
 
       this.hasError.set(true);
       setTimeout(() => {

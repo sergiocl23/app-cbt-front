@@ -108,7 +108,7 @@ export class NewsService {
     // Filtro de tags MODIFICADO
     if (params.filters?.tags?.nombre?.$in && Array.isArray(params.filters.tags.nombre.$in) && params.filters.tags.nombre.$in.length > 0) {
       const tagsToFilter = params.filters.tags.nombre.$in;
-      
+
       if (tagsToFilter.length === 1) {
         // Si hay un solo tag, usar $eq
         queryParams = queryParams.set('filters[tags][nombre][$eq]', tagsToFilter[0]);
@@ -124,18 +124,18 @@ export class NewsService {
 
     // Filtro de búsqueda de texto
     if (params.filters?.$or?.length > 0) {
-      // El servicio construye un filtro OR para buscar en varios campos 
+      // El servicio construye un filtro OR para buscar en varios campos
       const searchFields = ['title']; // Solo buscar en el título
       // Campos adicionales comentados por si se quieren habilitar en el futuro
       // const searchFields = ['title', 'summary', 'content'];
-      
+
       params.filters.$or.forEach((condition: any, index: number) => {
         const field = Object.keys(condition)[0];
         const value = condition[field].$containsi;
-        
+
         if (searchFields.includes(field)) {
           queryParams = queryParams.set(
-            `filters[$or][${index}][${field}][$containsi]`, 
+            `filters[$or][${index}][${field}][$containsi]`,
             value
           );
         }
@@ -148,7 +148,7 @@ export class NewsService {
       queryParams = queryParams.set('filters[relevanceScore][$null]', 'true');
       console.log('[DEBUG SERVICE] Agregando filtro para relevanceScore NULL');
     }
-    
+
     // Agregar filtro para relevanceScore no null
     if (params.filters?.relevanceScore?.$ne !== undefined) {
       queryParams = queryParams.set('filters[relevanceScore][$notNull]', 'true');
@@ -160,7 +160,7 @@ export class NewsService {
       queryParams = queryParams.set('filters[manualCreation][$eq]', 'true');
       console.log('[DEBUG SERVICE] Agregando filtro para manualCreation=true');
     }
-    
+
     // Agregar filtro para IDs específicos
     if (params.filters?.id?.$in && Array.isArray(params.filters.id.$in)) {
       // En Strapi v4, necesitamos usar una estructura específica para $in
@@ -193,17 +193,17 @@ export class NewsService {
   getNewsById(id: string): Observable<NewsItem> {
     const url = `${this.baseUrlStrapi}/api/noticias?filters[id][$eq]=${id}&populate=*`;
     console.log("[DEBUG SERVICE] Solicitando noticia:", url);
-    
-    return this.http.get<any>(url, { 
+
+    return this.http.get<any>(url, {
       headers: this.headers,
       observe: 'body'
     }).pipe(
       map(response => {
         console.log("[DEBUG SERVICE] Respuesta del backend (getNewsById):", response);
-        
+
         // Verificar la estructura de la respuesta para adaptarnos a diferentes formatos
         let article;
-        
+
         // Adaptamos a diferentes estructuras posibles del backend
         if (response.data && Array.isArray(response.data)) {
           // Caso 1: La respuesta tiene un array en data (estructura actual)
@@ -215,12 +215,12 @@ export class NewsService {
           // Caso 3: Formato especial con status success
           article = Array.isArray(response.data) ? response.data[0] : response.data;
         }
-        
+
         if (!article) {
           console.error("[ERROR SERVICE] No se encontró la noticia en la respuesta:", response);
           throw new Error('Noticia no encontrada');
         }
- 
+
         console.log("[DEBUG SERVICE] Artículo encontrado:", article);
         console.log("[DEBUG SERVICE] mainImage del artículo:", article.mainImage);
         console.log("[DEBUG SERVICE] Valores originales:", {
@@ -262,7 +262,7 @@ export class NewsService {
             locale: null,
             id_tag: tag.id_tag
           })) || [],
-          images: Array.isArray(article.images) ? article.images : 
+          images: Array.isArray(article.images) ? article.images :
                  (article.mainImage ? [article.mainImage] : []),
           createdAt: article.createdAt,
           articleType: article.articleType || 'regular',
@@ -281,15 +281,15 @@ export class NewsService {
   getNewsComplete(id: string): Observable<any> {
     const url = `${this.baseUrlStrapi}/api/noticias/ver/${id}?format=json`;
     console.log("[DEBUG SERVICE] Solicitando datos completos:", url);
-    
-    return this.http.get<any>(url, { 
+
+    return this.http.get<any>(url, {
       headers: this.headers,
       observe: 'body'
     }).pipe(
       map(response => {
         console.log("[DEBUG SERVICE] Respuesta completa del backend:", response);
         console.log("[DEBUG SERVICE] mainImage en la respuesta completa:", response.mainImage);
-        
+
         // Asegurarnos de que featuredImage y additionalImages estén correctamente estructurados
         // incluso si vienen como null o undefined desde el backend
         const processedResponse = {
@@ -299,14 +299,14 @@ export class NewsService {
           // Si no tiene imagen principal pero tiene images array, usar la primera como mainImage
           mainImage: response.mainImage || (response.images && response.images.length > 0 ? response.images[0] : null)
         };
-        
+
         console.log("[DEBUG SERVICE] Respuesta procesada:", {
           mainImage: processedResponse.mainImage,
           featuredImage: processedResponse.featuredImage,
           additionalImages: processedResponse.additionalImages,
           manualCreation: processedResponse.manualCreation
         });
-        
+
         return processedResponse;
       }),
       catchError(error => {
@@ -324,7 +324,7 @@ export class NewsService {
     // En lugar de intentar obtener los tags directamente de la API,
     // obtendremos los tags únicos de las noticias existentes
     console.log("[DEBUG SERVICE] Obteniendo tags de las noticias existentes");
-    
+
     return this.getNews({
       page: 1,
       pageSize: 100, // Solicitar un número grande para obtener la mayoría de las noticias
@@ -332,19 +332,19 @@ export class NewsService {
     }).pipe(
       map(response => {
         console.log("[DEBUG SERVICE] Extrayendo tags de la respuesta:", response);
-        
+
         // Verificar la estructura de la respuesta
         if (!response?.data || !Array.isArray(response.data)) {
           console.error("[ERROR SERVICE] Formato de respuesta inválido para extraer tags");
           return [];
         }
-        
+
         // Extraer todos los tags de todas las noticias
         const allTags: any[] = [];
         response.data.forEach((item: any) => {
           // El artículo puede tener diferentes estructuras
           const article = item.attributes || item;
-          
+
           if (article.tags) {
             // Si el artículo tiene tags en formato Strapi v4 (data/attributes)
             if (article.tags.data && Array.isArray(article.tags.data)) {
@@ -357,7 +357,7 @@ export class NewsService {
                   documentId: tag.documentId || tag.document_id || ''
                 });
               });
-            } 
+            }
             // Si el artículo tiene tags en formato array simple
             else if (Array.isArray(article.tags)) {
               article.tags.forEach((tag: any) => {
@@ -371,12 +371,12 @@ export class NewsService {
             }
           }
         });
-        
+
         // Eliminar duplicados basados en el nombre
         const uniqueTags = allTags.filter((tag, index, self) =>
           index === self.findIndex(t => t.nombre === tag.nombre)
         );
-        
+
         console.log("[DEBUG SERVICE] Tags únicos extraídos:", uniqueTags);
         return uniqueTags;
       }),
@@ -393,47 +393,58 @@ export class NewsService {
    * @param email El correo electrónico del suscriptor
    * @returns Observable con la respuesta del backend
    */
+  // addSubscriber(email: string, frequency: string): Observable<any> {
+  //   return from(
+  //     new Promise<string>((resolve, reject) => {
+  //       if (typeof grecaptcha === 'undefined' || !grecaptcha.ready || !grecaptcha.execute) {
+  //         console.error('[SERVICE] reCAPTCHA no está listo o no está definido.');
+  //         reject(new Error('reCAPTCHA not ready'));
+  //         return;
+  //       }
+  //       grecaptcha.ready(() => {
+  //         grecaptcha.execute('6LdNX0orAAAAAP9MEpwH0cPifQrEHv-a__mqKRJY', { action: 'submit_newsletter_subscription' })
+  //           .then((recaptchaToken: string) => {
+  //             if (!recaptchaToken) {
+  //               console.error('[SERVICE] Token reCAPTCHA vacío recibido.');
+  //               reject(new Error('Empty reCAPTCHA token'));
+  //               return;
+  //             }
+  //             console.log('[SERVICE] Token reCAPTCHA obtenido:', recaptchaToken);
+  //             resolve(recaptchaToken);
+  //           })
+  //           .catch((error: any) => {
+  //             console.error('[SERVICE] Error al obtener token reCAPTCHA:', error);
+  //             reject(error);
+  //           });
+  //       });
+  //     })
+  //   ).pipe(
+  //     switchMap((recaptchaToken: string) => {
+  //       const body = { email, recaptchaToken, frequency };
+  //       console.log('[SERVICE] Enviando a backend para suscribir:', body);
+  //       return this.http.post(`${this.baseUrlStrapi}/api/subscribers/subscribe`, body, {
+  //         headers: this.postHeaders
+  //       });
+  //     }),
+  //     map(response => {
+  //       console.log('[SERVICE] Suscripción exitosa:', response);
+  //       return response;
+  //     }),
+  //     catchError(error => {
+  //       console.error('[SERVICE] Error en la suscripción con reCAPTCHA:', error);
+  //       return throwError(() => error);
+  //     })
+  //   );
+  // }
   addSubscriber(email: string, frequency: string): Observable<any> {
-    return from(
-      new Promise<string>((resolve, reject) => {
-        if (typeof grecaptcha === 'undefined' || !grecaptcha.ready || !grecaptcha.execute) {
-          console.error('[SERVICE] reCAPTCHA no está listo o no está definido.');
-          reject(new Error('reCAPTCHA not ready'));
-          return;
-        }
-        grecaptcha.ready(() => {
-          grecaptcha.execute('6LdNX0orAAAAAP9MEpwH0cPifQrEHv-a__mqKRJY', { action: 'submit_newsletter_subscription' })
-            .then((recaptchaToken: string) => {
-              if (!recaptchaToken) {
-                console.error('[SERVICE] Token reCAPTCHA vacío recibido.');
-                reject(new Error('Empty reCAPTCHA token'));
-                return;
-              }
-              console.log('[SERVICE] Token reCAPTCHA obtenido:', recaptchaToken);
-              resolve(recaptchaToken);
-            })
-            .catch((error: any) => {
-              console.error('[SERVICE] Error al obtener token reCAPTCHA:', error);
-              reject(error);
-            });
-        });
-      })
-    ).pipe(
-      switchMap((recaptchaToken: string) => {
-        const body = { email, recaptchaToken, frequency };
-        console.log('[SERVICE] Enviando a backend para suscribir:', body);
-        return this.http.post(`${this.baseUrlStrapi}/api/subscribers/subscribe`, body, {
-          headers: this.postHeaders
-        });
-      }),
-      map(response => {
-        console.log('[SERVICE] Suscripción exitosa:', response);
-        return response;
-      }),
-      catchError(error => {
-        console.error('[SERVICE] Error en la suscripción con reCAPTCHA:', error);
-        return throwError(() => error);
-      })
+
+    const body = { email, frequency };
+
+    return this.http.post(`${this.baseUrlStrapi}/api/subscribers/subscribe`, body, {
+      headers: this.postHeaders
+    }).pipe(
+      map(response => response),
+      catchError(error => throwError(() => error))
     );
   }
 }

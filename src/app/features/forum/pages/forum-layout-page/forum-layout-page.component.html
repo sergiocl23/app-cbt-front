@@ -5,7 +5,7 @@
     <div class="sidebar-section">
       <div class="sidebar-header">
         <h3>Categorías</h3>
-        <button class="add-category-btn" (click)="onCreateSubcategory()" title="Agregar categoría">
+        <button class="add-category-btn" (click)="onCreateSubcategory()" title="Agregar categoría" *ngIf="hasAccess">
           <i class="fas fa-plus"></i>
         </button>
       </div>
@@ -30,7 +30,7 @@
             <i class="fas fa-folder"></i>
             <span>{{ subcategory.name }}</span>
           </div>
-          <div class="subcategory-actions">
+          <div class="subcategory-actions" *ngIf="hasAccess">
             <button class="edit-btn"
                     (click)="onEditSubcategory($event, subcategory)"
                     title="Editar categoría">
@@ -82,7 +82,7 @@
   <div class="forum-content">
     <div class="topics-header">
       <h2>{{ selectedSubcategory?.name || 'Todos los tópicos' }}</h2>
-      <button class="new-topic-btn" (click)="onNewTopic()">
+      <button class="new-topic-btn" (click)="onNewTopic()" *ngIf="hasAccess">
         <i class="fas fa-plus"></i> Nuevo tópico
       </button>
     </div>
@@ -125,7 +125,7 @@
           <div class="topic-meta">
             <span class="topic-author">
               <i class="fas fa-user"></i>
-              {{ topic.users_permissions_user?.username || 'Anónimo' }}
+              {{ topic.users_permissions_user?.name +' '+topic.users_permissions_user?.lastName+' - '+topic.users_permissions_user?.institution || 'Anónimo' }}
             </span>
             <span class="topic-category">
               <i class="fas fa-folder"></i>
@@ -138,7 +138,7 @@
           </div>
         </div>
 
-        <div class="topic-actions">
+        <div class="topic-actions" *ngIf="hasAccess">
           <button class="action-btn edit-btn"
                   (click)="onEditTopic($event, topic)"
                   title="Editar tópico">

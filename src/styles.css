@@ -85,3 +85,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .mapboxgl-ctrl-logo {
   display: none !important;
 }
+
+.grecaptcha-badge{
+  z-index: 99;
+}
+
+.p-message{
+  margin: 0;
+}
+
+::ng-deep .p-message-text {
+  white-space: pre-line;
+}

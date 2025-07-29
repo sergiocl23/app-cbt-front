@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, EventEmitter, inject, Input, Output } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { AuthService } from 'src/app/features/auth/services/auth.service';
@@ -22,6 +22,8 @@ export class SidebarComponent {
   @Output() close = new EventEmitter<void>(); // Emite cuando el sidebar se cierra
 
   authService = inject(AuthService);
+  router = inject(Router)
+
   public user = computed(() => this.authService.user());
 
   // public name = this.user()!.name;
@@ -29,8 +31,16 @@ export class SidebarComponent {
   // public role = this.user()?.role?.name;
   // public initials = (this.name[0] + this.lastName[0]).toUpperCase();
 
+  public name = this.user()?.name;
+  public lastName = this.user()?.lastName;
+  public role = this.user()?.role?.name;
+  public initials = this.name && this.lastName?(this.name[0] + this.lastName[0]).toUpperCase():'';
+  public id_role = this.user()?.role?.id;
+  public name_color = (this.id_role==1)?'bg-green':'bg-red';
+
   public sidebarItems = [
     { label: 'Genericas', show: false, sections: [
+      { label: 'Competencias de Tarapacá', icon: 'checklist', url: 'a'},
       // { label: 'Inicio', icon: 'home', url: 'home'},
       { label: 'Portal de Noticias', icon: 'newspaper', url: 'news/carousel'},
       // { label: 'Catálogo de Empresas', icon: 'store', url: 'a'},
@@ -38,7 +48,6 @@ export class SidebarComponent {
       { label: 'Foro', icon: 'forum', url: 'forum'},
       { label: 'Simulación', icon: 'route', url: 'simulation'},
       // { label: 'Contactos', icon: 'perm_contact_calendar', url: 'a'},
-      // { label: 'Aprende', icon: 'menu_book', url: 'a'},
     ]},
     //{ label: 'Portal de Noticias', show: true, sections: [
       //{ label: 'Ver Noticias', icon: 'newspaper', url: 'news/list'},
@@ -69,6 +78,8 @@ export class SidebarComponent {
 
   onLogout(){
     this.authService.logout();
+    // this.router.navigateByUrl('/auth/login');
+     window.location.reload();
   }
 
   onClose() {
